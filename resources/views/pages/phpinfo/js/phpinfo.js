@@ -1,0 +1,1 @@
+// JavaScript for phpinfo page

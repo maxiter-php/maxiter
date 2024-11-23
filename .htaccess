@@ -1,0 +1,17 @@
+RewriteEngine ON
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-l
+
+RewriteRule ^(.+)$ index.php?url=$1 [QSA,L]
+
+# You can change this link for some forbidden page as your wish
+ErrorDocument 403 https://freefrontend.com/assets/img/403-forbidden-html-templates/2021-error-403.png
+
+Options -Indexes
+
+<Files env.ini>
+    Order allow,deny
+    Deny from all
+</Files>

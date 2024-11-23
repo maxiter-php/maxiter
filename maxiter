@@ -1,0 +1,446 @@
+#!/usr/bin/env php
+<?php
+// require __DIR__ . "/app/models/LoadModel.php";
+
+class MaxiterConfiguration
+{
+    public function generateController($fileName)
+    {
+        $path = __DIR__ . '/app/controllers/' . $fileName . ".php";
+
+        // Content to be written to the file
+        $content = "<?php\n" .
+            "/*\n" .
+            "The controller file handles user input and interaction. It processes requests,\n" .
+            "invokes business logic, and updates the model as needed.\n" .
+            "\n" .
+            "@author Victor Béser\n" .
+            "*/\n" .
+            "require __DIR__ . '/../models/LoadModel.php';\n" .
+            "require __DIR__ . '/../models/SecureRequestModel.php';\n\n" .
+            "class " . ucfirst($fileName) . " {\n\n" .
+            "    public function main() {\n" .
+            "        // Your code here\n" .
+            "    }\n\n" .
+            "}\n\n" .
+            "\$controller = new " . ucfirst($fileName) . "();\n" .
+            "(isset(\$_POST['controller']) && !empty(\$_POST['controller'])) ? \$controller->{\$_POST['controller']}() : \$controller->main();\n";
+
+        // Create the /app directory if it doesn't exist
+        $this->createDirectory(__DIR__ . '/app');
+        // Create the /app/controllers directory if it doesn't exist
+        $this->createDirectory(__DIR__ . '/app/controllers');
+
+        // Check if the file already exists
+        if (file_exists($path)) {
+            echo "This controller already exists\n";
+        } else {
+            // Create the file and write the content
+            file_put_contents($path, $content);
+            echo "Controller $fileName created\n";
+        }
+    }
+
+    public function generatePage($fileName)
+    {
+        $path = __DIR__ . '/resources/views/pages/' . $fileName . '/' . $fileName . ".php";
+        $cssPath = __DIR__ . '/resources/views/pages/' . $fileName . '/css/' . $fileName . '.css';
+        $jsPath = __DIR__ . '/resources/views/pages/' . $fileName . '/js/' . $fileName . '.js';
+
+        // Content to be written to the PHP file
+        $content =
+            "<!-- \n" .
+            "This is your new page, it's already routed in Maxiter application\n" .
+            "and everything you need is included here.\n" .
+            "Happy Coding!\n" .
+            "\n" .
+            "@author Victor Béser\n" .
+            "-->\n" .
+            '<?php include __DIR__ . "/../_header/header.php"; ?>' . "\n" .
+            "<!-- Page Title -->\n" .
+            '<?php PagesTitleModel::title("Maxiter - ' . ucfirst($fileName) . '"); ?>' . "\n" .
+            '<link rel="stylesheet" href="./resources/views/pages/' . $fileName . '/css/' . $fileName . '.css">' . "\n" .
+            "<!--**********************************\n" .
+            "        Main wrapper start\n" .
+            "***********************************-->\n" .
+            '<div id="main-wrapper">' . "\n" .
+            "\n" .
+            "    <!-- NAVBAR -->\n" .
+            '    <?php include __DIR__ . "/../_navbar/navbar.php"; ?>' . "\n" .
+            "    <!-- NAVBAR -->\n" .
+            "\n" .
+            "    <!-- SIDEBAR -->\n" .
+            '    <?php include __DIR__ . "/../_sidenav/sidenav.php"; ?>' . "\n" .
+            "    <!-- SIDEBAR -->\n" .
+            "\n" .
+            "    <!--**********************************\n" .
+            "            Content body start\n" .
+            "        ***********************************-->\n" .
+            '    <div class="content-body">' . "\n" .
+            "        <!-- row -->\n" .
+            "        <div class=\"container-fluid\">" . "\n" .
+            "\n" .
+            "            <!-- CARDS -->\n" .
+            '            <?php include __DIR__ . "/../_cards/cards.php"; ?>' . "\n" .
+            "            <!-- CARDS -->\n" .
+            "\n" .
+            "            <div class=\"row\">" . "\n" .
+            "                <div class=\"col-xl-12 col-lg-8 col-md-8\">" . "\n" .
+            "                    <div class=\"card\">" . "\n" .
+            "                        <div class=\"card-header\">" . "\n" .
+            "                            <h4 class=\"card-title\"><?= EnvModel::env(\"APP_NAME\") ?> - " . ucfirst($fileName) . "</h4>\n" .
+            "                        </div>" . "\n" .
+            "                        <div class=\"card-body\">" . "\n" .
+            "                            <div class=\"row\">" . "\n" .
+            "                                <div style=\"text-align:justify;\" class=\"col-xl-12 col-lg-8\">" . "\n" .
+            "                                    <!-- CODE HERE HERE -->\n\n" .
+            "                                </div>" . "\n" .
+            "                            </div>" . "\n" .
+            "                        </div>" . "\n" .
+            "                    </div>" . "\n" .
+            "                </div>" . "\n" .
+            "\n" .
+            "            </div>" . "\n" .
+            "\n" .
+            "        </div>" . "\n" .
+            "    </div>" . "\n" .
+            "    <!--**********************************\n" .
+            "            Content body end\n" .
+            "        ***********************************-->\n" .
+            "\n" .
+            "</div>" . "\n" .
+            "<!--**********************************\n" .
+            "        Main wrapper end\n" .
+            "    ***********************************-->" . "\n" .
+            "\n" .
+            '<script src="./resources/views/pages/' . $fileName . '/js/' . $fileName . '.js"></script>' . "\n" .
+            '<?php include __DIR__ . "/../_footer/footer.php"; ?>'
+        ;
+
+        $this->createDirectory(__DIR__ . '/resources');
+        $this->createDirectory(__DIR__ . '/resources/views');
+        $this->createDirectory(__DIR__ . '/resources/views/pages');
+        $this->createDirectory(__DIR__ . '/resources/views/pages/' . $fileName . '/');
+        $this->createDirectory(__DIR__ . '/resources/views/pages/' . $fileName . '/css/');
+        $this->createDirectory(__DIR__ . '/resources/views/pages/' . $fileName . '/js/');
+
+        // Check if the PHP file already exists
+        if (file_exists($path)) {
+            echo "This page already exists\n";
+        } else {
+            // Create the PHP file and write the content
+            file_put_contents($path, $content);
+            echo "Page $fileName created\n";
+        }
+
+        // Content for the CSS file
+        $cssContent = "/* Styles for $fileName page */\n";
+        file_put_contents($cssPath, $cssContent);
+        echo "CSS file $fileName.css created\n";
+
+        // Content for the JS file
+        $jsContent = "// JavaScript for $fileName page\n";
+        file_put_contents($jsPath, $jsContent);
+        echo "JS file $fileName.js created\n";
+    }
+
+    public function generateModel($fileName)
+    {
+        $path = __DIR__ . '/app/models/' . $fileName . ".php";
+
+        // Content to be written to the file
+        $content = "<?php\n" .
+            "/*\n" .
+            "The model represents the application's data and business logic. It manages data retrieval, \n" .
+            "storage, and manipulation, often interacting with the database. \n" .
+            "The model encapsulates rules and validation to ensure data integrity.\n" .
+            "\n" .
+            "@author Victor Béser\n" .
+            "*/\n" .
+            "class " . ucfirst($fileName) . " {\n\n" .
+            "    public static function main() {\n" .
+            "        // Your code here\n" .
+            "    }\n\n" .
+            "}";
+
+        // Create the /app directory if it doesn't exist
+        $this->createDirectory(__DIR__ . '/app');
+        // Create the /app/models directory if it doesn't exist
+        $this->createDirectory(__DIR__ . '/app/models');
+
+        // Check if the file already exists
+        if (file_exists($path)) {
+            echo "This model already exists\n";
+        } else {
+            // Create the file and write the content
+            file_put_contents($path, $content);
+            echo "Model $fileName created\n";
+        }
+    }
+
+    public function generateLogModel($database)
+    {
+        $path = __DIR__ . '/app/models/LogModel.php';
+
+        if(!isset($database) || empty($database)) {
+            echo "Error: php maxiter new log [database]";
+            exit();
+        }
+
+        // Content to be written to the file
+        $content = "<?php\n" .
+            "/*\n" .
+            "This is the log file, use it statically where you want using LogModel::log(\"Your log text here\")\n" .
+            "\n" .
+            "@author Victor Béser\n" .
+            "*/\n" .
+            "class LogModel {\n\n" .
+            "    private static \$log;\n" .
+            "    public static function log(\$log) {\n" .
+            "        \$currentDateTime = new DateTime();\n" .
+            "        \$formattedDateTime = \$currentDateTime->format('Y-m-d H:i:s');\n\n" .
+            "        self::\$log = mb_strtoupper(\$log);\n\n" .
+            "        \$query = \"INSERT INTO logs (log, created_at) VALUES (:log, :date)\";\n" .
+            "        \$result = DatabaseModel::connection(\"$database\")->execute(\$query, [\n" .
+            "            \":log\" => self::\$log,\n" .
+            "            \":date\" => \$formattedDateTime,\n" .
+            "        ]);\n" .
+            "    }\n\n" .
+            "}";
+
+        // Create the /app directory if it doesn't exist
+        $this->createDirectory(__DIR__ . '/app');
+        // Create the /app/models directory if it doesn't exist
+        $this->createDirectory(__DIR__ . '/app/models');
+
+        // Check if the file already exists
+        if (file_exists($path)) {
+            echo "This model already exists\n";
+        } else {
+            // Create the file and write the content
+            file_put_contents($path, $content);
+            echo "LogModel with database '$database' created\n";
+        }
+    }
+
+    public function generateSQL($table) {
+
+        $path = __DIR__ . '/src/tables/'.$table.'.sql';
+
+        switch($table) {
+
+            case 'users':
+                $content = "-- Create the users table\n" .
+                "CREATE TABLE users (\n" .
+                "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
+                "    username VARCHAR(50) NOT NULL UNIQUE,\n" .
+                "    password VARCHAR(255) NOT NULL,\n" .
+                "    email VARCHAR(100) NOT NULL UNIQUE,\n" .
+                "    first_name VARCHAR(50),\n" .
+                "    last_name VARCHAR(50),\n" .
+                "    phone_number VARCHAR(15),\n" .
+                "    address VARCHAR(255),\n" .
+                "    city VARCHAR(50),\n" .
+                "    state VARCHAR(50),\n" .
+                "    zip_code VARCHAR(10),\n" .
+                "    country VARCHAR(50),\n" .
+                "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" .
+                "    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n" .
+                ");\n\n" .
+                "-- Insert data into the users table\n" .
+                "INSERT INTO users (username, password, email, first_name, last_name, phone_number, address, city, state, zip_code, country) VALUES\n" .
+                "('johndoe', MD5('password123'), 'johndoe@example.com', 'John', 'Doe', '1234567890', '123 Main St', 'Anytown', 'Anystate', '12345', 'USA'),\n" .
+                "('janedoe', MD5('mypassword'), 'janedoe@example.com', 'Jane', 'Doe', '0987654321', '456 Elm St', 'Othertown', 'Otherstate', '54321', 'USA'),\n" .
+                "('alice', MD5('alicepassword'), 'alice@example.com', 'Alice', 'Smith', '1112223333', '789 Maple Ave', 'Sometown', 'Somestate', '67890', 'USA'),\n" .
+                "('bob', MD5('bobpassword'), 'bob@example.com', 'Bob', 'Johnson', '4445556666', '321 Oak St', 'Differenttown', 'Differentstate', '09876', 'USA');";
+                break;
+
+            case 'logs':
+                $content = "-- Create the logs table\n" .
+                "CREATE TABLE logs (\n" .
+                "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
+                "    log TEXT NOT NULL,\n" . 
+                "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n" .
+                ");\n\n" .
+                "-- Insert data into the logs table\n" .
+                "INSERT INTO logs (log) VALUES\n" .
+                "('User johndoe logged in successfully'),\n" .
+                "('User janedoe attempted to access restricted area'),\n" .
+                "('User alice updated profile information'),\n" .
+                "('User bob logged out');";
+                break;
+                
+        
+            case 'products':
+                $content = "-- Create the products table\n" .
+                "CREATE TABLE products (\n" .
+                "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
+                "    name VARCHAR(100) NOT NULL,\n" .
+                "    description TEXT,\n" .
+                "    price DECIMAL(10, 2) NOT NULL,\n" .
+                "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" .
+                "    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n" .
+                ");\n\n" .
+                "-- Insert data into the products table\n" .
+                "INSERT INTO products (name, description, price) VALUES\n" .
+                "('Product 1', 'Description for Product 1', 19.99),\n" .
+                "('Product 2', 'Description for Product 2', 29.99),\n" .
+                "('Product 3', 'Description for Product 3', 39.99),\n" .
+                "('Product 4', 'Description for Product 4', 49.99);";
+                break;
+        
+            case 'orders':
+                $content = "-- Create the orders table\n" .
+                "CREATE TABLE orders (\n" .
+                "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
+                "    user_id INT NOT NULL,\n" .
+                "    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" .
+                "    status VARCHAR(50) NOT NULL,\n" .
+                "    total DECIMAL(10, 2) NOT NULL,\n" .
+                "    FOREIGN KEY (user_id) REFERENCES users(id)\n" .
+                ");\n\n" .
+                "-- Insert data into the orders table\n" .
+                "INSERT INTO orders (user_id, status, total) VALUES\n" .
+                "(1, 'Pending', 59.98),\n" .
+                "(2, 'Completed', 29.99),\n" .
+                "(1, 'Shipped', 39.99),\n" .
+                "(3, 'Cancelled', 19.99);";
+                break;
+        
+            case 'customers':
+                $content = "-- Create the customers table\n" .
+                "CREATE TABLE customers (\n" .
+                "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
+                "    name VARCHAR(100) NOT NULL,\n" .
+                "    email VARCHAR(100) NOT NULL UNIQUE,\n" .
+                "    phone_number VARCHAR(15),\n" .
+                "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" .
+                "    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n" .
+                ");\n\n" .
+                "-- Insert data into the customers table\n" .
+                "INSERT INTO customers (name, email, phone_number) VALUES\n" .
+                "('Alice Smith', 'alice@example.com', '1234567890'),\n" .
+                "('Bob Johnson', 'bob@example.com', '0987654321'),\n" .
+                "('Charlie Brown', 'charlie@example.com', '5551234567'),\n" .
+                "('Diana Prince', 'diana@example.com', '4449876543');";
+                break;
+        
+            case 'roles':
+                $content = "-- Create the roles table\n" .
+                "CREATE TABLE roles (\n" .
+                "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
+                "    role_name VARCHAR(50) NOT NULL UNIQUE,\n" .
+                "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" .
+                "    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n" .
+                ");\n\n" .
+                "-- Insert data into the roles table\n" .
+                "INSERT INTO roles (role_name) VALUES\n" .
+                "('Admin'),\n" .
+                "('Editor'),\n" .
+                "('Viewer'),\n" .
+                "('Guest');";
+                break;
+        
+            case 'permissions':
+                $content = "-- Create the permissions table\n" .
+                "CREATE TABLE permissions (\n" .
+                "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
+                "    permission_name VARCHAR(50) NOT NULL UNIQUE,\n" .
+                "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" .
+                "    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n" .
+                ");\n\n" .
+                "-- Insert data into the permissions table\n" .
+                "INSERT INTO permissions (permission_name) VALUES\n" .
+                "('Create'),\n" .
+                "('Read'),\n" .
+                "('Update'),\n" .
+                "('Delete');";
+                break;
+        
+            default:
+                $content = "-- Create the $table table\n" .
+                "CREATE TABLE $table (\n" .
+                "    id INT AUTO_INCREMENT PRIMARY KEY NOT NULL\n" .
+                ");";
+                break;
+        }
+        
+
+        // Create the /app directory if it doesn't exist
+        $this->createDirectory(__DIR__ . '/src');
+        // Create the /app/models directory if it doesn't exist
+        $this->createDirectory(__DIR__ . '/src/tables');
+
+        // Check if the file already exists
+        if (file_exists($path)) {
+            echo "This table already exists\n";
+        } else {
+            // Create the file and write the content
+            file_put_contents($path, $content);
+            echo "Table '$table' created in path /src/tables/\n";
+        }
+
+    }
+
+    private function createDirectory($dir)
+    {
+        if (!file_exists($dir)) {
+            mkdir($dir, 0777, true);
+        }
+    }
+}
+
+// Check if arguments were passed
+if ($argc < 2) {
+    
+    echo 
+    "\nMaxiter CLI usage\n" .
+    "\n" .    
+    "php maxiter new controller         #Create a new controller file in /app/controllers/\n" .
+    "php maxiter new model              #Create a new model file in /app/models/\n" .
+    "php maxiter new view               #Create a new view folder and files in /resources/views/pages/\n" .
+    "php maxiter new log                #Create a basic LogModel to use in your application\n\n" . 
+    "php maxiter new table              #Create a SQL file in /src/tables/\n\n"
+    ;
+
+    exit(1);
+}
+
+// Instantiate the MaxiterConfiguration class
+$config = new MaxiterConfiguration();
+
+// Check if the second argument is 'new' and the third is 'controller'
+if ($argv[1] === 'new' && $argv[2] === 'controller') {
+    if(!isset($argv[3]) || empty($argv[3])) {
+        echo "Error: php maxiter new controller [controller_name]";
+        exit();
+    }
+    $config->generateController($argv[3]);
+} else if ($argv[1] === 'new' && $argv[2] === 'model') {
+    if(!isset($argv[3]) || empty($argv[3])) {
+        echo "Error: php maxiter new model [model_name]";
+        exit();
+    }
+    $config->generateModel($argv[3]);
+} else if ($argv[1] === 'new' && $argv[2] === 'view') {
+    if(!isset($argv[3]) || empty($argv[3])) {
+        echo "Error: php maxiter new view [view_name]";
+        exit();
+    }
+    $config->generatePage($argv[3]);
+} else if ($argv[1] === 'new' && $argv[2] === 'log') {
+
+    if(!isset($argv[3]) || empty($argv[3])) {
+        echo "Error: php maxiter new log [database]";
+        exit();
+    }
+    $config->generateLogModel($argv[3]);
+} else if ($argv[1] === 'new' && $argv[2] === 'table') {
+    if(!isset($argv[3]) || empty($argv[3])) {
+        echo "Error: php maxiter new table [table_name]";
+        exit();
+    }
+    $config->generateSQL($argv[3]);
+} else {
+    echo "Command not found\n";
+}
