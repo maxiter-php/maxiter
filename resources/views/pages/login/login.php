@@ -54,9 +54,9 @@
         Scripts
     ***********************************-->
     <!-- Required vendors -->
-    <script src="../../vendor/global/global.min.js"></script>
-    <script src="../../js/quixnav-init.js"></script>
-    <script src="../../js/custom.min.js"></script>
+    <script src="./resources/views/vendor/global/global.min.js"></script>
+    <script src="./resources/views/js/quixnav-init.js"></script>
+    <script src="./resources/views/js/custom.min.js"></script>
 
     <!-- SWEET ALERT -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
