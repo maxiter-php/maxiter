@@ -125,7 +125,7 @@
                                         <span class="ml-2">Logout </span>
                                     </a>
                                 <?php else: ?>
-                                    <a href="./login" class="dropdown-item">
+                                    <a href="/login" class="dropdown-item">
                                         <i class="icon-user"></i>
                                         <span class="ml-2">Login Page </span>
                                     </a>

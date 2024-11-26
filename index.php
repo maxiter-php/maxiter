@@ -16,7 +16,7 @@ class Routes {
         if (is_file($pagePath)) {
             include $pagePath;
         } else {
-            header('Location: ../error');
+            header('Location: ./error');
             exit();
         }
     }
