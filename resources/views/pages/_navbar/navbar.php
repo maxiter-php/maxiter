@@ -116,7 +116,7 @@
                             <!-- A classic way to Authenticate users with Maxiter example -->
                             <div class="dropdown-menu dropdown-menu-right">
                                 <?php if (AuthModel::verify()): ?>
-                                    <a href="<?= RoutesModel::path("home") ?>" class="dropdown-item">
+                                    <a href="./home" class="dropdown-item">
                                         <i class="icon-user"></i>
                                         <span class="ml-2"><?= AuthModel::getContext("username"); ?> </span>
                                     </a>
@@ -125,7 +125,7 @@
                                         <span class="ml-2">Logout </span>
                                     </a>
                                 <?php else: ?>
-                                    <a href="<?= RoutesModel::path("login") ?>" class="dropdown-item">
+                                    <a href="./login" class="dropdown-item">
                                         <i class="icon-user"></i>
                                         <span class="ml-2">Login Page </span>
                                     </a>
