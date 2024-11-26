@@ -182,7 +182,7 @@ class MaxiterConfiguration
     {
         $path = __DIR__ . '/app/models/LogModel.php';
 
-        if(!isset($database) || empty($database)) {
+        if (!isset($database) || empty($database)) {
             echo "Error: php maxiter new log [database]";
             exit();
         }
@@ -223,148 +223,149 @@ class MaxiterConfiguration
         }
     }
 
-    public function generateSQL($table) {
+    public function generateSQL($table)
+    {
 
-        $path = __DIR__ . '/src/tables/'.$table.'.sql';
+        $path = __DIR__ . '/src/tables/' . $table . '.sql';
 
-        switch($table) {
+        switch ($table) {
 
             case 'users':
                 $content = "-- Create the users table\n" .
-                "CREATE TABLE users (\n" .
-                "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
-                "    username VARCHAR(50) NOT NULL UNIQUE,\n" .
-                "    password VARCHAR(255) NOT NULL,\n" .
-                "    email VARCHAR(100) NOT NULL UNIQUE,\n" .
-                "    first_name VARCHAR(50),\n" .
-                "    last_name VARCHAR(50),\n" .
-                "    phone_number VARCHAR(15),\n" .
-                "    address VARCHAR(255),\n" .
-                "    city VARCHAR(50),\n" .
-                "    state VARCHAR(50),\n" .
-                "    zip_code VARCHAR(10),\n" .
-                "    country VARCHAR(50),\n" .
-                "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" .
-                "    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n" .
-                ");\n\n" .
-                "-- Insert data into the users table\n" .
-                "INSERT INTO users (username, password, email, first_name, last_name, phone_number, address, city, state, zip_code, country) VALUES\n" .
-                "('johndoe', MD5('password123'), 'johndoe@example.com', 'John', 'Doe', '1234567890', '123 Main St', 'Anytown', 'Anystate', '12345', 'USA'),\n" .
-                "('janedoe', MD5('mypassword'), 'janedoe@example.com', 'Jane', 'Doe', '0987654321', '456 Elm St', 'Othertown', 'Otherstate', '54321', 'USA'),\n" .
-                "('alice', MD5('alicepassword'), 'alice@example.com', 'Alice', 'Smith', '1112223333', '789 Maple Ave', 'Sometown', 'Somestate', '67890', 'USA'),\n" .
-                "('bob', MD5('bobpassword'), 'bob@example.com', 'Bob', 'Johnson', '4445556666', '321 Oak St', 'Differenttown', 'Differentstate', '09876', 'USA');";
+                    "CREATE TABLE users (\n" .
+                    "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
+                    "    username VARCHAR(50) NOT NULL UNIQUE,\n" .
+                    "    password VARCHAR(255) NOT NULL,\n" .
+                    "    email VARCHAR(100) NOT NULL UNIQUE,\n" .
+                    "    first_name VARCHAR(50),\n" .
+                    "    last_name VARCHAR(50),\n" .
+                    "    phone_number VARCHAR(15),\n" .
+                    "    address VARCHAR(255),\n" .
+                    "    city VARCHAR(50),\n" .
+                    "    state VARCHAR(50),\n" .
+                    "    zip_code VARCHAR(10),\n" .
+                    "    country VARCHAR(50),\n" .
+                    "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" .
+                    "    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n" .
+                    ");\n\n" .
+                    "-- Insert data into the users table\n" .
+                    "INSERT INTO users (username, password, email, first_name, last_name, phone_number, address, city, state, zip_code, country) VALUES\n" .
+                    "('johndoe', MD5('password123'), 'johndoe@example.com', 'John', 'Doe', '1234567890', '123 Main St', 'Anytown', 'Anystate', '12345', 'USA'),\n" .
+                    "('janedoe', MD5('mypassword'), 'janedoe@example.com', 'Jane', 'Doe', '0987654321', '456 Elm St', 'Othertown', 'Otherstate', '54321', 'USA'),\n" .
+                    "('alice', MD5('alicepassword'), 'alice@example.com', 'Alice', 'Smith', '1112223333', '789 Maple Ave', 'Sometown', 'Somestate', '67890', 'USA'),\n" .
+                    "('bob', MD5('bobpassword'), 'bob@example.com', 'Bob', 'Johnson', '4445556666', '321 Oak St', 'Differenttown', 'Differentstate', '09876', 'USA');";
                 break;
 
             case 'logs':
                 $content = "-- Create the logs table\n" .
-                "CREATE TABLE logs (\n" .
-                "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
-                "    log TEXT NOT NULL,\n" . 
-                "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n" .
-                ");\n\n" .
-                "-- Insert data into the logs table\n" .
-                "INSERT INTO logs (log) VALUES\n" .
-                "('User johndoe logged in successfully'),\n" .
-                "('User janedoe attempted to access restricted area'),\n" .
-                "('User alice updated profile information'),\n" .
-                "('User bob logged out');";
+                    "CREATE TABLE logs (\n" .
+                    "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
+                    "    log TEXT NOT NULL,\n" .
+                    "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n" .
+                    ");\n\n" .
+                    "-- Insert data into the logs table\n" .
+                    "INSERT INTO logs (log) VALUES\n" .
+                    "('User johndoe logged in successfully'),\n" .
+                    "('User janedoe attempted to access restricted area'),\n" .
+                    "('User alice updated profile information'),\n" .
+                    "('User bob logged out');";
                 break;
-                
-        
+
+
             case 'products':
                 $content = "-- Create the products table\n" .
-                "CREATE TABLE products (\n" .
-                "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
-                "    name VARCHAR(100) NOT NULL,\n" .
-                "    description TEXT,\n" .
-                "    price DECIMAL(10, 2) NOT NULL,\n" .
-                "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" .
-                "    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n" .
-                ");\n\n" .
-                "-- Insert data into the products table\n" .
-                "INSERT INTO products (name, description, price) VALUES\n" .
-                "('Product 1', 'Description for Product 1', 19.99),\n" .
-                "('Product 2', 'Description for Product 2', 29.99),\n" .
-                "('Product 3', 'Description for Product 3', 39.99),\n" .
-                "('Product 4', 'Description for Product 4', 49.99);";
+                    "CREATE TABLE products (\n" .
+                    "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
+                    "    name VARCHAR(100) NOT NULL,\n" .
+                    "    description TEXT,\n" .
+                    "    price DECIMAL(10, 2) NOT NULL,\n" .
+                    "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" .
+                    "    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n" .
+                    ");\n\n" .
+                    "-- Insert data into the products table\n" .
+                    "INSERT INTO products (name, description, price) VALUES\n" .
+                    "('Product 1', 'Description for Product 1', 19.99),\n" .
+                    "('Product 2', 'Description for Product 2', 29.99),\n" .
+                    "('Product 3', 'Description for Product 3', 39.99),\n" .
+                    "('Product 4', 'Description for Product 4', 49.99);";
                 break;
-        
+
             case 'orders':
                 $content = "-- Create the orders table\n" .
-                "CREATE TABLE orders (\n" .
-                "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
-                "    user_id INT NOT NULL,\n" .
-                "    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" .
-                "    status VARCHAR(50) NOT NULL,\n" .
-                "    total DECIMAL(10, 2) NOT NULL,\n" .
-                "    FOREIGN KEY (user_id) REFERENCES users(id)\n" .
-                ");\n\n" .
-                "-- Insert data into the orders table\n" .
-                "INSERT INTO orders (user_id, status, total) VALUES\n" .
-                "(1, 'Pending', 59.98),\n" .
-                "(2, 'Completed', 29.99),\n" .
-                "(1, 'Shipped', 39.99),\n" .
-                "(3, 'Cancelled', 19.99);";
+                    "CREATE TABLE orders (\n" .
+                    "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
+                    "    user_id INT NOT NULL,\n" .
+                    "    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" .
+                    "    status VARCHAR(50) NOT NULL,\n" .
+                    "    total DECIMAL(10, 2) NOT NULL,\n" .
+                    "    FOREIGN KEY (user_id) REFERENCES users(id)\n" .
+                    ");\n\n" .
+                    "-- Insert data into the orders table\n" .
+                    "INSERT INTO orders (user_id, status, total) VALUES\n" .
+                    "(1, 'Pending', 59.98),\n" .
+                    "(2, 'Completed', 29.99),\n" .
+                    "(1, 'Shipped', 39.99),\n" .
+                    "(3, 'Cancelled', 19.99);";
                 break;
-        
+
             case 'customers':
                 $content = "-- Create the customers table\n" .
-                "CREATE TABLE customers (\n" .
-                "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
-                "    name VARCHAR(100) NOT NULL,\n" .
-                "    email VARCHAR(100) NOT NULL UNIQUE,\n" .
-                "    phone_number VARCHAR(15),\n" .
-                "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" .
-                "    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n" .
-                ");\n\n" .
-                "-- Insert data into the customers table\n" .
-                "INSERT INTO customers (name, email, phone_number) VALUES\n" .
-                "('Alice Smith', 'alice@example.com', '1234567890'),\n" .
-                "('Bob Johnson', 'bob@example.com', '0987654321'),\n" .
-                "('Charlie Brown', 'charlie@example.com', '5551234567'),\n" .
-                "('Diana Prince', 'diana@example.com', '4449876543');";
+                    "CREATE TABLE customers (\n" .
+                    "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
+                    "    name VARCHAR(100) NOT NULL,\n" .
+                    "    email VARCHAR(100) NOT NULL UNIQUE,\n" .
+                    "    phone_number VARCHAR(15),\n" .
+                    "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" .
+                    "    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n" .
+                    ");\n\n" .
+                    "-- Insert data into the customers table\n" .
+                    "INSERT INTO customers (name, email, phone_number) VALUES\n" .
+                    "('Alice Smith', 'alice@example.com', '1234567890'),\n" .
+                    "('Bob Johnson', 'bob@example.com', '0987654321'),\n" .
+                    "('Charlie Brown', 'charlie@example.com', '5551234567'),\n" .
+                    "('Diana Prince', 'diana@example.com', '4449876543');";
                 break;
-        
+
             case 'roles':
                 $content = "-- Create the roles table\n" .
-                "CREATE TABLE roles (\n" .
-                "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
-                "    role_name VARCHAR(50) NOT NULL UNIQUE,\n" .
-                "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" .
-                "    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n" .
-                ");\n\n" .
-                "-- Insert data into the roles table\n" .
-                "INSERT INTO roles (role_name) VALUES\n" .
-                "('Admin'),\n" .
-                "('Editor'),\n" .
-                "('Viewer'),\n" .
-                "('Guest');";
+                    "CREATE TABLE roles (\n" .
+                    "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
+                    "    role_name VARCHAR(50) NOT NULL UNIQUE,\n" .
+                    "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" .
+                    "    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n" .
+                    ");\n\n" .
+                    "-- Insert data into the roles table\n" .
+                    "INSERT INTO roles (role_name) VALUES\n" .
+                    "('Admin'),\n" .
+                    "('Editor'),\n" .
+                    "('Viewer'),\n" .
+                    "('Guest');";
                 break;
-        
+
             case 'permissions':
                 $content = "-- Create the permissions table\n" .
-                "CREATE TABLE permissions (\n" .
-                "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
-                "    permission_name VARCHAR(50) NOT NULL UNIQUE,\n" .
-                "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" .
-                "    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n" .
-                ");\n\n" .
-                "-- Insert data into the permissions table\n" .
-                "INSERT INTO permissions (permission_name) VALUES\n" .
-                "('Create'),\n" .
-                "('Read'),\n" .
-                "('Update'),\n" .
-                "('Delete');";
+                    "CREATE TABLE permissions (\n" .
+                    "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
+                    "    permission_name VARCHAR(50) NOT NULL UNIQUE,\n" .
+                    "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" .
+                    "    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n" .
+                    ");\n\n" .
+                    "-- Insert data into the permissions table\n" .
+                    "INSERT INTO permissions (permission_name) VALUES\n" .
+                    "('Create'),\n" .
+                    "('Read'),\n" .
+                    "('Update'),\n" .
+                    "('Delete');";
                 break;
-        
+
             default:
                 $content = "-- Create the $table table\n" .
-                "CREATE TABLE $table (\n" .
-                "    id INT AUTO_INCREMENT PRIMARY KEY NOT NULL\n" .
-                ");";
+                    "CREATE TABLE $table (\n" .
+                    "    id INT AUTO_INCREMENT PRIMARY KEY NOT NULL\n" .
+                    ");";
                 break;
         }
-        
+
 
         // Create the /app directory if it doesn't exist
         $this->createDirectory(__DIR__ . '/src');
@@ -382,6 +383,23 @@ class MaxiterConfiguration
 
     }
 
+    public function defaultConfig()
+    {
+        $path = __FILE__;
+        $dir = dirname($path);
+        $folder = basename($dir);
+        $env_ini = './env.ini';
+        $lines = file($env_ini, FILE_IGNORE_NEW_LINES);
+        foreach ($lines as $key => $line) {
+            if (strpos($line, 'APP_BASE_URL') !== false) {
+                $lines[$key] = 'APP_BASE_URL="/' . $folder . '"';
+                break; 
+            }
+        }
+        file_put_contents($env_ini, implode(PHP_EOL, $lines));
+        echo "Done!";
+    }
+
     private function createDirectory($dir)
     {
         if (!file_exists($dir)) {
@@ -392,15 +410,16 @@ class MaxiterConfiguration
 
 // Check if arguments were passed
 if ($argc < 2) {
-    
-    echo 
-    "\nMaxiter CLI usage\n" .
-    "\n" .    
-    "php maxiter new controller         #Create a new controller file in /app/controllers/\n" .
-    "php maxiter new model              #Create a new model file in /app/models/\n" .
-    "php maxiter new view               #Create a new view folder and files in /resources/views/pages/\n" .
-    "php maxiter new log                #Create a basic LogModel to use in your application\n\n" . 
-    "php maxiter new table              #Create a SQL file in /src/tables/\n\n"
+
+    echo
+        "\nMaxiter CLI usage\n" .
+        "\n" .
+        "php maxiter new controller         #Create a new controller file in /app/controllers/\n" .
+        "php maxiter new model              #Create a new model file in /app/models/\n" .
+        "php maxiter new view               #Create a new view folder and files in /resources/views/pages/\n" .
+        "php maxiter new log                #Create a basic LogModel to use in your application\n" .
+        "php maxiter new table              #Create a SQL file in /src/tables/\n" .
+        "php maxiter config                 #Is something broke? Try this!\n\n"
     ;
 
     exit(1);
@@ -411,36 +430,38 @@ $config = new MaxiterConfiguration();
 
 // Check if the second argument is 'new' and the third is 'controller'
 if ($argv[1] === 'new' && $argv[2] === 'controller') {
-    if(!isset($argv[3]) || empty($argv[3])) {
+    if (!isset($argv[3]) || empty($argv[3])) {
         echo "Error: php maxiter new controller [controller_name]";
         exit();
     }
     $config->generateController($argv[3]);
 } else if ($argv[1] === 'new' && $argv[2] === 'model') {
-    if(!isset($argv[3]) || empty($argv[3])) {
+    if (!isset($argv[3]) || empty($argv[3])) {
         echo "Error: php maxiter new model [model_name]";
         exit();
     }
     $config->generateModel($argv[3]);
 } else if ($argv[1] === 'new' && $argv[2] === 'view') {
-    if(!isset($argv[3]) || empty($argv[3])) {
+    if (!isset($argv[3]) || empty($argv[3])) {
         echo "Error: php maxiter new view [view_name]";
         exit();
     }
     $config->generatePage($argv[3]);
 } else if ($argv[1] === 'new' && $argv[2] === 'log') {
 
-    if(!isset($argv[3]) || empty($argv[3])) {
+    if (!isset($argv[3]) || empty($argv[3])) {
         echo "Error: php maxiter new log [database]";
         exit();
     }
     $config->generateLogModel($argv[3]);
 } else if ($argv[1] === 'new' && $argv[2] === 'table') {
-    if(!isset($argv[3]) || empty($argv[3])) {
+    if (!isset($argv[3]) || empty($argv[3])) {
         echo "Error: php maxiter new table [table_name]";
         exit();
     }
     $config->generateSQL($argv[3]);
+} else if ($argv[1] === 'config') {
+    $config->defaultConfig();
 } else {
     echo "Command not found\n";
 }

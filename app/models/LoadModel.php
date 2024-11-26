@@ -16,6 +16,7 @@ require __DIR__ . "/AuthModel.php";
 require __DIR__ . "/LogModel.php";
 require __DIR__ . "/ResponseModel.php";
 require __DIR__ . "/PagesTitleModel.php";
+require __DIR__ . "/RoutesModel.php";
 // Required Models
 
 // Set the default timezone in env.ini file

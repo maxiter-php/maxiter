@@ -2,7 +2,7 @@
 
 <!-- Page Title -->
 <?php PagesTitleModel::title("Maxiter - Home Page"); ?>
-<link rel="stylesheet" href="./resources/views/pages/list-example/css/list-example.css">
+<link rel="stylesheet" href="<?= EnvModel::env("APP_BASE_URL") ?>/resources/views/pages/list-example/css/list-example.css">
 
 <!--**********************************
         Main wrapper start
@@ -81,5 +81,5 @@
         Main wrapper end
     ***********************************-->
 
-<script src="./resources/views/pages/list-example/js/list-example.js"></script>
+<script src="<?= EnvModel::env("APP_BASE_URL") ?>/resources/views/pages/list-example/js/list-example.js"></script>
 <?php include __DIR__ . "/../_footer/footer.php"; ?>

@@ -1,4 +1,4 @@
-<?php require __DIR__ . "/../../../../app/models/LoadModel.php"; ?>
+<?php require __DIR__ . "/../../../../app/models/LoadModel.php"; echo RoutesModel::path("home") ?>
 <?php PagesTitleModel::title("Maxiter - Login Page"); ?>
 <!DOCTYPE html>
 <html lang="pt-br" class="h-100">
@@ -9,8 +9,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title><?= PagesTitleModel::getTitle() ?></title>
     <!-- Favicon icon -->
-    <link rel="icon" type="image/png" sizes="16x16" href="./resources/views/images/favicon.png">
-    <link href="./resources/views/css/style.css" rel="stylesheet">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?= EnvModel::env("APP_BASE_URL") ?>/resources/views/images/favicon.png">
+    <link href="<?= EnvModel::env("APP_BASE_URL") ?>/resources/views/css/style.css" rel="stylesheet">
 
 </head>
 
@@ -54,14 +54,14 @@
         Scripts
     ***********************************-->
     <!-- Required vendors -->
-    <script src="../../vendor/global/global.min.js"></script>
-    <script src="../../js/quixnav-init.js"></script>
-    <script src="../../js/custom.min.js"></script>
+    <script src="<?= EnvModel::env("APP_BASE_URL") ?>/resources/views/vendor/global/global.min.js"></script>
+    <script src="<?= EnvModel::env("APP_BASE_URL") ?>/resources/views/quixnav-init.js"></script>
+    <script src="<?= EnvModel::env("APP_BASE_URL") ?>/resources/views/custom.min.js"></script>
 
     <!-- SWEET ALERT -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script src="./resources/views/pages/login/js/login.js"></script>
+    <script src="<?= EnvModel::env("APP_BASE_URL") ?>/resources/views/pages/login/js/login.js"></script>
 </body>
 
 </html>
