@@ -2,7 +2,7 @@
 
 <!-- Page Title -->
 <?php PagesTitleModel::title("Maxiter - Home Page"); ?>
-<link rel="stylesheet" href="./resources/views/pages/home/css/home.css">
+<link rel="stylesheet" href="../resources/views/pages/home/css/home.css">
 
 <!--**********************************
         Main wrapper start
@@ -189,5 +189,5 @@
         Main wrapper end
     ***********************************-->
 
-<script src="./resources/views/pages/home/js/home.js"></script>
+<script src="../resources/views/pages/home/js/home.js"></script>
 <?php include __DIR__ . "/../_footer/footer.php"; ?>

@@ -385,18 +385,6 @@ class MaxiterConfiguration
 
     public function defaultConfig()
     {
-        $path = __FILE__;
-        $dir = dirname($path);
-        $folder = basename($dir);
-        $env_ini = './env.ini';
-        $lines = file($env_ini, FILE_IGNORE_NEW_LINES);
-        foreach ($lines as $key => $line) {
-            if (strpos($line, 'APP_BASE_URL') !== false) {
-                $lines[$key] = 'APP_BASE_URL="/' . $folder . '"';
-                break; 
-            }
-        }
-        file_put_contents($env_ini, implode(PHP_EOL, $lines));
         echo "Done!";
     }
 

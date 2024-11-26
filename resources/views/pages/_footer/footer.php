@@ -23,15 +23,15 @@
     ***********************************-->
 
 <!-- Cards JS -->
-<script src="<?= EnvModel::env("APP_BASE_URL") ?>/resources/views/js/cards.js"></script>
+<script src="../resources/views/js/cards.js"></script>
 
 <!-- Navbar JS -->
-<script src="<?= EnvModel::env("APP_BASE_URL") ?>/resources/views/pages/_navbar/js/navbar.js"></script>
+<script src="../resources/views/pages/_navbar/js/navbar.js"></script>
 
 <!-- Required vendors -->
-<script src="<?= EnvModel::env("APP_BASE_URL") ?>/resources/views/vendor/global/global.min.js"></script>
-<script src="<?= EnvModel::env("APP_BASE_URL") ?>/resources/views/js/quixnav-init.js"></script>
-<script src="<?= EnvModel::env("APP_BASE_URL") ?>/resources/views/js/custom.min.js"></script>
+<script src="../resources/views/vendor/global/global.min.js"></script>
+<script src="../resources/views/js/quixnav-init.js"></script>
+<script src="../resources/views/js/custom.min.js"></script>
 
 <!-- SWEET ALERT -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
