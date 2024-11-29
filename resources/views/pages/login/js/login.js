@@ -1,5 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    // Obtém a URL base da página
+    let absolutePath = window.location.origin;
+
+    // Aqui você pode apenas concatenar o caminho relativo, sem manipulações com "../"
+    let loginUrl = absolutePath + "/app/controllers/LogoutController.php";
+
     let loginForm = document.querySelector("#login-form");
     loginForm.addEventListener("submit", (e) => {
         e.preventDefault();
@@ -8,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let dataObj = Object.fromEntries(data);
 
         $.ajax({
-            url: "../../../../app/controllers/LoginController.php",
+            url: loginUrl,
             type: "POST",
             data: {
                 user: dataObj.user,

@@ -59,7 +59,7 @@ class MaxiterConfiguration
             '<?php include __DIR__ . "/../_header/header.php"; ?>' . "\n" .
             "<!-- Page Title -->\n" .
             '<?php PagesTitleModel::title("Maxiter - ' . ucfirst($fileName) . '"); ?>' . "\n" .
-            '<link rel="stylesheet" href="./resources/views/pages/' . $fileName . '/css/' . $fileName . '.css">' . "\n" .
+            '<link rel="stylesheet" href="<?= EnvModel::env("APP_BASE_URL") ?>/resources/views/pages/' . $fileName . '/css/' . $fileName . '.css">' . "\n" .
             "<!--**********************************\n" .
             "        Main wrapper start\n" .
             "***********************************-->\n" .
@@ -113,7 +113,7 @@ class MaxiterConfiguration
             "        Main wrapper end\n" .
             "    ***********************************-->" . "\n" .
             "\n" .
-            '<script src="./resources/views/pages/' . $fileName . '/js/' . $fileName . '.js"></script>' . "\n" .
+            '<script src="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/pages/' . $fileName . '/js/' . $fileName . '.js"></script>' . "\n" .
             '<?php include __DIR__ . "/../_footer/footer.php"; ?>'
         ;
 

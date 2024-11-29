@@ -9,8 +9,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title><?= PagesTitleModel::getTitle() ?></title>
     <!-- Favicon icon -->
-    <link rel="icon" type="image/png" sizes="16x16" href="../resources/views/images/favicon.png">
-    <link href="../resources/views/css/style.css" rel="stylesheet">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/images/favicon.png">
+    <link href="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/css/style.css" rel="stylesheet">
 
 </head>
 
@@ -54,13 +54,13 @@
         Scripts
     ***********************************-->
     <!-- Required vendors -->
-    <script src="../resources/views/vendor/global/global.min.js"></script>
-    <script src="../resources/views/js/quixnav-init.js"></script>
-    <script src="../resources/views/js/custom.min.js"></script>
+    <script src="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/vendor/global/global.min.js"></script>
+    <script src="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/js/quixnav-init.js"></script>
+    <script src="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/js/custom.min.js"></script>
     <!-- SWEET ALERT -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script src="../resources/views/pages/login/js/login.js"></script>
+    <script src="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/pages/login/js/login.js"></script>
 </body>
 
 </html>
