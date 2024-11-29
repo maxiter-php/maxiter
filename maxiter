@@ -419,21 +419,28 @@ class MaxiterConfiguration
             exec("php -S localhost:$port");
         }
     }
-    public function defaultConfig()
+    public function setPath($pathUrl)
     {
-        // $path = __FILE__;
-        // $dir = dirname($path);
-        // $folder = basename($dir);
-        // $env_ini = './env.ini';
-        // $lines = file($env_ini, FILE_IGNORE_NEW_LINES);
-        // foreach ($lines as $key => $line) {
-        //     if (strpos($line, 'APP_BASE_URL') !== false) {
-        //         $lines[$key] = 'APP_BASE_URL="/' . $folder . '"';
-        //         break; 
-        //     }
-        // }
-        // file_put_contents($env_ini, implode(PHP_EOL, $lines));
-        echo "Done!";
+        $env_ini = './env.ini';
+        $lines = file($env_ini, FILE_IGNORE_NEW_LINES);
+        foreach ($lines as $key => $line) {
+            if (strpos($line, 'APP_BASE_URL') !== false) {
+                $lines[$key] = 'APP_BASE_URL="'.$pathUrl.'"';
+                break; 
+            }
+        }
+
+        $path_js = './path.js';
+        $lines_js = file($path_js, FILE_IGNORE_NEW_LINES);
+        foreach ($lines_js as $key => $line) {
+            if (strpos($line, 'APP_BASE_URL') !== false) {
+                $lines_js[$key] = 'APP_BASE_URL:"'.$pathUrl.'"';
+                break; 
+            }
+        }
+        file_put_contents($env_ini, implode(PHP_EOL, $lines));
+        file_put_contents($path_js, implode(PHP_EOL, $lines_js));
+        echo "New project base url set: $pathUrl";
     }
 
     private function createDirectory($dir)
@@ -503,8 +510,12 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
     } else {
         $config->initServer($argv[2]);
     }
-} else if ($argv[1] === 'config') {
-    $config->defaultConfig();
+} else if ($argv[1] === 'path') {
+    if (!isset($argv[2]) || empty($argv[2])) {
+        echo "Error: php maxiter path [base_url_path] || Example: php maxiter path http://localhost/maxiter/ * Don't forget the / at the end!";
+        exit();
+    }
+    $config->setPath($argv[2]);
 } else {
     echo "Command not found\n";
 }
