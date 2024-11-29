@@ -425,8 +425,8 @@ class MaxiterConfiguration
         $lines = file($env_ini, FILE_IGNORE_NEW_LINES);
         foreach ($lines as $key => $line) {
             if (strpos($line, 'APP_BASE_URL') !== false) {
-                $lines[$key] = 'APP_BASE_URL="'.$pathUrl.'"';
-                break; 
+                $lines[$key] = 'APP_BASE_URL="' . $pathUrl . '"';
+                break;
             }
         }
 
@@ -434,14 +434,648 @@ class MaxiterConfiguration
         $lines_js = file($path_js, FILE_IGNORE_NEW_LINES);
         foreach ($lines_js as $key => $line) {
             if (strpos($line, 'APP_BASE_URL') !== false) {
-                $lines_js[$key] = 'APP_BASE_URL:"'.$pathUrl.'"';
-                break; 
+                $lines_js[$key] = 'APP_BASE_URL:"' . $pathUrl . '"';
+                break;
             }
         }
         file_put_contents($env_ini, implode(PHP_EOL, $lines));
         file_put_contents($path_js, implode(PHP_EOL, $lines_js));
         echo "New project base url set: $pathUrl";
     }
+
+
+    // ############################################################################ //
+    // ############################################################################ //
+    // ############################ SET NEW TEMPLATE ############################## //
+    // ############################################################################ //
+    // ############################################################################ //
+
+    public function setNewTemplate($templateFolder)
+    {
+        // Folder paths
+        $viewsFolder = __DIR__ . "\\resources\\views";  // Destination folder
+        $templateFolder = __DIR__ . "\\src\\template\\$templateFolder";  // Template source folder
+        $indexFile = $templateFolder . "\\index.html";
+
+        // Remove the views folder if it exists
+        echo "Removing views folder...\n";
+        if (is_dir($viewsFolder)) {
+            // Check if the system is Windows or Unix-like (Linux/Mac)
+            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                // Use the command to remove the folder on Windows
+                exec("rd /s /q \"$viewsFolder\"");
+            } else {
+                // Use the command to remove the folder on Linux/Mac
+                exec("rm -rf \"$viewsFolder\"");
+            }
+        } else {
+            echo "Views folder not found.\n";
+        }
+
+        // Check if the folder was successfully removed
+        if (!is_dir($viewsFolder)) {
+            echo "Views folder removed successfully or not found.\n";
+        } else {
+            echo "Failed to remove views folder.\n";
+        }
+
+        // Recreate the views folder
+        echo "Creating views folder...\n";
+        if (mkdir($viewsFolder, 0777, true)) {
+            echo "Views folder created successfully.\n";
+        } else {
+            echo "Failed to create views folder.\n";
+            return;
+        }
+
+        // Check if the source folder exists
+        if (is_dir($templateFolder)) {
+            // Get the files from the template
+            $files = scandir($templateFolder);
+
+            // Iterate over the files in the source folder
+            foreach ($files as $file) {
+                // Ignore the entries "." and ".."
+                if ($file != '.' && $file != '..') {
+                    $sourcePath = $templateFolder . '\\' . $file; // Full path of the source file
+                    $destinationPath = $viewsFolder . '\\' . $file; // Full path of the destination file
+
+                    // Check if it's a directory (subfolder) and copy the subfolder and its files
+                    if (is_dir($sourcePath)) {
+                        // Create the subfolder in the destination, if it doesn't exist
+                        if (!is_dir($destinationPath)) {
+                            mkdir($destinationPath, 0777, true);
+                        }
+                        echo "Subfolder '$file' copied successfully!\n";
+
+                        // Copy all files and subfolders within the subfolder
+                        $this->copyDirectoryContents($sourcePath, $destinationPath);
+                    }
+                }
+            }
+        } else {
+            echo "The source folder '$templateFolder' does not exist.\n";
+        }
+
+
+        // Create pages folder and subfolders
+        $pagesFolder = __DIR__ . "\\resources\\views\\pages";
+        echo "Creating pages folder...\n";
+        if (mkdir($pagesFolder, 0777, true)) {
+            echo "Pages folder created successfully.\n";
+        } else {
+            echo "Failed to create Pages folder.\n";
+            return;
+        }
+        // _header
+        $headerFolder = __DIR__ . "\\resources\\views\\pages\\_header";
+        echo "Creating _header component...\n";
+        if (!is_dir($headerFolder)) {
+            if (mkdir($headerFolder, 0777, true)) {
+                echo "_header component created successfully.\n";
+            } else {
+                echo "Failed to create _header component.\n";
+            }
+        } else {
+            echo "_header component already exists.\n";
+        }
+
+        // _footer
+        $footerFolder = __DIR__ . "\\resources\\views\\pages\\_footer";
+        echo "Creating _footer component...\n";
+        if (!is_dir($footerFolder)) {
+            if (mkdir($footerFolder, 0777, true)) {
+                echo "_footer component created successfully.\n";
+            } else {
+                echo "Failed to create _footer component.\n";
+            }
+        } else {
+            echo "_footer component already exists.\n";
+        }
+
+        // _navbar
+        $navbarFolder = __DIR__ . "\\resources\\views\\pages\\_navbar";
+        echo "Creating _navbar component...\n";
+        if (!is_dir($navbarFolder)) {
+            if (mkdir($navbarFolder, 0777, true)) {
+                echo "_navbar component created successfully.\n";
+            } else {
+                echo "Failed to create _navbar component.\n";
+            }
+        } else {
+            echo "_navbar component already exists.\n";
+        }
+
+        // _sidebar
+        $sidebarFolder = __DIR__ . "\\resources\\views\\pages\\_sidebar";
+        echo "Creating _sidebar component...\n";
+        if (!is_dir($sidebarFolder)) {
+            if (mkdir($sidebarFolder, 0777, true)) {
+                echo "_sidebar component created successfully.\n";
+            } else {
+                echo "Failed to create _sidebar component.\n";
+            }
+        } else {
+            echo "_sidebar component already exists.\n";
+        }
+
+        // home
+        $homeFolder = __DIR__ . "\\resources\\views\\pages\\home";
+        echo "Creating home folder...\n";
+        if (!is_dir($homeFolder)) {
+            if (mkdir($homeFolder, 0777, true)) {
+                echo "Home folder created successfully.\n";
+            } else {
+                echo "Failed to create Home folder.\n";
+            }
+        } else {
+            echo "Home folder already exists.\n";
+        }
+
+        // Creating files and content
+        // Path to the index.html template file
+        // $indexFile = $templateFolder . "\\index.html";
+
+        // _header folder path
+        $headerFolder = __DIR__ . "\\resources\\views\\pages\\_header";
+
+        // Check if the index file exists
+        if (file_exists($indexFile)) {
+            // Read the content of index.html
+            $fileContent = file_get_contents($indexFile);
+
+            // Use regular expression to extract content between @header markers
+            if (preg_match('/@header(.*?)@header/s', $fileContent, $matches)) {
+                // $matches[1] will contain the content between the @header markers
+
+                // Create the _header folder if it doesn't exist
+                if (!is_dir($headerFolder)) {
+                    if (mkdir($headerFolder, 0777, true)) {
+                        echo "_header folder created successfully.\n";
+                    } else {
+                        echo "Failed to create _header folder.\n";
+                    }
+                }
+
+                // Create the header.php file and write the extracted content
+                $headerFile = $headerFolder . "\\header.php";
+                if (file_put_contents($headerFile, $matches[1])) {
+                    echo "header.php file created successfully inside the _header folder.\n";
+                } else {
+                    echo "Failed to create header.php file.\n";
+                }
+            } else {
+                echo "No content found between @header markers.\n";
+            }
+        } else {
+            echo "The index.html file does not exist.\n";
+        }
+
+
+
+        // _footer folder path
+        $footerFolder = __DIR__ . "\\resources\\views\\pages\\_footer";
+
+        // Check if the index file exists
+        if (file_exists($indexFile)) {
+            // Read the content of index.html
+            $fileContent = file_get_contents($indexFile);
+
+            // Use regular expression to extract content between @header markers
+            if (preg_match('/@footer(.*?)@footer/s', $fileContent, $matches)) {
+                // $matches[1] will contain the content between the @header markers
+
+                // Create the _header folder if it doesn't exist
+                if (!is_dir($footerFolder)) {
+                    if (mkdir($footerFolder, 0777, true)) {
+                        echo "_footer folder created successfully.\n";
+                    } else {
+                        echo "Failed to create _footer folder.\n";
+                    }
+                }
+
+                // Create the footer.php file and write the extracted content
+                $footerFile = $footerFolder . "\\footer.php";
+                if (file_put_contents($footerFile, $matches[1])) {
+                    echo "footer.php file created successfully inside the _footer folder.\n";
+                } else {
+                    echo "Failed to create footer.php file.\n";
+                }
+            } else {
+                echo "No content found between @footer markers.\n";
+            }
+        } else {
+            echo "The index.html file does not exist.\n";
+        }
+
+
+
+        // _navbar folder path
+        $navbarFolder = __DIR__ . "\\resources\\views\\pages\\_navbar";
+
+        // Check if the index file exists
+        if (file_exists($indexFile)) {
+            // Read the content of index.html
+            $fileContent = file_get_contents($indexFile);
+
+            // Use regular expression to extract content between @header markers
+            if (preg_match('/@navbar(.*?)@navbar/s', $fileContent, $matches)) {
+                // $matches[1] will contain the content between the @header markers
+
+                // Create the _header folder if it doesn't exist
+                if (!is_dir($navbarFolder)) {
+                    if (mkdir($navbarFolder, 0777, true)) {
+                        echo "_navbar folder created successfully.\n";
+                    } else {
+                        echo "Failed to create _navbar folder.\n";
+                    }
+                }
+
+                // Create the navbar.php file and write the extracted content
+                $navbarFile = $navbarFolder . "\\navbar.php";
+                if (file_put_contents($navbarFile, $matches[1])) {
+                    echo "navbar.php file created successfully inside the _navbar folder.\n";
+                } else {
+                    echo "Failed to create navbar.php file.\n";
+                }
+            } else {
+                echo "No content found between @navbar markers.\n";
+            }
+        } else {
+            echo "The index.html file does not exist.\n";
+        }
+
+        // _sidebar folder path
+        $sidebarFolder = __DIR__ . "\\resources\\views\\pages\\_sidebar";
+
+        // Check if the index file exists
+        if (file_exists($indexFile)) {
+            // Read the content of index.html
+            $fileContent = file_get_contents($indexFile);
+
+            // Use regular expression to extract content between @header markers
+            if (preg_match('/@sidebar(.*?)@sidebar/s', $fileContent, $matches)) {
+                // $matches[1] will contain the content between the @header markers
+
+                // Create the _header folder if it doesn't exist
+                if (!is_dir($sidebarFolder)) {
+                    if (mkdir($sidebarFolder, 0777, true)) {
+                        echo "_sidebar folder created successfully.\n";
+                    } else {
+                        echo "Failed to create _sidebar folder.\n";
+                    }
+                }
+
+                // Create the sidebar.php file and write the extracted content
+                $sidebarFile = $sidebarFolder . "\\sidebar.php";
+                if (file_put_contents($sidebarFile, $matches[1])) {
+                    echo "sidebar.php file created successfully inside the _sidebar folder.\n";
+                } else {
+                    echo "Failed to create sidebar.php file.\n";
+                }
+            } else {
+                echo "No content found between @sidebar markers.\n";
+            }
+        } else {
+            echo "The index.html file does not exist.\n";
+        }
+
+
+        // _body folder path
+        $bodyFolder = __DIR__ . "\\resources\\views\\pages\\home";
+
+        // Check if the index file exists
+        if (file_exists($indexFile)) {
+            // Read the content of index.html
+            $fileContent = file_get_contents($indexFile);
+
+            // Use regular expression to extract content between @header markers
+            if (preg_match('/@body(.*?)@body/s', $fileContent, $matches)) {
+                // $matches[1] will contain the content between the @header markers
+
+                // Create the _header folder if it doesn't exist
+                if (!is_dir($bodyFolder)) {
+                    if (mkdir($bodyFolder, 0777, true)) {
+                        echo "Home folder created successfully.\n";
+                    } else {
+                        echo "Failed to create Home folder.\n";
+                    }
+                }
+
+                // Create the body.php file and write the extracted content
+                $bodyFile = $bodyFolder . "\\home.php";
+                if (file_put_contents($bodyFile, $matches[1])) {
+                    echo "home.php file created successfully inside the home folder.\n";
+                } else {
+                    echo "Failed to create home.php file.\n";
+                }
+            } else {
+                echo "No content found between @body markers.\n";
+            }
+        } else {
+            echo "The index.html file does not exist.\n";
+        }
+
+
+
+        // Add final configurations
+
+        // HEADER
+        $headerFile = __DIR__ . "\\resources\\views\\pages\\_header\\header.php";
+        // The content to prepend
+        $preContent = "<!-- You need this to load all Models of your Projects -->\n<?php require __DIR__ . \"/../../../../app/models/LoadModel.php\"; ?>\n";
+        // Check if the header.php file exists
+        if (file_exists($headerFile)) {
+            // Read the current content of the file
+            $currentContent = file_get_contents($headerFile);
+
+            // Prepend the new content to the existing content
+            $newContent = $preContent . $currentContent;
+
+            // Write the new content back to the file
+            if (file_put_contents($headerFile, $newContent)) {
+                echo "Successfully added the configuration at the beginning of header.php.\n";
+            } else {
+                echo "Failed to update header.php.\n";
+            }
+        } else {
+            echo "The header.php file does not exist.\n";
+        }
+        // Check if the header.php file exists
+        if (file_exists($headerFile)) {
+            // Read the content of the header.php file
+            $content = file_get_contents($headerFile);
+
+            // Use regular expression to find all <link> tags and modify the href
+            $content = preg_replace_callback('/<link[^>]*href="([^"]+)"/', function ($matches) {
+                // The original href value
+                $originalHref = $matches[1];
+
+                // Modify the href by prepending the base URL
+                $modifiedHref = '<?= EnvModel::env("APP_BASE_URL") ?>resources/views/' . $originalHref;
+
+                // Replace the href in the <link> tag with the modified href
+                return str_replace($originalHref, $modifiedHref, $matches[0]);
+            }, $content);
+
+            // Write the modified content back to the header.php file
+            if (file_put_contents($headerFile, $content)) {
+                echo "Successfully updated the href in <link> tags.\n";
+            } else {
+                echo "Failed to update the header.php file.\n";
+            }
+        } else {
+            echo "The header.php file does not exist.\n";
+        }
+
+        // Check if the header.php file exists
+        if (file_exists($headerFile)) {
+            // Read the current content of the file
+            $content = file_get_contents($headerFile);
+
+            // Regular expression to find the <title> tag and replace its content
+            $content = preg_replace('/<title[^>]*>.*<\/title>/i', '<title id="page_title"></title>', $content);
+
+            // Write the modified content back to the file
+            if (file_put_contents($headerFile, $content)) {
+                echo "Successfully updated the title tag in header.php.\n";
+            } else {
+                echo "Failed to update the header.php file.\n";
+            }
+        } else {
+            echo "The header.php file does not exist.\n";
+        }
+
+        // FOOTER
+        $footerFile = __DIR__ . "\\resources\\views\\pages\\_footer\\footer.php";
+        // The content to prepend
+        $preContent = "<script>\n
+                            // Page Title Definition \n
+                            document.querySelector('#page_title').innerHTML = <?= json_encode(PagesTitleModel::getTitle()); ?>\n
+                        </script>";
+        // Check if the footer.php file exists
+        if (file_exists($footerFile)) {
+            // Read the current content of the file
+            $currentContent = file_get_contents($footerFile);
+
+            // Prepend the new content to the existing content
+            $newContent = $preContent . $currentContent;
+
+            // Write the new content back to the file
+            if (file_put_contents($footerFile, $newContent)) {
+                echo "Successfully added the configuration at the beginning of footer.php.\n";
+            } else {
+                echo "Failed to update footer.php.\n";
+            }
+        } else {
+            echo "The footer.php file does not exist.\n";
+        }
+        // Check if the footer.php file exists
+        if (file_exists($footerFile)) {
+            // Read the content of the footer.php file
+            $content = file_get_contents($footerFile);
+
+            // Use regular expression to find all <link> tags and modify the href
+            $content = preg_replace_callback('/<script[^>]*src="([^"]+)"/', function ($matches) {
+                // The original href value
+                $originalHref = $matches[1];
+
+                // Modify the href by prepending the base URL
+                $modifiedHref = '<?= EnvModel::env("APP_BASE_URL") ?>resources/views/' . $originalHref;
+
+                // Replace the href in the <link> tag with the modified href
+                return str_replace($originalHref, $modifiedHref, $matches[0]);
+            }, $content);
+
+            // Write the modified content back to the footer.php file
+            if (file_put_contents($footerFile, $content)) {
+                echo "Successfully updated the src in <script> tags.\n";
+            } else {
+                echo "Failed to update the footer.php file.\n";
+            }
+        } else {
+            echo "The footer.php file does not exist.\n";
+        }
+
+
+
+        // HOMEPAGE
+        $homeFile = __DIR__ . "\\resources\\views\\pages\\home\\home.php";
+        // The content to prepend
+        $preContent = "<?php include __DIR__ . '/../_header/header.php'; ?>\n
+<!-- Page Title -->\n
+<?php PagesTitleModel::title('Maxiter - Home Page'); ?>\n
+<link rel='stylesheet' href='<?= EnvModel::env('APP_BASE_URL') ?>resources/views/pages/home/css/home.css'>\n";
+        // Check if the home.php file exists
+        if (file_exists($homeFile)) {
+            // Read the current content of the file
+            $currentContent = file_get_contents($homeFile);
+
+            // Prepend the new content to the existing content
+            $newContent = $preContent . $currentContent;
+
+            // Write the new content back to the file
+            if (file_put_contents($homeFile, $newContent)) {
+                echo "Successfully added the configuration at the beginning of home.php.\n";
+            } else {
+                echo "Failed to update home.php.\n";
+            }
+        } else {
+            echo "The home.php file does not exist.\n";
+        }
+        // The content to append
+        $appendContent = "<script src='<?= EnvModel::env('APP_BASE_URL') ?>resources/views/pages/home/js/home.js'></script>\n
+<?php include __DIR__ . '/../_footer/footer.php'; ?>";
+
+        // Check if the home.php file exists
+        if (file_exists($homeFile)) {
+            // Read the current content of the file
+            $currentContent = file_get_contents($homeFile);
+
+            // Append the new content to the existing content
+            $newContent = $currentContent . $appendContent;
+
+            // Write the new content back to the file
+            if (file_put_contents($homeFile, $newContent)) {
+                echo "Successfully added the configuration at the end of home.php.\n";
+            } else {
+                echo "Failed to update home.php.\n";
+            }
+        } else {
+            echo "The home.php file does not exist.\n";
+        }
+
+        // All SRC or URL IMAGE HOMEPAGE
+        // Check if the home.php file exists
+        if (file_exists($homeFile)) {
+            // Read the current content of the file
+            $content = file_get_contents($homeFile);
+
+            // Regular expression to find and modify img src paths
+            $content = preg_replace_callback('/<img[^>]*src=["\']([^"\']+)["\']/i', function ($matches) {
+                $originalSrc = $matches[1];  // The original src value
+                // Check if the path is relative (i.e., not starting with "http" or "//")
+                if (strpos($originalSrc, 'http') === false && strpos($originalSrc, '//') === false) {
+                    // Prepend the base URL and resources/views/ to the src path
+                    $modifiedSrc = '<?= EnvModel::env(\'APP_BASE_URL\') ?>resources/views/' . $originalSrc;
+                    return str_replace($originalSrc, $modifiedSrc, $matches[0]);
+                }
+                // If the src is already an absolute URL, return it unchanged
+                return $matches[0];
+            }, $content);
+
+            // Regular expression to find and modify background-image url() paths
+            $content = preg_replace_callback('/background-image:\s*url\(["\']?([^"\')]+)["\']?\)/i', function ($matches) {
+                $originalUrl = $matches[1];  // The original URL in the background-image
+                // Check if the path is relative
+                if (strpos($originalUrl, 'http') === false && strpos($originalUrl, '//') === false) {
+                    // Prepend the base URL and resources/views/ to the background-image URL
+                    $modifiedUrl = 'url(<?= EnvModel::env(\'APP_BASE_URL\') ?>resources/views/' . $originalUrl . ')';
+                    // Replace only the part inside the url() function with the modified URL
+                    return preg_replace('/url\(["\']?([^"\')]+)["\']?\)/', $modifiedUrl, $matches[0]);
+                }
+                // If the URL is already absolute, return it unchanged
+                return $matches[0];
+            }, $content);
+
+            // Write the modified content back to the file
+            if (file_put_contents($homeFile, $content)) {
+                echo "Successfully updated the src and background-image paths in home.php.\n";
+            } else {
+                echo "Failed to update the home.php file.\n";
+            }
+        } else {
+            echo "The home.php file does not exist.\n";
+        }
+
+        // All SRC or URL IMAGE FOOTER
+        $footerFile = __DIR__ . "\\resources\\views\\pages\\home\\home.php";
+        // Check if the home.php file exists
+        if (file_exists($footerFile)) {
+            // Read the current content of the file
+            $content = file_get_contents($footerFile);
+
+            // Regular expression to find and modify img src paths
+            $content = preg_replace_callback('/<img[^>]*src=["\']([^"\']+)["\']/i', function ($matches) {
+                $originalSrc = $matches[1];  // The original src value
+                // Check if the path is relative (i.e., not starting with "http" or "//")
+                if (strpos($originalSrc, 'http') === false && strpos($originalSrc, '//') === false) {
+                    // Prepend the base URL and resources/views/ to the src path
+                    $modifiedSrc = '<?= EnvModel::env(\'APP_BASE_URL\') ?>resources/views/' . $originalSrc;
+                    return str_replace($originalSrc, $modifiedSrc, $matches[0]);
+                }
+                // If the src is already an absolute URL, return it unchanged
+                return $matches[0];
+            }, $content);
+
+            // Regular expression to find and modify background-image url() paths
+            $content = preg_replace_callback('/background-image:\s*url\(["\']?([^"\')]+)["\']?\)/i', function ($matches) {
+                $originalUrl = $matches[1];  // The original URL in the background-image
+                // Check if the path is relative
+                if (strpos($originalUrl, 'http') === false && strpos($originalUrl, '//') === false) {
+                    // Prepend the base URL and resources/views/ to the background-image URL
+                    $modifiedUrl = 'url(<?= EnvModel::env(\'APP_BASE_URL\') ?>resources/views/' . $originalUrl . ')';
+                    // Replace only the part inside the url() function with the modified URL
+                    return preg_replace('/url\(["\']?([^"\')]+)["\']?\)/', $modifiedUrl, $matches[0]);
+                }
+                // If the URL is already absolute, return it unchanged
+                return $matches[0];
+            }, $content);
+
+            // Write the modified content back to the file
+            if (file_put_contents($footerFile, $content)) {
+                echo "Successfully updated the src and background-image paths in footer.php.\n";
+            } else {
+                echo "Failed to update the footer.php file.\n";
+            }
+        } else {
+            echo "The footer.php file does not exist.\n";
+        }
+
+
+
+
+
+    }
+
+
+    // Helper function to copy the contents of a subfolder (recursively)
+    private function copyDirectoryContents($sourceDir, $destinationDir)
+    {
+        // Get the files and folders inside the source directory
+        $items = scandir($sourceDir);
+
+        // Iterate over the items in the subfolder
+        foreach ($items as $item) {
+            if ($item != '.' && $item != '..') {
+                $sourcePath = $sourceDir . '\\' . $item;
+                $destinationPath = $destinationDir . '\\' . $item;
+
+                if (is_dir($sourcePath)) {
+                    // If it's a directory, create it in the destination and copy its contents
+                    if (!is_dir($destinationPath)) {
+                        mkdir($destinationPath, 0777, true);
+                    }
+                    // Recursively copy the contents of the subfolder
+                    $this->copyDirectoryContents($sourcePath, $destinationPath);
+                } else {
+                    // If it's a file, copy it
+                    copy($sourcePath, $destinationPath);
+                    echo "File '$item' copied successfully!\n";
+                }
+            }
+        }
+    }
+
+
+
+    // ############################################################################ //
+    // ############################################################################ //
+    // ############################ SET NEW TEMPLATE ############################## //
+    // ############################################################################ //
+    // ############################################################################ //
+
+
 
     private function createDirectory($dir)
     {
@@ -517,6 +1151,21 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
         exit();
     }
     $config->setPath($argv[2]);
+} else if ($argv[1] === 'new' && $argv[2] === 'template') {
+    if (!isset($argv[3]) || empty($argv[3])) {
+        echo "Error: php maxiter new template [template_folder_name]";
+        exit();
+    }
+
+    echo "Warning! This will erase all your actual /views data and set up a new configuration using the template in src/template/" . $argv[3] . ". Are you sure? (y/N): ";
+    $handle = fopen("php://stdin", "r");
+    $response = trim(fgets($handle));  // Obtém a resposta e remove espaços em branco ao redor
+    fclose($handle);
+    if (strtolower($response) === 'y' || strtolower($response) === 'yes') {
+        $config->setNewTemplate($argv[3]);
+    } else {
+        echo "Operation cancelled.";
+    }
 } else {
     echo "Command not found\n";
 }
