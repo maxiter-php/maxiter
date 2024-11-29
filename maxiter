@@ -776,6 +776,50 @@ class MaxiterConfiguration
             echo "The index.html file does not exist.\n";
         }
 
+        // home JS folder creation
+        $homeFolder = __DIR__ . "\\resources\\views\\pages\\home\\js";
+        echo "Creating Home JS file file...\n";
+        if (!is_dir($homeFolder)) {
+            if (mkdir($homeFolder, 0777, true)) {
+                echo "Home JS file created successfully.\n";
+            } else {
+                echo "Failed to create Home JS file.\n";
+            }
+        } else {
+            echo "Home JS file already exists.\n";
+        }
+        // home JS folder path
+        $homeJSFolder = __DIR__ . "\\resources\\views\\pages\\home\\js";
+        // Create the home.js file and write the extracted content
+        $homeJSFile = $homeJSFolder . "\\home.js";
+        if (file_put_contents($homeJSFile, "// JavaScript for home page")) {
+            echo "home.js file created successfully inside the home/js folder.\n";
+        } else {
+            echo "Failed to create home.js file.\n";
+        }
+        
+        // home css folder creation
+        $homeFolder = __DIR__ . "\\resources\\views\\pages\\home\\css";
+        echo "Creating Home css file file...\n";
+        if (!is_dir($homeFolder)) {
+            if (mkdir($homeFolder, 0777, true)) {
+                echo "Home css file created successfully.\n";
+            } else {
+                echo "Failed to create Home css file.\n";
+            }
+        } else {
+            echo "Home css file already exists.\n";
+        }
+        // home css folder path
+        $homecssFolder = __DIR__ . "\\resources\\views\\pages\\home\\css";
+        // Create the home.css file and write the extracted content
+        $homecssFile = $homecssFolder . "\\home.css";
+        if (file_put_contents($homecssFile, ' /* Styles for home page */ ')) {
+            echo "home.css file created successfully inside the home/css folder.\n";
+        } else {
+            echo "Failed to create home.js file.\n";
+        }
+
 
 
         // Add final configurations
@@ -989,8 +1033,8 @@ class MaxiterConfiguration
         }
 
         // All SRC or URL IMAGE FOOTER
-        $footerFile = __DIR__ . "\\resources\\views\\pages\\home\\home.php";
-        // Check if the home.php file exists
+        $footerFile = __DIR__ . "\\resources\\views\\pages\\_footer\\footer.php";
+        // Check if the footer.php file exists
         if (file_exists($footerFile)) {
             // Read the current content of the file
             $content = file_get_contents($footerFile);

@@ -1,144 +1,46 @@
-<!--**********************************
-            Nav header start
-        ***********************************-->
-<div class="nav-header">
-    <a href="../index/" class="brand-logo">
-        <!-- <img class="logo-abbr" src="../../images/logo.png" alt="">
-        <img class="logo-compact" src="../../images/logo-text.png" alt="">
-        <img class="brand-title" src="../../images/logo-text.png" alt=""> -->
-        <h4 style="color:white;"><?= EnvModel::env("APP_NAME") ?></h4>
-        <!-- <h4 class="logo-compact" style="color:white;">CGRS</h4> -->
-    </a>
 
-    <div class="nav-control">
-        <div class="hamburger">
-            <span class="line"></span><span class="line"></span><span class="line"></span>
-        </div>
+<header class="navigation fixed-top">
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <a class="navbar-brand" href="index.html"><img src="images/logo.png" alt="Egen"></a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navigation"
+      aria-controls="navigation" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse text-center" id="navigation">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="index.html">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="about.html">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="services.html">Services</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="blog.html">Blog</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="portfolio.html">Portfolio</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Pages</a>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="team.html">Team</a>
+            <a class="dropdown-item" href="team-single.html">Team Details</a>
+            <a class="dropdown-item" href="career.html">Career</a>
+            <a class="dropdown-item" href="career-single.html">Career Details</a>
+            <a class="dropdown-item" href="blog-single.html">Blog Details</a>
+            <a class="dropdown-item" href="pricing.html">Pricing</a></a>
+            <a class="dropdown-item" href="faqs.html">FAQ's</a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="contact.html">Contact</a>
+        </li>
+      </ul>
     </div>
-</div>
-<!--**********************************
-            Nav header end
-        ***********************************-->
+  </nav>
+</header>
 
-<!--**********************************
-            Header start
-        ***********************************-->
-<div class="header">
-    <div class="header-content">
-        <nav class="navbar navbar-expand">
-            <div class="collapse navbar-collapse justify-content-between">
-                <div class="header-left">
-                    <div class="search_bar dropdown">
-                        <span class="search_icon p-3 c-pointer" data-toggle="dropdown">
-                            <i class="mdi mdi-magnify"></i>
-                        </span>
-                        <div class="dropdown-menu p-0 m-0">
-                            <form>
-                               
-                                <!-- <h2>TESTE</h2> -->
-                                <input class="form-control" type="search" placeholder="Search..."
-                                    aria-label="Search">
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <ul class="navbar-nav header-right">
-                    <li class="nav-item dropdown notification_dropdown">
-                        <a class="nav-link" href="#" role="button" data-toggle="dropdown">
-                            <i class="mdi mdi-bell"></i>
-                            <div class="pulse-css"></div>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right">
-                            <ul class="list-unstyled">
-                                <li class="media dropdown-item">
-                                    <span class="success"><i class="ti-user"></i></span>
-                                    <div class="media-body">
-                                        <a href="#">
-                                            <p><strong>Martin</strong> has added a <strong>customer</strong>
-                                                Successfully
-                                            </p>
-                                        </a>
-                                    </div>
-                                    <span class="notify-time">3:20 am</span>
-                                </li>
-                                <li class="media dropdown-item">
-                                    <span class="primary"><i class="ti-shopping-cart"></i></span>
-                                    <div class="media-body">
-                                        <a href="#">
-                                            <p><strong>Jennifer</strong> purchased Light Dashboard 2.0.</p>
-                                        </a>
-                                    </div>
-                                    <span class="notify-time">3:20 am</span>
-                                </li>
-                                <li class="media dropdown-item">
-                                    <span class="danger"><i class="ti-bookmark"></i></span>
-                                    <div class="media-body">
-                                        <a href="#">
-                                            <p><strong>Robin</strong> marked a <strong>ticket</strong> as unsolved.
-                                            </p>
-                                        </a>
-                                    </div>
-                                    <span class="notify-time">3:20 am</span>
-                                </li>
-                                <li class="media dropdown-item">
-                                    <span class="primary"><i class="ti-heart"></i></span>
-                                    <div class="media-body">
-                                        <a href="#">
-                                            <p><strong>David</strong> purchased Light Dashboard 1.0.</p>
-                                        </a>
-                                    </div>
-                                    <span class="notify-time">3:20 am</span>
-                                </li>
-                                <li class="media dropdown-item">
-                                    <span class="success"><i class="ti-image"></i></span>
-                                    <div class="media-body">
-                                        <a href="#">
-                                            <p><strong> James.</strong> has added a<strong>customer</strong>
-                                                Successfully
-                                            </p>
-                                        </a>
-                                    </div>
-                                    <span class="notify-time">3:20 am</span>
-                                </li>
-                            </ul>
-                            <a class="all-notification" href="#">See all notifications <i
-                                    class="ti-arrow-right"></i></a>
-                        </div>
-                    </li>
-                    <a href="./login">
-                        <li class="nav-item dropdown header-profile">
-                            <a class="nav-link" href="#" role="button" data-toggle="dropdown">
-                                <i class="mdi mdi-account"></i>
-                            </a>
-
-
-                            <!-- A classic way to Authenticate users with Maxiter example -->
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <?php if (!AuthModel::verify()): ?>
-                                    <a href="./home" class="dropdown-item">
-                                        <i class="icon-user"></i>
-                                        <span class="ml-2"><?= AuthModel::getContext("username"); ?> </span>
-                                    </a>
-                                    <a href="#" id="btn-logout" class="dropdown-item">
-                                        <i class="icon-key"></i>
-                                        <span class="ml-2">Logout </span>
-                                    </a>
-                                <?php else: ?>
-                                    <a href="./login" class="dropdown-item">
-                                        <i class="icon-user"></i>
-                                        <span class="ml-2">Login Page </span>
-                                    </a>
-                                <?php endif; ?>
-                            </div>
-                        </li>
-                    </a>
-                </ul>
-            </div>
-        </nav>
-    </div>
-</div>
-
-<!--**********************************
-            Header end ti-comment-alt
-        ***********************************-->

@@ -1,36 +1,50 @@
 <!-- You need this to load all Models of your Projects -->
-<?php require __DIR__."/../../../../app/models/LoadModel.php"; ?>
+<?php require __DIR__ . "/../../../../app/models/LoadModel.php"; ?>
+
 
 <!DOCTYPE html>
-<html lang="pt-br">
+
+<!--
+ // WEBSITE: https://themefisher.com
+ // TWITTER: https://twitter.com/themefisher
+ // FACEBOOK: https://www.facebook.com/themefisher
+ // GITHUB: https://github.com/themefisher/
+-->
+
+<html lang="zxx">
 
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title id="page_title"></title>
+  <meta charset="utf-8">
+  <title id="page_title"></title>
 
-    <!-- Favicon icon -->
-    <link rel="icon" type="image/png" sizes="16x16" href="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/images/favicon.png">
+  <!-- mobile responsive meta -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <!-- theme meta -->
+  <meta name="theme-name" content="agen" />
+  
+  <!-- ** Plugins Needed for the Project ** -->
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/plugins/bootstrap/bootstrap.min.css">
+  <!-- slick slider -->
+  <link rel="stylesheet" href="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/plugins/slick/slick.css">
+  <!-- themefy-icon -->
+  <link rel="stylesheet" href="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/plugins/themify-icons/themify-icons.css">
+  <!-- venobox css -->
+  <link rel="stylesheet" href="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/plugins/venobox/venobox.css">
+  <!-- card slider -->
+  <link rel="stylesheet" href="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/plugins/card-slider/css/style.css">
 
-    <!-- Main CSS -->
-    <link href="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/css/style.css" rel="stylesheet">
-
-
+  <!-- Main Stylesheet -->
+  <link href="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/css/style.css" rel="stylesheet">
+  
+  <!--Favicon-->
+  <link rel="shortcut icon" href="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/images/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/images/favicon.ico" type="image/x-icon">
 
 </head>
 
 <body>
-    <!--*******************
-        Preloader start
-    ********************-->
-    <div id="preloader">
-        <div class="sk-three-bounce">
-            <div class="sk-child sk-bounce1"></div>
-            <div class="sk-child sk-bounce2"></div>
-            <div class="sk-child sk-bounce3"></div>
-        </div>
-    </div>
-    <!--*******************
-        Preloader end
-    ********************-->
+  
+  
