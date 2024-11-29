@@ -11,7 +11,6 @@ require __DIR__ . '/../models/SecureRequestModel.php';
 class LogoutController {
 
     public function main() {
-        ResponseModel::json(true, "Logout!");
         // Your code here
         session_start();
         session_unset();
