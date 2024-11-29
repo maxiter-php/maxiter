@@ -463,7 +463,8 @@ if ($argc < 2) {
         "php maxiter new log                #Create a basic LogModel to use in your application\n" .
         "php maxiter new table              #Create a SQL file in /src/tables/\n" .
         "php maxiter config                 #Is something broke? Try this!\n" .
-        "php maxiter server [port]          #Initiate a PHP server using the default port 7000 if port argument is empty\n\n"
+        "php maxiter server [port]          #Initiate a PHP server using the default port 7000 if port argument is empty\n" .
+        "php maxiter path                   #Configure the path url of your project, main path: http://localhost/\n\n"
     ;
 
     exit(1);
