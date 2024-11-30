@@ -1022,6 +1022,19 @@ class MaxiterConfiguration
                 return $matches[0];
             }, $content);
 
+            // Regular expression to find and modify img src paths
+            $content = preg_replace_callback('/<source[^>]*src=["\']([^"\']+)["\']/i', function ($matches) {
+                $originalSrc = $matches[1];  // The original src value
+                // Check if the path is relative (i.e., not starting with "http" or "//")
+                if (strpos($originalSrc, 'http') === false && strpos($originalSrc, '//') === false) {
+                    // Prepend the base URL and resources/views/ to the src path
+                    $modifiedSrc = '<?= EnvModel::env(\'APP_BASE_URL\') ?>resources/views/' . $originalSrc;
+                    return str_replace($originalSrc, $modifiedSrc, $matches[0]);
+                }
+                // If the src is already an absolute URL, return it unchanged
+                return $matches[0];
+            }, $content);
+
             // Write the modified content back to the file
             if (file_put_contents($homeFile, $content)) {
                 echo "Successfully updated the src and background-image paths in home.php.\n";
