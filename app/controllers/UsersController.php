@@ -13,7 +13,7 @@ class UsersController {
     public function main() {
         
         // Your code here
-        $result = DatabaseModel::connection("maxiter")->execute("SELECT * FROM users");
+        $result = DatabaseModel::connection(EnvModel::env("DB"))->execute("SELECT * FROM users");
         $compactData = [];
         while($resultFetch = $result->fetch(PDO::FETCH_ASSOC)) {
             $compactData[] = $resultFetch;

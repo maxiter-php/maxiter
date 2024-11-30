@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log("List Example");
     $.ajax({
-        url: "./app/controllers/UsersController.php",
+        url: path.APP_BASE_URL + "app/controllers/UsersController.php",
         type: "GET",
         success: function (response) {
             let tbody_table = document.querySelector("#tbody-table");
