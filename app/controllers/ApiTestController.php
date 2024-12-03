@@ -1,16 +1,15 @@
 <?php
 /*
-The controller file handles user input and interaction. It processes requests,
-invokes business logic, and updates the model as needed.
+The API controller file handles user input and interaction. It processes requests,
+invokes business logic, and returns as needed.
 
 @author Victor Béser
 */
 require __DIR__ . '/../models/LoadModel.php';
-//require __DIR__ . '/../models/SecureRequestModel.php'; // Remove this if it's a route for an API
 
 class ApiTestController {
 
-    public function main() {
+    public function info() {
         // Your code here
         ResponseModel::json(true, "Your Api Route Is Working Successfully!");
     }
@@ -18,8 +17,9 @@ class ApiTestController {
         // Your code here
         ResponseModel::json(true, "Hello World!");
     }
+    public function withMiddleware() {
+        // Your code here
+        ResponseModel::json(true, "You're authorized!");
+    }
 
 }
-
-$controller = new ApiTestController();
-// (isset($_POST['controller']) && !empty($_POST['controller'])) ? $controller->{$_POST['controller']}() : $controller->main();

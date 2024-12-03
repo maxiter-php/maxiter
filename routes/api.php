@@ -21,7 +21,8 @@ if ($urlParts[0] === 'api' && $urlParts[1] != null) {
     header('Location: ../home');exit();
 }
 
-// echo $url;exit();
+// Middleware
+require __DIR__ . "/../app/middlewares/BearerAuthorizationMiddleware.php";
 
 // Include your Controllers
 include __DIR__ . "/../app/controllers/ApiTestController.php";
@@ -29,13 +30,22 @@ include __DIR__ . "/../app/controllers/ApiTestController.php";
 class Api {
 
     public function routes($url) {
+        $routes = [
+            
+            // Your routes
+            '/info'  => ['controller' => 'ApiTestController', 'function' => 'info', 'middleware' => null],
+            '/hello' => ['controller' => 'ApiTestController', 'function' => 'helloWorld', 'middleware' => null],
+            '/auth'  => ['controller' => 'ApiTestController', 'function' => 'withMiddleware', 'middleware' => 'BearerAuthorizationMiddleware'],
 
-        // Your routes
-        // ApiModel::route("/info", $url, "ApiTestController");
-        
-        ApiModel::route("/info/teste", $url, "ApiTestController", "helloWorld");
+        ];
+        $url = rtrim($url,"/");
+        if (isset($routes[$url])) {
+            $route = $routes[$url];
+            ApiModel::route($url, $url, $route['controller'], $route['function'], $route['middleware']);
+        } else {
+            ResponseModel::json(false, "404 not found");
+        }
     }
-
 }
 
 

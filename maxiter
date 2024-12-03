@@ -797,7 +797,7 @@ class MaxiterConfiguration
         } else {
             echo "Failed to create home.js file.\n";
         }
-        
+
         // home css folder creation
         $homeFolder = __DIR__ . "\\resources\\views\\pages\\home\\css";
         echo "Creating Home css file file...\n";
@@ -1134,6 +1134,78 @@ class MaxiterConfiguration
 
 
 
+    public function generateApiController($fileName)
+    {
+        $path = __DIR__ . '/app/controllers/' . $fileName . ".php";
+
+        // Content to be written to the file
+        $content = "<?php\n" .
+            "/*\n" .
+            "The API controller file handles user input and interaction. It processes requests,\n" .
+            "invokes business logic, and returns as needed.\n" .
+            "\n" .
+            "@author Victor Béser\n" .
+            "*/\n" .
+            "require __DIR__ . '/../models/LoadModel.php';\n\n" .
+            "class " . ucfirst($fileName) . " {\n\n" .
+            "    public function main() {\n" .
+            "        // Your code here\n" .
+            "    }\n\n" .
+            "}\n\n" .
+            "\$controller = new " . ucfirst($fileName) . "();";
+
+        // Create the /app directory if it doesn't exist
+        $this->createDirectory(__DIR__ . '/app');
+        // Create the /app/controllers directory if it doesn't exist
+        $this->createDirectory(__DIR__ . '/app/controllers');
+
+        // Check if the file already exists
+        if (file_exists($path)) {
+            echo "This controller already exists\n";
+        } else {
+            // Create the file and write the content
+            file_put_contents($path, $content);
+            echo "Controller $fileName created\n";
+        }
+    }
+
+    public function generateMiddleware($fileName)
+    {
+        $path = __DIR__ . '/app/middlewares/' . $fileName . ".php";
+
+        // Content to be written to the file
+        $content = "<?php\n" .
+            "/*\n" .
+            "A middleware is a function that processes incoming requests \n" .
+            "before they reach the main application or route handler.\n" .
+            "It can modify requests, responses, or handle tasks like\n" .
+            "authentication, logging, and error handling.\n" .
+            "\n" .
+            "@author Victor Béser\n" .
+            "*/\n" .
+            "require __DIR__ . '/../models/LoadModel.php';\n\n" .
+            "class " . ucfirst($fileName) . " {\n\n" .
+            "    public static function handle() {\n" .
+            "        // Your code here\n" .
+            "    }\n\n" .
+            "}";
+
+        // Create the /app directory if it doesn't exist
+        $this->createDirectory(__DIR__ . '/app');
+        // Create the /app/controllers directory if it doesn't exist
+        $this->createDirectory(__DIR__ . '/app/middlewares');
+
+        // Check if the file already exists
+        if (file_exists($path)) {
+            echo "This middleware already exists\n";
+        } else {
+            // Create the file and write the content
+            file_put_contents($path, $content);
+            echo "Middleware $fileName created\n";
+        }
+    }
+
+
     private function createDirectory($dir)
     {
         if (!file_exists($dir)) {
@@ -1156,7 +1228,9 @@ if ($argc < 2) {
         "php maxiter config                 #Is something broke? Try this!\n" .
         "php maxiter server [port]          #Initiate a PHP server using the default port 7000 if port argument is empty\n" .
         "php maxiter path                   #Configure the path url of your project, main path: http://localhost/\n" .
-        "php maxiter new template           #Configure a new template in your project\n\n"
+        "php maxiter new template           #Configure a new template in your project\n" .
+        "php maxiter new api                #Create a new API controller file in /app/controllers/\n" .
+        "php maxiter new middleware         #Create a new middleware file in /app/middlewares/\n\n"
     ;
 
     exit(1);
@@ -1224,6 +1298,18 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
     } else {
         echo "Operation cancelled.";
     }
+} else if ($argv[1] === 'new' && $argv[2] === 'api') {
+    if (!isset($argv[3]) || empty($argv[3])) {
+        echo "Error: php maxiter new api [api_controller_name]";
+        exit();
+    }
+    $config->generateApiController($argv[3]);
+} else if ($argv[1] === 'new' && $argv[2] === 'middleware') {
+    if (!isset($argv[3]) || empty($argv[3])) {
+        echo "Error: php maxiter new middleware [middleware_name]";
+        exit();
+    }
+    $config->generateMiddleware($argv[3]);
 } else {
     echo "Command not found\n";
 }
