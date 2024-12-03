@@ -29,7 +29,8 @@ class DatabaseModel
         self::$pass = $config['pass'];
 
         try {
-            self::$pdo = new PDO(self::$driver . ":host=" . self::$host . ";port=" . self::$port . ";dbname=" . self::$db . "", self::$user, self::$pass);
+            self::$pdo = new PDO(self::$driver . ":host=" . self::$host . ";port=" . self::$port . ";dbname=" . self::$db . ";charset=utf8", self::$user, self::$pass);
+            self::$pdo->exec("SET NAMES 'utf8'");
         } catch (PDOException $e) {
             die("Error while connecting database: " . $e->getMessage());
         }

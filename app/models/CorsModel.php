@@ -11,11 +11,11 @@ class CorsModel
 
     public static function setCors()
     {
-        // Your code here
-        header("Access-Control-Allow-Origin: *");  // Permite acesso de qualquer origem
-        header("Access-Control-Allow-Methods: GET, POST, OPTIONS"); // Permite os métodos HTTP necessários
-        header("Access-Control-Allow-Headers: Content-Type"); // Permite os cabeçalhos necessários
-        header("Access-Control-Allow-Credentials: true"); // Se for necessário enviar cookies ou autenticação
+        // Cors
+        header("Access-Control-Allow-Origin: *"); 
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+        header("Access-Control-Allow-Headers: Content-Type");
+        header("Access-Control-Allow-Credentials: true");
 
     }
 
