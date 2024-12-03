@@ -8,6 +8,7 @@ or something.
 
 @author Victor Béser
 */
+header('Content-Type: application/json; charset=utf-8');
 class ResponseModel {
 
     private static $status;

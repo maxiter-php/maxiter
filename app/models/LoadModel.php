@@ -8,7 +8,7 @@ Don't forget, this file should be used in header of all controller files using "
 */
 // ob_start();
 // session_start();
-
+ini_set('memory_limit', '256M');
 
 // Required Models
 require __DIR__ . "/EnvModel.php";

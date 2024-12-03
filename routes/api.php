@@ -24,6 +24,9 @@ if ($urlParts[0] === 'api' && $urlParts[1] != null) {
 // Middleware
 require __DIR__ . "/../app/middlewares/BearerAuthorizationMiddleware.php";
 
+// LoadModel
+require __DIR__ . '/../app/models/LoadModel.php';
+
 // Include your Controllers
 include __DIR__ . "/../app/controllers/ApiTestController.php";
 
