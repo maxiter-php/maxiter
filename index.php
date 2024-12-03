@@ -31,5 +31,6 @@ class Routes {
 }
 
 $url = isset($_GET['url']) && !empty($_GET['url']) ? htmlspecialchars(trim($_GET['url'])) : 'home';
-$routes = new Routes();
-$routes->routes($url);
+$routes = new Routes($url);
+// $routes->routes($url);
+?>

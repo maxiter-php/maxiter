@@ -16,3 +16,5 @@ class SecureRequestModel {
 }
 
 SecureRequestModel::init();
+
+?>

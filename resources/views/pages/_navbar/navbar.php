@@ -6,7 +6,7 @@
         <!-- <img class="logo-abbr" src="../../images/logo.png" alt="">
         <img class="logo-compact" src="../../images/logo-text.png" alt="">
         <img class="brand-title" src="../../images/logo-text.png" alt=""> -->
-        <h4 style="color:white;"><?= EnvModel::env("APP_NAME") ?></h4>
+        <h4 style="color:white;"><?php echo EnvModel::env("APP_NAME") ?></h4>
         <!-- <h4 class="logo-compact" style="color:white;">CGRS</h4> -->
     </a>
 
@@ -118,7 +118,7 @@
                                 <?php if (!AuthModel::verify()): ?>
                                     <a href="./home" class="dropdown-item">
                                         <i class="icon-user"></i>
-                                        <span class="ml-2"><?= AuthModel::getContext("username"); ?> </span>
+                                        <span class="ml-2"><?php echo AuthModel::getContext("username"); ?> </span>
                                     </a>
                                     <a href="#" id="btn-logout" class="dropdown-item">
                                         <i class="icon-key"></i>

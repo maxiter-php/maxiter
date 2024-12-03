@@ -47,13 +47,14 @@ class EnvModel
         self::$user = self::$env[$database]['USER'];
         self::$pass = self::$env[$database]['PASS'];
 
-        return json_encode([
+        return json_encode(array(
             "driver" => self::$driver,
             "port" => self::$port,
             "host" => self::$host,
             "user" => self::$user,
             "pass" => self::$pass,
-        ]);
+        ));
+        
 
     }
 

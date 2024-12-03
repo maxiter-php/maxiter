@@ -17,10 +17,10 @@ class ResponseModel {
         self::$status = $status;
         self::$data = $data;
 
-        echo json_encode([
+        echo json_encode(array(
             "status" => self::$status,
             "data" => self::$data,
-        ]);exit();
+        ));exit();
 
 
     }

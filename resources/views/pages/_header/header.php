@@ -11,10 +11,10 @@
     <title id="page_title"></title>
 
     <!-- Favicon icon -->
-    <link rel="icon" type="image/png" sizes="16x16" href="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/images/favicon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?php echo EnvModel::env("APP_BASE_URL") ?>resources/views/images/favicon.png">
 
     <!-- Main CSS -->
-    <link href="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/css/style.css" rel="stylesheet">
+    <link href="<?php echo EnvModel::env("APP_BASE_URL") ?>resources/views/css/style.css" rel="stylesheet">
 
 
 
