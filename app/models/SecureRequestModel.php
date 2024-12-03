@@ -9,7 +9,7 @@ class SecureRequestModel {
 
     public static function init() {
         if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
-            die('Acesso negado.');
+            die('Denied.');
         }
     }
 
