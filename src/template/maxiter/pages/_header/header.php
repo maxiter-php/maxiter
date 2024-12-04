@@ -1,4 +1,3 @@
-<!-- You need this to load all Models of your Projects -->
 <?php require __DIR__."/../../../../app/models/LoadModel.php"; ?>
 
 <!DOCTYPE html>
