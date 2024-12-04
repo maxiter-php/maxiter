@@ -32,4 +32,4 @@ class Routes {
 
 $url = isset($_GET['url']) && !empty($_GET['url']) ? htmlspecialchars(trim($_GET['url'])) : 'home';
 $routes = new Routes();
-$routes->routes($url);
+$routes->routes($url); // Remove this line for PHP Legacy Versions and add the $url variable to the new Routes() above: $routes new Routes($url);

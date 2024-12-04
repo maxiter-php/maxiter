@@ -14,7 +14,7 @@ class UsersController {
         
         // Your code here
         $result = DatabaseModel::connection(EnvModel::env("DB"))->execute("SELECT * FROM users");
-        $compactData = [];
+        $compactData = array();
         while($resultFetch = $result->fetch(PDO::FETCH_ASSOC)) {
             $compactData[] = $resultFetch;
         }

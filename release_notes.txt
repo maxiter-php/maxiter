@@ -1,3 +1,6 @@
+1.4.1
+- Configurations to work in legacy and modern PHP versions;
+
 1.4.0
 - Added docker configuration;
 - Updated Maxiter CLI to cors config in header.php template changing;

@@ -14,10 +14,10 @@ class LogModel {
         self::$log = mb_strtoupper($log);
 
         $query = "INSERT INTO logs (log, created_at) VALUES (:log, :date)";
-        $result = DatabaseModel::connection("maxiter")->execute($query, [
+        $result = DatabaseModel::connection("maxiter")->execute($query, array(
             ":log" => self::$log,
             ":date" => $formattedDateTime,
-        ]);
+        ));
     }
 
 }

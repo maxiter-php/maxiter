@@ -33,14 +33,14 @@ include __DIR__ . "/../app/controllers/ApiTestController.php";
 class Api {
 
     public function routes($url) {
-        $routes = [
+        $routes = array(
             
             // Your routes
             '/info'  => ['controller' => 'ApiTestController', 'function' => 'info', 'middleware' => null],
             '/hello' => ['controller' => 'ApiTestController', 'function' => 'helloWorld', 'middleware' => null],
             '/auth'  => ['controller' => 'ApiTestController', 'function' => 'withMiddleware', 'middleware' => 'BearerAuthorizationMiddleware'],
 
-        ];
+        );
         $url = rtrim($url,"/");
         if (isset($routes[$url])) {
             $route = $routes[$url];
