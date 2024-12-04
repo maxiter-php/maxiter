@@ -827,7 +827,7 @@ class MaxiterConfiguration
         // HEADER
         $headerFile = __DIR__ . "\\resources\\views\\pages\\_header\\header.php";
         // The content to prepend
-        $preContent = "<!-- You need this to load all Models of your Projects -->\n<?php require __DIR__ . \"/../../../../app/models/LoadModel.php\"; ?>\n";
+        $preContent = "<?php require __DIR__ . \"/../../../../app/models/LoadModel.php\"; ?>\n";
         // Check if the header.php file exists
         if (file_exists($headerFile)) {
             // Read the current content of the file

@@ -1,3 +1,7 @@
+1.4.0
+- Added docker configuration;
+- Updated Maxiter CLI to cors config in header.php template changing;
+
 1.3.2
 - Added configs in Api; Cors; ApiTestController; Maxiter CLI api generate;
 

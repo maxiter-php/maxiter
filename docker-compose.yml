@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  maxiter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: yourname/maxiter:latest # Change
+    container_name: maxiter_container # Change
+    ports:
+      - "8084:80"
+    volumes:
+      - .:/var/www/html # Change

@@ -2,5 +2,5 @@
 // 
 // @author Victor Béser
 var path = {
-APP_BASE_URL:"http://localhost/"
+APP_BASE_URL:"http://localhost:8084/"
 };
