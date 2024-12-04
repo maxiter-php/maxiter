@@ -1146,7 +1146,6 @@ class MaxiterConfiguration
             "\n" .
             "@author Victor Béser\n" .
             "*/\n" .
-            "require __DIR__ . '/../models/LoadModel.php';\n\n" .
             "class " . ucfirst($fileName) . " {\n\n" .
             "    public function main() {\n" .
             "        // Your code here\n" .
