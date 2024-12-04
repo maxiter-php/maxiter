@@ -5,7 +5,6 @@ invokes business logic, and returns as needed.
 
 @author Victor Béser
 */
-require __DIR__ . '/../models/LoadModel.php';
 
 class ApiTestController {
 
