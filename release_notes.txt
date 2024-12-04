@@ -1,7 +1,7 @@
 1.4.1
-- Configurations to work in legacy and modern PHP versions;
 - Bugfix in redirects;
 - Bugfix in api routing;
+- Updated configurations for Docker;
 
 1.4.0
 - Added docker configuration;

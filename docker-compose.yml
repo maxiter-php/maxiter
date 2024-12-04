@@ -5,9 +5,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: yourname/maxiter:latest # Change
-    container_name: maxiter_container # Change
+    image: maxiter-php/maxiter:latest
+    container_name: maxiter_container
     ports:
-      - "8084:80"
+      - "7000:80"
     volumes:
-      - .:/var/www/html # Change
+      - .:/var/www/html

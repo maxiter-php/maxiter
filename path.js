@@ -2,5 +2,5 @@
 // 
 // @author Victor Béser
 var path = {
-APP_BASE_URL:"http://localhost/maxiter/"
+APP_BASE_URL:"http://localhost/"
 };
