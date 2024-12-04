@@ -11,21 +11,20 @@ $urlParsed = $_SESSION['api-route'];
 unset($_SESSION['api-route']);
 $urlParts = explode('/', $urlParsed['path']);
 
-if ($urlParts[0] === 'api' && $urlParts[1] != null) {
+// LoadModel
+require __DIR__ . '/../app/models/LoadModel.php';
+
+if ($urlParts[0] === 'api' || $urlParts[0] === 'api/' && $urlParts[1] != null) {
     if (count($urlParts) > 1) {
         $url = "/" . implode("/", array_slice($urlParts, 1));
     } else {
-        header('Location: ../home');exit();
+        ResponseModel::json(false, "404 not found");
     }
 } else {
-    header('Location: ../home');exit();
+    ResponseModel::json(false, "404 not found");
 }
-
 // Middleware
 require __DIR__ . "/../app/middlewares/BearerAuthorizationMiddleware.php";
-
-// LoadModel
-require __DIR__ . '/../app/models/LoadModel.php';
 
 // Include your Controllers
 include __DIR__ . "/../app/controllers/ApiTestController.php";
