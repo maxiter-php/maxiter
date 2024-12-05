@@ -18,6 +18,7 @@ require __DIR__ . "/ResponseModel.php";
 require __DIR__ . "/PagesTitleModel.php";
 require __DIR__ . "/CorsModel.php";
 require __DIR__ . "/ApiModel.php";
+require __DIR__ . "/TreatModel.php";
 // Required Models
 
 // Set the default timezone in env.ini file

@@ -9,7 +9,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title><?= PagesTitleModel::getTitle() ?></title>
     <!-- Favicon icon -->
-    <link rel="icon" type="image/png" sizes="16x16" href="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/images/favicon.png">
+    <link rel="icon" type="image/png" sizes="16x16"
+        href="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/images/favicon.png">
     <link href="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/css/style.css" rel="stylesheet">
 
 </head>
@@ -35,7 +36,7 @@
                                             <input required name="password" type="password" class="form-control"
                                                 placeholder="Your passoword...">
                                         </div>
-                                       
+
                                         <div class="text-center">
                                             <button type="submit" class="btn btn-primary btn-block">Login</button>
                                         </div>
@@ -53,6 +54,9 @@
     <!--**********************************
         Scripts
     ***********************************-->
+    <!-- PATH JS -->
+    <script src="<?= EnvModel::env("APP_BASE_URL") ?>path.js"></script>
+    
     <!-- Required vendors -->
     <script src="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/vendor/global/global.min.js"></script>
     <script src="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/js/quixnav-init.js"></script>
