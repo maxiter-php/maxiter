@@ -1,3 +1,6 @@
+1.4.2
+- Added char treatment with TreatModel
+
 1.4.1
 - Bugfix in redirects;
 - Bugfix in api routing;
