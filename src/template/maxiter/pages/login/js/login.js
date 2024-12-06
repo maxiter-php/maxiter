@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let dataObj = Object.fromEntries(data);
 
         $.ajax({
-            url: path.APP_BASE_URL + "app/controllers/LogoutController.php",
+            url: path.APP_BASE_URL + "app/controllers/UsersController.php",
             type: "POST",
             data: {
                 user: dataObj.user,
@@ -21,7 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if(responseFetch.status == true) {
 
-                    window.location.href = "../index/";
+                    // Redirect home page
+                    window.location.href = path.APP_BASE_URL + "home";
                     
                 } else {
                     console.log(responseFetch.data);

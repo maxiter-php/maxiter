@@ -2,7 +2,7 @@
 
 <!-- Page Title -->
 <?php PagesTitleModel::title("Maxiter - Home Page"); ?>
-<link rel="stylesheet" href="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/pages/list-example/css/list-example.css">
+<link rel="stylesheet" href="<?php echo EnvModel::env("APP_BASE_URL") ?>resources/views/pages/list-example/css/list-example.css">
 
 <!--**********************************
         Main wrapper start
@@ -32,7 +32,7 @@
                 <div class="col-xl-12 col-lg-8 col-md-8">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title"><?= EnvModel::env("APP_NAME") ?> - List Example
+                            <h4 class="card-title"><?php echo EnvModel::env("APP_NAME") ?> - List Example
                             </h4>
                         </div>
                         <div class="card-body" id="table-container">
@@ -81,5 +81,5 @@
         Main wrapper end
     ***********************************-->
 
-<script src="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/pages/list-example/js/list-example.js"></script>
+<script src="<?php echo EnvModel::env("APP_BASE_URL") ?>resources/views/pages/list-example/js/list-example.js"></script>
 <?php include __DIR__ . "/../_footer/footer.php"; ?>
