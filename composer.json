@@ -1,0 +1,11 @@
+{
+    "name": "maxiter/maxiter",
+    "description": "Maxiter configurations",
+    "type": "project",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/maxiter-php/maxiter"
+        }
+    ]
+}
