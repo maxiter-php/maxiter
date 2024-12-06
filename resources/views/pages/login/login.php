@@ -7,11 +7,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title><?= PagesTitleModel::getTitle() ?></title>
+    <title><?php echo PagesTitleModel::getTitle() ?></title>
     <!-- Favicon icon -->
     <link rel="icon" type="image/png" sizes="16x16"
-        href="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/images/favicon.png">
-    <link href="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/css/style.css" rel="stylesheet">
+        href="<?php echo EnvModel::env("APP_BASE_URL") ?>resources/views/images/favicon.png">
+    <link href="<?php echo EnvModel::env("APP_BASE_URL") ?>resources/views/css/style.css" rel="stylesheet">
 
 </head>
 
@@ -55,16 +55,16 @@
         Scripts
     ***********************************-->
     <!-- PATH JS -->
-    <script src="<?= EnvModel::env("APP_BASE_URL") ?>path.js"></script>
+    <script src="<?php echo EnvModel::env("APP_BASE_URL") ?>path.js"></script>
     
     <!-- Required vendors -->
-    <script src="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/vendor/global/global.min.js"></script>
-    <script src="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/js/quixnav-init.js"></script>
-    <script src="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/js/custom.min.js"></script>
+    <script src="<?php echo EnvModel::env("APP_BASE_URL") ?>resources/views/vendor/global/global.min.js"></script>
+    <script src="<?php echo EnvModel::env("APP_BASE_URL") ?>resources/views/js/quixnav-init.js"></script>
+    <script src="<?php echo EnvModel::env("APP_BASE_URL") ?>resources/views/js/custom.min.js"></script>
     <!-- SWEET ALERT -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script src="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/pages/login/js/login.js"></script>
+    <script src="<?php echo EnvModel::env("APP_BASE_URL") ?>resources/views/pages/login/js/login.js"></script>
 </body>
 
 </html>

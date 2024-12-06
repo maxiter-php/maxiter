@@ -1,5 +1,8 @@
+1.4.3
+- Configurations for both old and modern PHP versions;
+
 1.4.2
-- Added char treatment with TreatModel
+- Added char treatment with TreatModel;
 
 1.4.1
 - Bugfix in redirects;

@@ -35,9 +35,9 @@ class Api {
         $routes = array(
             
             // Your routes
-            '/info'  => ['controller' => 'ApiTestController', 'function' => 'info', 'middleware' => null],
-            '/hello' => ['controller' => 'ApiTestController', 'function' => 'helloWorld', 'middleware' => null],
-            '/auth'  => ['controller' => 'ApiTestController', 'function' => 'withMiddleware', 'middleware' => 'BearerAuthorizationMiddleware'],
+            '/info'  => array('controller' => 'ApiTestController', 'function' => 'info', 'middleware' => null),
+            '/hello' => array('controller' => 'ApiTestController', 'function' => 'helloWorld', 'middleware' => null),
+            '/auth'  => array('controller' => 'ApiTestController', 'function' => 'withMiddleware', 'middleware' => 'BearerAuthorizationMiddleware'),
 
         );
         $url = rtrim($url,"/");

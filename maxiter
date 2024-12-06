@@ -59,7 +59,7 @@ class MaxiterConfiguration
             '<?php include __DIR__ . "/../_header/header.php"; ?>' . "\n" .
             "<!-- Page Title -->\n" .
             '<?php PagesTitleModel::title("Maxiter - ' . ucfirst($fileName) . '"); ?>' . "\n" .
-            '<link rel="stylesheet" href="<?= EnvModel::env("APP_BASE_URL") ?>/resources/views/pages/' . $fileName . '/css/' . $fileName . '.css">' . "\n" .
+            '<link rel="stylesheet" href="<?php echo EnvModel::env("APP_BASE_URL") ?>/resources/views/pages/' . $fileName . '/css/' . $fileName . '.css">' . "\n" .
             "<!--**********************************\n" .
             "        Main wrapper start\n" .
             "***********************************-->\n" .
@@ -88,7 +88,7 @@ class MaxiterConfiguration
             "                <div class=\"col-xl-12 col-lg-8 col-md-8\">" . "\n" .
             "                    <div class=\"card\">" . "\n" .
             "                        <div class=\"card-header\">" . "\n" .
-            "                            <h4 class=\"card-title\"><?= EnvModel::env(\"APP_NAME\") ?> - " . ucfirst($fileName) . "</h4>\n" .
+            "                            <h4 class=\"card-title\"><?php echo EnvModel::env(\"APP_NAME\") ?> - " . ucfirst($fileName) . "</h4>\n" .
             "                        </div>" . "\n" .
             "                        <div class=\"card-body\">" . "\n" .
             "                            <div class=\"row\">" . "\n" .
@@ -113,7 +113,7 @@ class MaxiterConfiguration
             "        Main wrapper end\n" .
             "    ***********************************-->" . "\n" .
             "\n" .
-            '<script src="<?= EnvModel::env("APP_BASE_URL") ?>resources/views/pages/' . $fileName . '/js/' . $fileName . '.js"></script>' . "\n" .
+            '<script src="<?php echo EnvModel::env("APP_BASE_URL") ?>resources/views/pages/' . $fileName . '/js/' . $fileName . '.js"></script>' . "\n" .
             '<?php include __DIR__ . "/../_footer/footer.php"; ?>'
         ;
 
@@ -856,7 +856,7 @@ class MaxiterConfiguration
                 $originalHref = $matches[1];
 
                 // Modify the href by prepending the base URL
-                $modifiedHref = '<?= EnvModel::env("APP_BASE_URL") ?>resources/views/' . $originalHref;
+                $modifiedHref = '<?php echo EnvModel::env("APP_BASE_URL") ?>resources/views/' . $originalHref;
 
                 // Replace the href in the <link> tag with the modified href
                 return str_replace($originalHref, $modifiedHref, $matches[0]);
@@ -895,7 +895,7 @@ class MaxiterConfiguration
         // The content to prepend
         $preContent = "<script>\n
                             // Page Title Definition \n
-                            document.querySelector('#page_title').innerHTML = <?= json_encode(PagesTitleModel::getTitle()); ?>\n
+                            document.querySelector('#page_title').innerHTML = <?php echo json_encode(PagesTitleModel::getTitle()); ?>\n
                         </script>";
         // Check if the footer.php file exists
         if (file_exists($footerFile)) {
@@ -925,7 +925,7 @@ class MaxiterConfiguration
                 $originalHref = $matches[1];
 
                 // Modify the href by prepending the base URL
-                $modifiedHref = '<?= EnvModel::env("APP_BASE_URL") ?>resources/views/' . $originalHref;
+                $modifiedHref = '<?php echo EnvModel::env("APP_BASE_URL") ?>resources/views/' . $originalHref;
 
                 // Replace the href in the <link> tag with the modified href
                 return str_replace($originalHref, $modifiedHref, $matches[0]);
@@ -949,7 +949,7 @@ class MaxiterConfiguration
         $preContent = "<?php include __DIR__ . '/../_header/header.php'; ?>\n
 <!-- Page Title -->\n
 <?php PagesTitleModel::title('Maxiter - Home Page'); ?>\n
-<link rel='stylesheet' href='<?= EnvModel::env('APP_BASE_URL') ?>resources/views/pages/home/css/home.css'>\n";
+<link rel='stylesheet' href='<?php echo EnvModel::env('APP_BASE_URL') ?>resources/views/pages/home/css/home.css'>\n";
         // Check if the home.php file exists
         if (file_exists($homeFile)) {
             // Read the current content of the file
@@ -968,7 +968,7 @@ class MaxiterConfiguration
             echo "The home.php file does not exist.\n";
         }
         // The content to append
-        $appendContent = "<script src='<?= EnvModel::env('APP_BASE_URL') ?>resources/views/pages/home/js/home.js'></script>\n
+        $appendContent = "<script src='<?php echo EnvModel::env('APP_BASE_URL') ?>resources/views/pages/home/js/home.js'></script>\n
 <?php include __DIR__ . '/../_footer/footer.php'; ?>";
 
         // Check if the home.php file exists
@@ -1001,7 +1001,7 @@ class MaxiterConfiguration
                 // Check if the path is relative (i.e., not starting with "http" or "//")
                 if (strpos($originalSrc, 'http') === false && strpos($originalSrc, '//') === false) {
                     // Prepend the base URL and resources/views/ to the src path
-                    $modifiedSrc = '<?= EnvModel::env(\'APP_BASE_URL\') ?>resources/views/' . $originalSrc;
+                    $modifiedSrc = '<?php echo EnvModel::env(\'APP_BASE_URL\') ?>resources/views/' . $originalSrc;
                     return str_replace($originalSrc, $modifiedSrc, $matches[0]);
                 }
                 // If the src is already an absolute URL, return it unchanged
@@ -1014,7 +1014,7 @@ class MaxiterConfiguration
                 // Check if the path is relative
                 if (strpos($originalUrl, 'http') === false && strpos($originalUrl, '//') === false) {
                     // Prepend the base URL and resources/views/ to the background-image URL
-                    $modifiedUrl = 'url(<?= EnvModel::env(\'APP_BASE_URL\') ?>resources/views/' . $originalUrl . ')';
+                    $modifiedUrl = 'url(<?php echo EnvModel::env(\'APP_BASE_URL\') ?>resources/views/' . $originalUrl . ')';
                     // Replace only the part inside the url() function with the modified URL
                     return preg_replace('/url\(["\']?([^"\')]+)["\']?\)/', $modifiedUrl, $matches[0]);
                 }
@@ -1028,7 +1028,7 @@ class MaxiterConfiguration
                 // Check if the path is relative (i.e., not starting with "http" or "//")
                 if (strpos($originalSrc, 'http') === false && strpos($originalSrc, '//') === false) {
                     // Prepend the base URL and resources/views/ to the src path
-                    $modifiedSrc = '<?= EnvModel::env(\'APP_BASE_URL\') ?>resources/views/' . $originalSrc;
+                    $modifiedSrc = '<?php echo EnvModel::env(\'APP_BASE_URL\') ?>resources/views/' . $originalSrc;
                     return str_replace($originalSrc, $modifiedSrc, $matches[0]);
                 }
                 // If the src is already an absolute URL, return it unchanged
@@ -1058,7 +1058,7 @@ class MaxiterConfiguration
                 // Check if the path is relative (i.e., not starting with "http" or "//")
                 if (strpos($originalSrc, 'http') === false && strpos($originalSrc, '//') === false) {
                     // Prepend the base URL and resources/views/ to the src path
-                    $modifiedSrc = '<?= EnvModel::env(\'APP_BASE_URL\') ?>resources/views/' . $originalSrc;
+                    $modifiedSrc = '<?php echo EnvModel::env(\'APP_BASE_URL\') ?>resources/views/' . $originalSrc;
                     return str_replace($originalSrc, $modifiedSrc, $matches[0]);
                 }
                 // If the src is already an absolute URL, return it unchanged
@@ -1071,7 +1071,7 @@ class MaxiterConfiguration
                 // Check if the path is relative
                 if (strpos($originalUrl, 'http') === false && strpos($originalUrl, '//') === false) {
                     // Prepend the base URL and resources/views/ to the background-image URL
-                    $modifiedUrl = 'url(<?= EnvModel::env(\'APP_BASE_URL\') ?>resources/views/' . $originalUrl . ')';
+                    $modifiedUrl = 'url(<?php echo EnvModel::env(\'APP_BASE_URL\') ?>resources/views/' . $originalUrl . ')';
                     // Replace only the part inside the url() function with the modified URL
                     return preg_replace('/url\(["\']?([^"\')]+)["\']?\)/', $modifiedUrl, $matches[0]);
                 }
