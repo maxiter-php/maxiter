@@ -2,13 +2,11 @@
     "name": "maxiter/maxiter",
     "description": "Maxiter configurations",
     "type": "project",
+    "license": "MIT",
     "repositories": [
         {
             "type": "vcs",
             "url": "https://github.com/maxiter-php/maxiter"
         }
-    ],
-    "require": {
-        "maxiter/maxiter": "dev-main"
-    }
+    ]
 }
