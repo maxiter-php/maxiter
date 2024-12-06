@@ -15,7 +15,7 @@ class UsersController {
         // Escaping special chars with TreatModel
         $data = TreatModel::escape($_POST);
         $user = $data['user'];
-        $password = $data['password'];
+        $password = TreatModel::hash($data['password'], "md5"); // Hashing password with TreatModel, you could use 'md5' or 'hash'
 
         // Searching for an especific user in database using DatabaseModel with params
         $result = DatabaseModel::connection(EnvModel::env("DB"))->execute("SELECT * FROM users WHERE username = :user AND password = :pass", array(
@@ -29,6 +29,20 @@ class UsersController {
         } else {
             ResponseModel::json( false, "User is not ok!");
         }
+
+    }
+
+
+    public function getUsers() {
+
+        $result = DatabaseModel::connection(EnvModel::env("DB"))->execute("SELECT * FROM users");
+
+        $response = array();
+        while($resultFetch = $result->fetch(PDO::FETCH_ASSOC)) {
+            $response[] = $resultFetch;
+        }
+
+        ResponseModel::json(true, $response);
 
     }
 

@@ -2,8 +2,14 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("List Example");
     $.ajax({
         url: path.APP_BASE_URL + "app/controllers/UsersController.php",
-        type: "GET",
+        type: "POST",
+        data: {
+            controller: 'getUsers' // Function in controller
+        },
         success: function (response) {
+
+            console.log(response);
+
             let tbody_table = document.querySelector("#tbody-table");
             tbody_table.innerHTML = "";
 

@@ -1,5 +1,6 @@
 1.4.3
 - Configurations for both old and modern PHP versions;
+- Hashing option in TreatModel;
 
 1.4.2
 - Added char treatment with TreatModel;
