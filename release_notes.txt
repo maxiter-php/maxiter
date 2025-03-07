@@ -1,3 +1,6 @@
+1.4.5
+- Added Sweet Alert easy-to-use function;
+
 1.4.4
 - New return in AuthModel;
 - Function for array null or empty in TreatModel;

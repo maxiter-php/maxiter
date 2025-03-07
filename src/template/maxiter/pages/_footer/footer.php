@@ -4,7 +4,7 @@
 
 
 
-<script>
+        <script>
     // Page Title Definition
     document.querySelector("#page_title").innerHTML = <?php echo json_encode(PagesTitleModel::getTitle()); ?>
 </script>
@@ -38,6 +38,9 @@
 
 <!-- SWEET ALERT -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- SWAL FUNCTION JS -->
+<script src="<?php echo EnvModel::env("APP_BASE_URL") ?>swal.js"></script>
 
 <!-- JS XLSX -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"
