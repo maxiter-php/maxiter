@@ -23,8 +23,12 @@ class UsersController {
             ":pass" => $password
         ));
 
+        $resultFetch = $result->fetch(PDO::FETCH_ASSOC);
+        
         // Returning JSON with ResponseModel
         if($result->rowCount() != 0) {
+            $_SESSION['logged'] = true;
+            $_SESSION['userContext'] = $resultFetch;
             ResponseModel::json( true, "User is ok!");
         } else {
             ResponseModel::json( false, "User is not ok!");

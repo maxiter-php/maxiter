@@ -27,7 +27,10 @@ class AuthModel {
 
         if(isset($_SESSION['logged'])) {
             self::$contextData = $contextData;
-            return $_SESSION[self::$contextData];
+
+            $userContext = $_SESSION['userContext'];
+
+            return $userContext[self::$contextData];
 
         }
 

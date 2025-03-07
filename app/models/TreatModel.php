@@ -17,6 +17,14 @@ class TreatModel
         return $response;
     }
 
+    public static function isNull(array $data)
+    {
+        $filtered = array_filter($data, function ($value) {
+            return $value === null || empty($value);
+        });
+        return count($filtered) > 0;
+    }
+    
     public static function hash(string $password, string $method = "md5")
     {
 
