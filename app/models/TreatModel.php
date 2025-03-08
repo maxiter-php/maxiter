@@ -8,13 +8,18 @@ return all array data with char escape.
 class TreatModel
 {
 
-    public static function escape(array $data)
+    public static function escape($data)
     {
-        $response = array();
-        foreach ($data as $key => $value) {
-            $response[$key] = htmlspecialchars(trim($value), ENT_QUOTES, 'UTF-8');
+        if (is_array($data)) {
+            $response = array();
+            foreach ($data as $key => $value) {
+                $response[$key] = htmlspecialchars(trim($value), ENT_QUOTES, 'UTF-8');
+            }
+            return $response;
+        } else {
+            $response = htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
+            return $response;
         }
-        return $response;
     }
 
     public static function isNull(array $data)
@@ -24,7 +29,7 @@ class TreatModel
         });
         return count($filtered) > 0;
     }
-    
+
     public static function hash(string $password, string $method = "md5")
     {
 
