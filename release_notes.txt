@@ -1,5 +1,6 @@
 1.4.6
 - Escape function accept string and not only array;
+- TreatModel isNull function handle with exceptions;
 
 1.4.5
 - Added Sweet Alert easy-to-use function;

@@ -22,11 +22,24 @@ class TreatModel
         }
     }
 
-    public static function isNull(array $data)
+    public static function isNull(array $data, $exception = null)
     {
+        if (!empty($exception)) {
+            if (is_array($exception)) {
+                foreach ($exception as $key) {
+                    if (array_key_exists($key, $data)) {
+                        unset($data[$key]);
+                    }
+                }
+            } elseif (array_key_exists($exception, $data)) {
+                unset($data[$exception]);
+            }
+        }
+
         $filtered = array_filter($data, function ($value) {
             return $value === null || empty($value);
         });
+
         return count($filtered) > 0;
     }
 
