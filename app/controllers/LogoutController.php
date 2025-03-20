@@ -12,10 +12,9 @@ class LogoutController {
 
     public function main() {
         // Your code here
-        session_start();
+        LogModel::log("logout user id: " . AuthModel::getContext('id'));
         session_unset();
         session_destroy();
-
         ResponseModel::json(true, "Logout!");
     }
 

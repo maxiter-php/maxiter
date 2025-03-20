@@ -1,3 +1,6 @@
+1.4.7
+- LogModel & LogoutController bugfix;
+
 1.4.6
 - Escape function accept string and not only array;
 - TreatModel isNull function handle with exceptions;
