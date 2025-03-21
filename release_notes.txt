@@ -1,3 +1,6 @@
+1.4.8
+- Added new function to select @body tag content from template/index.html in generating pages;
+
 1.4.7
 - LogModel & LogoutController bugfix;
 

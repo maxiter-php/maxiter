@@ -41,81 +41,84 @@ class MaxiterConfiguration
         }
     }
 
-    public function generatePage($fileName)
+    public function generatePage($fileName, $baseContent = null)
     {
         $path = __DIR__ . '/resources/views/pages/' . $fileName . '/' . $fileName . ".php";
         $cssPath = __DIR__ . '/resources/views/pages/' . $fileName . '/css/' . $fileName . '.css';
         $jsPath = __DIR__ . '/resources/views/pages/' . $fileName . '/js/' . $fileName . '.js';
 
         // Content to be written to the PHP file
-        $content =
-            "<!-- \n" .
-            "This is your new page, it's already routed in Maxiter application\n" .
-            "and everything you need is included here.\n" .
-            "Happy Coding!\n" .
-            "\n" .
-            "@author Victor Béser\n" .
-            "-->\n" .
-            '<?php include __DIR__ . "/../_header/header.php"; ?>' . "\n" .
-            "<!-- Page Title -->\n" .
-            '<?php PagesTitleModel::title("Maxiter - ' . ucfirst($fileName) . '"); ?>' . "\n" .
-            '<link rel="stylesheet" href="<?php echo EnvModel::env("APP_BASE_URL") ?>/resources/views/pages/' . $fileName . '/css/' . $fileName . '.css">' . "\n" .
-            "<!--**********************************\n" .
-            "        Main wrapper start\n" .
-            "***********************************-->\n" .
-            '<div id="main-wrapper">' . "\n" .
-            "\n" .
-            "    <!-- NAVBAR -->\n" .
-            '    <?php include __DIR__ . "/../_navbar/navbar.php"; ?>' . "\n" .
-            "    <!-- NAVBAR -->\n" .
-            "\n" .
-            "    <!-- SIDEBAR -->\n" .
-            '    <?php include __DIR__ . "/../_sidenav/sidenav.php"; ?>' . "\n" .
-            "    <!-- SIDEBAR -->\n" .
-            "\n" .
-            "    <!--**********************************\n" .
-            "            Content body start\n" .
-            "        ***********************************-->\n" .
-            '    <div class="content-body">' . "\n" .
-            "        <!-- row -->\n" .
-            "        <div class=\"container-fluid\">" . "\n" .
-            "\n" .
-            "            <!-- CARDS -->\n" .
-            '            <?php include __DIR__ . "/../_cards/cards.php"; ?>' . "\n" .
-            "            <!-- CARDS -->\n" .
-            "\n" .
-            "            <div class=\"row\">" . "\n" .
-            "                <div class=\"col-xl-12 col-lg-8 col-md-8\">" . "\n" .
-            "                    <div class=\"card\">" . "\n" .
-            "                        <div class=\"card-header\">" . "\n" .
-            "                            <h4 class=\"card-title\"><?php echo EnvModel::env(\"APP_NAME\") ?> - " . ucfirst($fileName) . "</h4>\n" .
-            "                        </div>" . "\n" .
-            "                        <div class=\"card-body\">" . "\n" .
-            "                            <div class=\"row\">" . "\n" .
-            "                                <div style=\"text-align:justify;\" class=\"col-xl-12 col-lg-8\">" . "\n" .
-            "                                    <!-- CODE HERE HERE -->\n\n" .
-            "                                </div>" . "\n" .
-            "                            </div>" . "\n" .
-            "                        </div>" . "\n" .
-            "                    </div>" . "\n" .
-            "                </div>" . "\n" .
-            "\n" .
-            "            </div>" . "\n" .
-            "\n" .
-            "        </div>" . "\n" .
-            "    </div>" . "\n" .
-            "    <!--**********************************\n" .
-            "            Content body end\n" .
-            "        ***********************************-->\n" .
-            "\n" .
-            "</div>" . "\n" .
-            "<!--**********************************\n" .
-            "        Main wrapper end\n" .
-            "    ***********************************-->" . "\n" .
-            "\n" .
-            '<script src="<?php echo EnvModel::env("APP_BASE_URL") ?>resources/views/pages/' . $fileName . '/js/' . $fileName . '.js"></script>' . "\n" .
-            '<?php include __DIR__ . "/../_footer/footer.php"; ?>'
-        ;
+        if ($baseContent == null) {
+            $content =
+                "<!-- \n" .
+                "This is your new page, it's already routed in Maxiter application\n" .
+                "and everything you need is included here.\n" .
+                "Happy Coding!\n" .
+                "\n" .
+                "@author Victor Béser\n" .
+                "-->\n" .
+                '<?php include __DIR__ . "/../_header/header.php"; ?>' . "\n" .
+                "<!-- Page Title -->\n" .
+                '<?php PagesTitleModel::title("Maxiter - ' . ucfirst($fileName) . '"); ?>' . "\n" .
+                '<link rel="stylesheet" href="<?php echo EnvModel::env("APP_BASE_URL") ?>/resources/views/pages/' . $fileName . '/css/' . $fileName . '.css">' . "\n" .
+                "<!--**********************************\n" .
+                "        Main wrapper start\n" .
+                "***********************************-->\n" .
+                '<div id="main-wrapper">' . "\n" .
+                "\n" .
+                "    <!-- NAVBAR -->\n" .
+                '    <?php include __DIR__ . "/../_navbar/navbar.php"; ?>' . "\n" .
+                "    <!-- NAVBAR -->\n" .
+                "\n" .
+                "    <!-- SIDEBAR -->\n" .
+                '    <?php include __DIR__ . "/../_sidenav/sidenav.php"; ?>' . "\n" .
+                "    <!-- SIDEBAR -->\n" .
+                "\n" .
+                "    <!--**********************************\n" .
+                "            Content body start\n" .
+                "        ***********************************-->\n" .
+                '    <div class="content-body">' . "\n" .
+                "        <!-- row -->\n" .
+                "        <div class=\"container-fluid\">" . "\n" .
+                "\n" .
+                "            <!-- CARDS -->\n" .
+                '            <?php include __DIR__ . "/../_cards/cards.php"; ?>' . "\n" .
+                "            <!-- CARDS -->\n" .
+                "\n" .
+                "            <div class=\"row\">" . "\n" .
+                "                <div class=\"col-xl-12 col-lg-8 col-md-8\">" . "\n" .
+                "                    <div class=\"card\">" . "\n" .
+                "                        <div class=\"card-header\">" . "\n" .
+                "                            <h4 class=\"card-title\"><?php echo EnvModel::env(\"APP_NAME\") ?> - " . ucfirst($fileName) . "</h4>\n" .
+                "                        </div>" . "\n" .
+                "                        <div class=\"card-body\">" . "\n" .
+                "                            <div class=\"row\">" . "\n" .
+                "                                <div style=\"text-align:justify;\" class=\"col-xl-12 col-lg-8\">" . "\n" .
+                "                                    <!-- CODE HERE HERE -->\n\n" .
+                "                                </div>" . "\n" .
+                "                            </div>" . "\n" .
+                "                        </div>" . "\n" .
+                "                    </div>" . "\n" .
+                "                </div>" . "\n" .
+                "\n" .
+                "            </div>" . "\n" .
+                "\n" .
+                "        </div>" . "\n" .
+                "    </div>" . "\n" .
+                "    <!--**********************************\n" .
+                "            Content body end\n" .
+                "        ***********************************-->\n" .
+                "\n" .
+                "</div>" . "\n" .
+                "<!--**********************************\n" .
+                "        Main wrapper end\n" .
+                "    ***********************************-->" . "\n" .
+                "\n" .
+                '<script src="<?php echo EnvModel::env("APP_BASE_URL") ?>resources/views/pages/' . $fileName . '/js/' . $fileName . '.js"></script>' . "\n" .
+                '<?php include __DIR__ . "/../_footer/footer.php"; ?>'
+            ;
+        }
+
 
         $this->createDirectory(__DIR__ . '/resources');
         $this->createDirectory(__DIR__ . '/resources/views');
@@ -129,7 +132,37 @@ class MaxiterConfiguration
             echo "This page already exists\n";
         } else {
             // Create the PHP file and write the content
-            file_put_contents($path, $content);
+
+            if ($baseContent == null) {
+                file_put_contents($path, $content);
+
+            } else if ($baseContent != null) {
+                $indexFile = __DIR__ . "\\src\\template\\$baseContent\\index.html";
+
+                // Check if the index file exists
+                if (file_exists($indexFile)) {
+                    // Read the content of index.html
+                    $fileContent = file_get_contents($indexFile);
+
+                    // Use regular expression to extract content between @header markers
+                    if (preg_match('/@body(.*?)@body/s', $fileContent, $matches)) {
+                        // $matches[1] will contain the content between the @header markers
+
+                        // Create the body.php file and write the extracted content
+                        $bodyFile = __DIR__ . "\\resources\\views\\pages\\$fileName\\$fileName.php";
+                        if (file_put_contents($path, $matches[1])) {
+                            echo "Page $fileName will be created using the index.html with @body tag as content.\n";
+                        } else {
+                            echo "Failed to create $fileName.php file.\n";
+                        }
+                    } else {
+                        echo "No content found between @body markers.\n";
+                    }
+                } else {
+                    echo "The index.html file does not exist.\n";
+                }
+            }
+
             echo "Page $fileName created\n";
         }
 
@@ -142,6 +175,114 @@ class MaxiterConfiguration
         $jsContent = "// JavaScript for $fileName page\n";
         file_put_contents($jsPath, $jsContent);
         echo "JS file $fileName.js created\n";
+
+        // FINAL CONFIGURATIONS CHANGING TAGS WITH PATH VAR
+        if ($baseContent != null) {
+            // PAGE
+            $page = __DIR__ . "\\resources\\views\\pages\\$fileName\\$fileName.php";
+            // The content to prepend
+            $preContent = "<?php include __DIR__ . '/../_header/header.php'; ?>\n
+<!-- Page Title -->\n
+<?php PagesTitleModel::title('Maxiter - $fileName Page'); ?>\n
+<link rel='stylesheet' href='<?php echo EnvModel::env('APP_BASE_URL') ?>resources/views/pages/$fileName/css/$fileName.css'>\n";
+            // Check if the $fileName.php file exists
+            if (file_exists($page)) {
+                // Read the current content of the file
+                $currentContent = file_get_contents($page);
+
+                // Prepend the new content to the existing content
+                $newContent = $preContent . $currentContent;
+
+                // Write the new content back to the file
+                if (file_put_contents($page, $newContent)) {
+                    echo "Successfully added the configuration at the beginning of $fileName.php.\n";
+                } else {
+                    echo "Failed to update $fileName.php.\n";
+                }
+            } else {
+                echo "The $fileName.php file does not exist.\n";
+            }
+            // The content to append
+            $appendContent = "<script src='<?php echo EnvModel::env('APP_BASE_URL') ?>resources/views/pages/$fileName/js/$fileName.js'></script>\n
+<?php include __DIR__ . '/../_footer/footer.php'; ?>";
+
+            // Check if the $fileName.php file exists
+            if (file_exists($page)) {
+                // Read the current content of the file
+                $currentContent = file_get_contents($page);
+
+                // Append the new content to the existing content
+                $newContent = $currentContent . $appendContent;
+
+                // Write the new content back to the file
+                if (file_put_contents($page, $newContent)) {
+                    echo "Successfully added the configuration at the end of $fileName.php.\n";
+                } else {
+                    echo "Failed to update $fileName.php.\n";
+                }
+            } else {
+                echo "The $fileName.php file does not exist.\n";
+            }
+
+            // All SRC or URL IMAGE HOMEPAGE
+            // Check if the home.php file exists
+            if (file_exists($page)) {
+                // Read the current content of the file
+                $content = file_get_contents($page);
+
+                // Regular expression to find and modify img src paths
+                $content = preg_replace_callback('/<img[^>]*src=["\']([^"\']+)["\']/i', function ($matches) {
+                    $originalSrc = $matches[1];  // The original src value
+                    // Check if the path is relative (i.e., not starting with "http" or "//")
+                    if (strpos($originalSrc, 'http') === false && strpos($originalSrc, '//') === false) {
+                        // Prepend the base URL and resources/views/ to the src path
+                        $modifiedSrc = '<?php echo EnvModel::env(\'APP_BASE_URL\') ?>resources/views/' . $originalSrc;
+                        return str_replace($originalSrc, $modifiedSrc, $matches[0]);
+                    }
+                    // If the src is already an absolute URL, return it unchanged
+                    return $matches[0];
+                }, $content);
+
+                // Regular expression to find and modify background-image url() paths
+                $content = preg_replace_callback('/background-image:\s*url\(["\']?([^"\')]+)["\']?\)/i', function ($matches) {
+                    $originalUrl = $matches[1];  // The original URL in the background-image
+                    // Check if the path is relative
+                    if (strpos($originalUrl, 'http') === false && strpos($originalUrl, '//') === false) {
+                        // Prepend the base URL and resources/views/ to the background-image URL
+                        $modifiedUrl = 'url(<?php echo EnvModel::env(\'APP_BASE_URL\') ?>resources/views/' . $originalUrl . ')';
+                        // Replace only the part inside the url() function with the modified URL
+                        return preg_replace('/url\(["\']?([^"\')]+)["\']?\)/', $modifiedUrl, $matches[0]);
+                    }
+                    // If the URL is already absolute, return it unchanged
+                    return $matches[0];
+                }, $content);
+
+                // Regular expression to find and modify img src paths
+                $content = preg_replace_callback('/<source[^>]*src=["\']([^"\']+)["\']/i', function ($matches) {
+                    $originalSrc = $matches[1];  // The original src value
+                    // Check if the path is relative (i.e., not starting with "http" or "//")
+                    if (strpos($originalSrc, 'http') === false && strpos($originalSrc, '//') === false) {
+                        // Prepend the base URL and resources/views/ to the src path
+                        $modifiedSrc = '<?php echo EnvModel::env(\'APP_BASE_URL\') ?>resources/views/' . $originalSrc;
+                        return str_replace($originalSrc, $modifiedSrc, $matches[0]);
+                    }
+                    // If the src is already an absolute URL, return it unchanged
+                    return $matches[0];
+                }, $content);
+
+                // Write the modified content back to the file
+                if (file_put_contents($page, $content)) {
+                    echo "Successfully updated the src and background-image paths in $fileName.php.\n";
+                } else {
+                    echo "Failed to update the $fileName.php file.\n";
+                }
+                
+            } else {
+                echo "The $fileName.php file does not exist.\n";
+            }
+        }
+
+        echo "Note that this is not 100% perfect due the massive exceptions we get when different types of devs create different templates many different ways, please check out the src, href, and stuff.";
     }
 
     public function generateModel($fileName)
@@ -1253,10 +1394,14 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
     $config->generateModel($argv[3]);
 } else if ($argv[1] === 'new' && $argv[2] === 'view') {
     if (!isset($argv[3]) || empty($argv[3])) {
-        echo "Error: php maxiter new view [view_name]";
+        echo "Error: php maxiter new view [view_name] [optional: template_name]";
         exit();
     }
-    $config->generatePage($argv[3]);
+    if(isset($argv[4])) {
+        $config->generatePage($argv[3], $argv[4]);
+    } else {
+        $config->generatePage($argv[3]);
+    }
 } else if ($argv[1] === 'new' && $argv[2] === 'log') {
 
     if (!isset($argv[3]) || empty($argv[3])) {
