@@ -276,7 +276,7 @@ class MaxiterConfiguration
                 } else {
                     echo "Failed to update the $fileName.php file.\n";
                 }
-                
+
             } else {
                 echo "The $fileName.php file does not exist.\n";
             }
@@ -559,6 +559,14 @@ class MaxiterConfiguration
             }
             exec("php -S localhost:$port");
         }
+    }
+
+    public function initGUI()
+    {
+        $env = parse_ini_file("./env.ini", true);
+        $path = $env["app"]["APP_BASE_URL"];
+        echo "Do not forget to set your correct app base url using ' php maxiter path [path] ', using: $path";
+        exec("start $path" . "gui.html");
     }
     public function setPath($pathUrl)
     {
@@ -1397,7 +1405,7 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
         echo "Error: php maxiter new view [view_name] [optional: template_name]";
         exit();
     }
-    if(isset($argv[4])) {
+    if (isset($argv[4])) {
         $config->generatePage($argv[3], $argv[4]);
     } else {
         $config->generatePage($argv[3]);
@@ -1421,6 +1429,10 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
     } else {
         $config->initServer($argv[2]);
     }
+} else if ($argv[1] === 'gui') {
+    if (!isset($argv[2]) || empty($argv[2])) {
+        $config->initGUI();
+    }
 } else if ($argv[1] === 'path') {
     if (!isset($argv[2]) || empty($argv[2])) {
         echo "Error: php maxiter path [base_url_path] || Example: php maxiter path http://localhost/maxiter/ * Don't forget the / at the end!";
@@ -1433,15 +1445,16 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
         exit();
     }
 
-    echo "Warning! This will erase all your actual /views data and set up a new configuration using the template in src/template/" . $argv[3] . ". Are you sure? (y/N): ";
-    $handle = fopen("php://stdin", "r");
-    $response = trim(fgets($handle));  // Obtém a resposta e remove espaços em branco ao redor
-    fclose($handle);
-    if (strtolower($response) === 'y' || strtolower($response) === 'yes') {
-        $config->setNewTemplate($argv[3]);
-    } else {
-        echo "Operation cancelled.";
-    }
+    echo "Warning! This will erase all your actual /views data and set up a new configuration using the template in src/template/" . $argv[3] . ".";
+    $config->setNewTemplate($argv[3]);
+    // $handle = fopen("php://stdin", "r");
+    // $response = trim(fgets($handle));  
+    // fclose($handle);
+    // if (strtolower($response) === 'y' || strtolower($response) === 'yes') {
+    //     $config->setNewTemplate($argv[3]);
+    // } else {
+    //     echo "Operation cancelled.";
+    // }
 } else if ($argv[1] === 'new' && $argv[2] === 'api') {
     if (!isset($argv[3]) || empty($argv[3])) {
         echo "Error: php maxiter new api [api_controller_name]";
