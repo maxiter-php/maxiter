@@ -1,3 +1,6 @@
+1.4.10
+- Added file treatment in TreatModel;
+
 1.4.9
 - Added GUI for CLI;
 

@@ -66,5 +66,19 @@ class TreatModel
 
     }
 
+    public static function file($file, $path) {
+
+        $fileName = $file['name'];
+        $newFileName = md5(uniqid(microtime(), true));
+        $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+        if(move_uploaded_file($file['tmp_name'], $path . "$newFileName.$extension")) {
+            $newFileName = "$newFileName.$extension";
+        }
+
+        return $newFileName;
+
+    }
+
 
 }
