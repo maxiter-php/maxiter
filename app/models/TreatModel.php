@@ -78,7 +78,7 @@ class TreatModel
 
         if(move_uploaded_file($file['tmp_name'], $path . "$newFileName.$extension")) {
             $newFileName = "$newFileName.$extension";
-            return true;
+            return $newFileName;
         } else {
             return false;
         }
