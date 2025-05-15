@@ -1,3 +1,6 @@
+1.5.2
+- Updated Maxiter CLI with prod env config;
+
 1.5.1
 - Updated Maxiter CLI with phpunit execute command;
 

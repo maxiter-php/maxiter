@@ -1404,6 +1404,33 @@ class MaxiterConfiguration
 
     }
 
+    public function configProdEnv()
+    {
+        $gitignorePath = __DIR__ . '/.gitignore';
+
+        $entries = array(
+            'vendor/',
+            'bash.php',
+            'gui.html',
+            'maxiter',
+            'phpunit.xml',
+            'README.md',
+            'release_notes.txt',
+        );
+
+        $current = file_exists($gitignorePath) ? file($gitignorePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) : [];
+
+        $merged = array_unique(array_merge($current, $entries));
+
+        sort($merged);
+
+        file_put_contents($gitignorePath, implode(PHP_EOL, $merged) . PHP_EOL);
+
+        echo "Generated .gitignore with non-prod files\n";
+    }
+
+
+
 
 
     private function createDirectory($dir)
@@ -1532,6 +1559,12 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
         exit();
     }
     $config->PHPUnitTest();
+} else if ($argv[1] === 'config' && $argv[2] === 'prod') {
+    if (!isset($argv[1]) || empty($argv[1]) || !isset($argv[2]) || empty($argv[2])) {
+        echo "Error: php maxiter config prod";
+        exit();
+    }
+    $config->configProdEnv();
 } else {
     echo "Command not found\n";
 }
