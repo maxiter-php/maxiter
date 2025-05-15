@@ -25,10 +25,10 @@ class UnitTestControllerTest extends TestCase
 
         $this->assertJson($output);
 
-        $expected = json_encode([
+        $expected = json_encode(array(
             "status" => true,
             "data" => 10
-        ]);
+        ));
 
         $this->assertEquals($expected, $output);
     }
