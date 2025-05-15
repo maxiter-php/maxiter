@@ -1369,9 +1369,9 @@ class MaxiterConfiguration
             "*/\n" .
             "define('PHPUNIT_RUNNING', true);\n" .
             "use PHPUnit\Framework\TestCase;\n" .
-            "require_once __DIR__ . '/../app/controllers/".$fileName.".php';\n\n" .
+            "require_once __DIR__ . '/../app/controllers/" . $fileName . ".php';\n\n" .
             "class " . ucfirst($fileName . "Test") . " extends TestCase {\n\n" .
-            "    public function test".ucfirst($functionName)."() {\n" .
+            "    public function test" . ucfirst($functionName) . "() {\n" .
             "        // Your code here \n\n" .
             "    }\n\n" .
             "}";
@@ -1385,9 +1385,23 @@ class MaxiterConfiguration
         } else {
             // Create the file and write the content
             file_put_contents($path, $content);
-            echo "Unit test ".$fileName."Test created in /tests/ for the controller in /app/controllers/$fileName.php\n";
+            echo "Unit test " . $fileName . "Test created in /tests/ for the controller in /app/controllers/$fileName.php\n";
             echo "Do not forget to use composer install command to install necessary dependencies for the Unit Test";
         }
+    }
+
+    public function PHPUnitTest()
+    {
+
+
+        $cmd = "php ./vendor/bin/phpunit";
+        exec($cmd, $output, $returnCode);
+        if ($returnCode === 0) {
+            echo implode("\n", $output);
+        } else {
+            echo "Error: $returnCode";
+        }
+
     }
 
 
@@ -1512,6 +1526,12 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
         exit();
     }
     $config->generateUnitTest($argv[3], $argv[4]);
+} else if ($argv[1] === 'testme') {
+    if (!isset($argv[1]) || empty($argv[1])) {
+        echo "Error: php maxiter testme";
+        exit();
+    }
+    $config->PHPUnitTest();
 } else {
     echo "Command not found\n";
 }
