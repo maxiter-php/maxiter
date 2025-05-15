@@ -1,5 +1,5 @@
 1.5.3
-- Updated Maxiter CLI with auto added model in LoadModel file
+- Updated Maxiter CLI with auto added model in LoadModel file;
 
 1.5.2
 - Updated Maxiter CLI with prod env config;
