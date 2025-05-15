@@ -14,11 +14,12 @@ class UnitTestController {
         // Your code here
     }
 
-    public function sum($a, $b) {
+    public function postSum() {
 
-        // Example of a simple calculator
-        return $a + $b;
-
+        // Example of a simple calculator a + b
+        $a = $_POST["a"];
+        $b = $_POST["b"];
+        ResponseModel::json(true, $a + $b); 
 
     }
 

@@ -139,25 +139,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bash'])) {
 
             break;
 
+        case 'newUnitTest':
+            $cmd = "php maxiter new unittest " . $_POST['apiControllerName'] . " " . $_POST['functionName'];
+
+            exec($cmd, $output, $returnCode);
+
+            if ($returnCode === 0) {
+                echo implode("\n", $output);
+            } else {
+                echo "Error: $returnCode";
+            }
+
+            break;
+
     }
 
-
-    // Lista de comandos permitidos (segurança)
-
-    // Verifica se o comando é permitido
-    // if (in_array($command, $allowedCommands)) {
-    //     // Executa o comando e captura a saída
-    //     exec($command, $output, $returnCode);
-
-    //     if ($returnCode === 0) {
-    //         echo implode("\n", $output);
-    //     } else {
-    //         echo "Erro ao executar o comando. Código: $returnCode";
-    //     }
-    // } else {
-    //     echo "Comando não permitido!";
-    // }
 } else {
-    echo "Requisição inválida!";
+    echo "Invalid Request!";
 }
 ?>

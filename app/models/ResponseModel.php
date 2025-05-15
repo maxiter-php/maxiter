@@ -20,8 +20,11 @@ class ResponseModel {
         echo json_encode(array(
             "status" => self::$status,
             "data" => self::$data,
-        ));exit();
+        ));
 
+        if (php_sapi_name() !== 'cli' || !defined('PHPUNIT_RUNNING')) {
+            exit();
+        } 
 
     }
 

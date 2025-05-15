@@ -1,1 +1,1 @@
-{"version":1,"defects":[],"times":[]}
+{"version":1,"defects":{"UnitTestControllerTest::testPostSum":7},"times":{"UnitTestControllerTest::testSum":0.004,"UnitTestControllerTest::testPostSum":0.005}}

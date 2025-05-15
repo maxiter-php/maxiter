@@ -277,6 +277,30 @@
                 </div>
             </div>
 
+            <div class="col-md-6 col-lg-3   ">
+                <div class="card custom-card">
+                    <div class="card-header text-white" style="background-color: #3b435b;">
+                        <h5 class="card-title mb-0">New Unit Test</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="contactForm">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Controller Name</label>
+                                <input type="text" class="form-control" id="iptUTControllerName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Function Name</label>
+                                <input type="text" class="form-control" id="iptUTFunctionName" required>
+                            </div>
+                            <button type="button" id="btnUnitTest" class="btn w-100"
+                                style="background-color: #3b435b;color:white;">Create</button>
+                            <hr>
+                            <p class="cliDescription">Create a new Unit Test file in tests/</p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
 
         </div>
     </div>
@@ -580,6 +604,7 @@
 
             });
 
+            
             // New API Controller
             let btnAPIController = document.querySelector("#btnAPIController");
             btnAPIController.addEventListener("click", (e) => {
@@ -604,12 +629,44 @@
                         });
 
                         iptApiController.value = "";
-
+                        
                     }
                 });
-
+                
             });
 
+            // New Unit Test Controller
+            let btnUnitTest = document.querySelector("#btnUnitTest");
+            btnUnitTest.addEventListener("click", (e) => {
+                e.preventDefault();
+            
+                let iptUTControllerName = document.querySelector("#iptUTControllerName");
+                let iptUTFunctionName = document.querySelector("#iptUTFunctionName");
+                let apiControllerName = iptUTControllerName.value;
+            
+                $.ajax({
+                    url: path.APP_BASE_URL + "bash.php",
+                    type: "POST",
+                    data: {
+                        bash: "newUnitTest",
+                        apiControllerName: apiControllerName,
+                        functionName: iptUTFunctionName.value
+                    },
+                    success: function (response) {
+            
+                        Swal.fire({
+                            title: "Done!",
+                            text: response,
+                            icon: "success"
+                        });
+            
+                        iptUTControllerName.value = "";
+            
+                    }
+                });
+            
+            });
+            
         });
     </script>
 </body>

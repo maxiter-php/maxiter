@@ -1353,6 +1353,44 @@ class MaxiterConfiguration
         }
     }
 
+    public function generateUnitTest($fileName, $functionName)
+    {
+        $path = __DIR__ . '/tests/' . $fileName . "Test.php";
+
+        // Content to be written to the file
+        $content = "<?php\n" .
+            "/*\n" .
+            "This is an example of how to implement unit test into your application. \n" .
+            "Feel free to try using PHP 8+ or PHP 5.3 legacy version below. \n" .
+            "Checkout the /app/controllers/UnitTestController.php and /tests/UnitTestControllerTest.php \n" .
+            "to see an example of how implement unit test in Maxiter!\n" .
+            "\n" .
+            "@author Victor Béser\n" .
+            "*/\n" .
+            "define('PHPUNIT_RUNNING', true);\n" .
+            "use PHPUnit\Framework\TestCase;\n" .
+            "require_once __DIR__ . '/../app/controllers/".$fileName.".php';\n\n" .
+            "class " . ucfirst($fileName . "Test") . " extends TestCase {\n\n" .
+            "    public function test".ucfirst($functionName)."() {\n" .
+            "        // Your code here \n\n" .
+            "    }\n\n" .
+            "}";
+
+        // Create the /tests directory if it doesn't exist
+        $this->createDirectory(__DIR__ . '/tests');
+
+        // Check if the file already exists
+        if (file_exists($path)) {
+            echo "This unit test already exists\n";
+        } else {
+            // Create the file and write the content
+            file_put_contents($path, $content);
+            echo "Unit test ".$fileName."Test created in /tests/ for the controller in /app/controllers/$fileName.php\n";
+            echo "Do not forget to use composer install command to install necessary dependencies for the Unit Test";
+        }
+    }
+
+
 
     private function createDirectory($dir)
     {
@@ -1468,6 +1506,12 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
         exit();
     }
     $config->generateMiddleware($argv[3]);
+} else if ($argv[1] === 'new' && $argv[2] === 'unittest') {
+    if (!isset($argv[3]) || empty($argv[3]) || !isset($argv[4]) || empty($argv[4])) {
+        echo "Error: php maxiter new unittest [controller_name] [function_name]";
+        exit();
+    }
+    $config->generateUnitTest($argv[3], $argv[4]);
 } else {
     echo "Command not found\n";
 }

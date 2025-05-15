@@ -5,6 +5,9 @@
 - Added autoload to LoadModel.php;
 - Added PHPUnit & phpunit.xml;
 - Added folder tests for unit testing;
+- SecureRequestModel fix to PHPUnit;
+- ResponseModel fix to PHPUnit;
+- Updated Maxiter CLI;
 
 1.4.10
 - Added file treatment in TreatModel;
