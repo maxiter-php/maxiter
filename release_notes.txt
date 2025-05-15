@@ -1,3 +1,11 @@
+1.5.0
+- Fix maxiter cli;
+- Added composer;
+- Added .gitignore;
+- Added autoload to LoadModel.php;
+- Added PHPUnit & phpunit.xml;
+- Added folder tests for unit testing;
+
 1.4.10
 - Added file treatment in TreatModel;
 

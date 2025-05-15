@@ -1378,7 +1378,8 @@ if ($argc < 2) {
         "php maxiter path                   #Configure the path url of your project, main path: http://localhost/\n" .
         "php maxiter new template           #Configure a new template in your project\n" .
         "php maxiter new api                #Create a new API controller file in /app/controllers/\n" .
-        "php maxiter new middleware         #Create a new middleware file in /app/middlewares/\n\n"
+        "php maxiter new middleware         #Create a new middleware file in /app/middlewares/\n" .
+        "php maxiter gui                    #Open Maxiter GUI in browser\n\n"
     ;
 
     exit(1);

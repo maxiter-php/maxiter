@@ -8,6 +8,8 @@ Don't forget, this file should be used in header of all controller files using "
 */
 session_start();
 
+// Vendor Composer
+require __DIR__ . "/../../vendor/autoload.php";
 
 // Required Models
 require __DIR__ . "/EnvModel.php";

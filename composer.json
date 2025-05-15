@@ -1,4 +1,5 @@
 {
+    "info": "Use the phpunit 3.7.* version for PHP 5.3 legacy as require for composer: 'phpunit/phpunit: 3.7.*'",
     "name": "maxiter/maxiter",
     "description": "Maxiter configurations",
     "type": "project",
@@ -8,5 +9,8 @@
             "type": "vcs",
             "url": "https://github.com/maxiter-php/maxiter"
         }
-    ]
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "^11.5"
+    }
 }
