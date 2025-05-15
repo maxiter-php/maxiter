@@ -289,7 +289,7 @@ class MaxiterConfiguration
     {
         $path = __DIR__ . '/app/models/' . $fileName . ".php";
 
-        // Content to be written to the file
+        // Conteúdo do model a ser criado
         $content = "<?php\n" .
             "/*\n" .
             "The model represents the application's data and business logic. It manages data retrieval, \n" .
@@ -304,20 +304,51 @@ class MaxiterConfiguration
             "    }\n\n" .
             "}";
 
-        // Create the /app directory if it doesn't exist
         $this->createDirectory(__DIR__ . '/app');
-        // Create the /app/models directory if it doesn't exist
         $this->createDirectory(__DIR__ . '/app/models');
 
-        // Check if the file already exists
         if (file_exists($path)) {
             echo "This model already exists\n";
         } else {
-            // Create the file and write the content
             file_put_contents($path, $content);
             echo "Model $fileName created\n";
+
+            $loadModelPath = __DIR__ . '/app/models/LoadModel.php';
+            if (file_exists($loadModelPath) && is_writable($loadModelPath)) {
+                $loadModelContent = file_get_contents($loadModelPath);
+
+                $newRequireLine = 'require __DIR__ . "/' . ucfirst($fileName) . 'Model.php";';
+
+                if (strpos($loadModelContent, $newRequireLine) === false) {
+
+                    $pattern = '/(require\s+__DIR__\s*\.\s*".*?Model\.php";\s*)$/m';
+
+                    if (preg_match_all($pattern, $loadModelContent, $matches, PREG_OFFSET_CAPTURE)) {
+                        $lastMatch = end($matches[0]);
+                        $pos = $lastMatch[1] + strlen($lastMatch[0]);
+
+                        $loadModelContent = substr_replace(
+                            $loadModelContent,
+                            "\n" . $newRequireLine,
+                            $pos,
+                            0
+                        );
+
+                        file_put_contents($loadModelPath, $loadModelContent);
+
+                        echo "Added $fileName require to LoadModel.php\n";
+                    } else {
+                        echo "Could not find the last require statement to append new model require.\n";
+                    }
+                } else {
+                    echo "Require statement for $fileName already exists in LoadModel.php\n";
+                }
+            } else {
+                echo "LoadModel.php not found or not writable\n";
+            }
         }
     }
+
 
     public function generateLogModel($database)
     {
