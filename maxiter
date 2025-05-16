@@ -1460,6 +1460,82 @@ class MaxiterConfiguration
         echo "Generated .gitignore with non-prod files\n";
     }
 
+    public function newComponent($componentName, $templateFolder = null)
+    {
+
+
+        $componentFolder = __DIR__ . "\\resources\\views\\pages\\_$componentName";
+        echo "Creating _$componentName component...\n";
+        if (!is_dir($componentFolder)) {
+            if (mkdir($componentFolder, 0777, true)) {
+                echo "_$componentName component created successfully in /resources/views/pages/_$componentName\n";
+            } else {
+                echo "Failed to create _$componentName component.\n";
+            }
+        } else {
+            echo "_$componentName component already exists.\n";
+        }
+
+        if ($templateFolder == null) {
+
+            // Create the header.php file and write the extracted content
+            $componentFile = $componentFolder . "\\$componentName.php";
+            $content = "<!--********** $componentName ***********-->\n<!-- Include this file in any file using the command below: -->\n<!-- ". '<?php include __DIR__ . "/../_'. $componentName .'/'. $componentName .'.php"; ?>' ." -->";
+            if (file_put_contents($componentFile, $content)) {
+                echo "$componentName.php file created successfully inside the _$componentName folder.\n";
+            } else {
+                echo "Failed to create $componentName.php file.\n";
+            }
+
+        } else {
+
+
+            // Creating files and content
+            // Path to the index.html template file
+            $templateFolder = __DIR__ . "\\src\\template\\$templateFolder";  // Template source folder
+            $indexFile = $templateFolder . "\\index.html";
+
+            // _header folder path
+            $headerFolder = __DIR__ . "\\resources\\views\\pages\\_$componentName";
+
+            // Check if the index file exists
+            if (file_exists($indexFile)) {
+                // Read the content of index.html
+                $fileContent = file_get_contents($indexFile);
+
+                // Use regular expression to extract content between @header markers
+                $pattern = '/@' . $componentName . '(.*?)@' . $componentName . '/s';
+                if (preg_match($pattern, $fileContent, $matches)) {
+                    // $matches[1] will contain the content between the @header markers
+
+                    // Create the _header folder if it doesn't exist
+                    if (!is_dir($headerFolder)) {
+                        if (mkdir($headerFolder, 0777, true)) {
+                            echo "_header folder created successfully.\n";
+                        } else {
+                            echo "Failed to create _header folder.\n";
+                        }
+                    }
+
+                    // Create the header.php file and write the extracted content
+                    $headerFile = $headerFolder . "\\$componentName.php";
+                    if (file_put_contents($headerFile, $matches[1])) {
+                        echo "$componentName.php file created successfully inside the _$componentName folder.\n";
+                    } else {
+                        echo "Failed to create $componentName.php file.\n";
+                    }
+                } else {
+                    echo "No content found between @$componentName markers.\n";
+                }
+            } else {
+                echo "The index.html file does not exist.\n";
+            }
+
+
+        }
+
+
+    }
 
 
 
@@ -1596,6 +1672,16 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
         exit();
     }
     $config->configProdEnv();
+} else if ($argv[1] === 'new' && $argv[2] === 'component') {
+    if (!isset($argv[3]) || empty($argv[3])) {
+        echo "Error: php maxiter new component [component_name] [template_name]";
+        exit();
+    }
+    if(isset($argv[4])) {
+        $config->newComponent($argv[3], $argv[4]);
+    } else {
+        $config->newComponent($argv[3]);
+    }
 } else {
     echo "Command not found\n";
 }
