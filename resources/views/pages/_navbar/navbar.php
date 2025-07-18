@@ -118,7 +118,7 @@
                                 <?php if (AuthModel::verify()): ?>
                                     <a href="<?php echo EnvModel::env("APP_BASE_URL") ?>home" class="dropdown-item">
                                         <i class="icon-user"></i>
-                                        <span class="ml-2"><?php echo AuthModel::getContext("username"); ?> </span>
+                                        <span class="ml-2"><?php echo AuthModel::getContext("name"); ?> </span>
                                     </a>
                                     <a href="#" id="btn-logout" class="dropdown-item">
                                         <i class="icon-key"></i>

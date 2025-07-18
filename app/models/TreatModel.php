@@ -72,7 +72,7 @@ class TreatModel
         $newFileName = md5(uniqid(microtime(), true));
         $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
-        if(!array_key_exists($extension, $extensions)) {
+        if(!in_array($extension, $extensions)) {
             return false;
         }
 

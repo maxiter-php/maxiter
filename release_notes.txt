@@ -1,3 +1,15 @@
+1.6.0
+- Updated Maxiter CLI with prod env config deleting non-prod files;
+- Updated AuthModel::verify function with Authorization and Authentication method;
+- Updated UsersController example using new verify method;
+- Updated Maxiter Logo;
+- Added segments example to log in _footer component;
+- Added auth-example view showing how use the new AuthModel::verify method;
+- Added Auto Path configuration in Maxiter CLI;
+- Fix in TreatModel::file now using in_array instead array_key_exists;
+- Fix Maxiter CLI new model, when generating model the LoadModel file it's not adding an extra "Model" after the model's name;
+
+
 1.5.4
 - Updated Maxiter CLI with custom component using php maxiter new component command line;
 

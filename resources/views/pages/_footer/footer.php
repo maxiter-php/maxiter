@@ -1,7 +1,18 @@
 <!--**********************************
             Footer start
         ***********************************-->
+<?php
 
+// LOG TO GET WHICH PAGE USER IS ACCESSING
+// $uri = $_SERVER['REQUEST_URI'];
+// $uri = parse_url($uri, PHP_URL_PATH); 
+
+// $segments = explode('/', trim($uri, '/')); 
+// $lastSegment = end($segments);
+
+// LogModel::log("Acess in page: $lastSegment");
+
+?>
 
 
 <script>

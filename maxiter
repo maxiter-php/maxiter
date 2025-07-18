@@ -317,11 +317,11 @@ class MaxiterConfiguration
             if (file_exists($loadModelPath) && is_writable($loadModelPath)) {
                 $loadModelContent = file_get_contents($loadModelPath);
 
-                $newRequireLine = 'require __DIR__ . "/' . ucfirst($fileName) . 'Model.php";';
+                $newRequireLine = 'require __DIR__ . "/' . ucfirst($fileName) . '.php";';
 
                 if (strpos($loadModelContent, $newRequireLine) === false) {
 
-                    $pattern = '/(require\s+__DIR__\s*\.\s*".*?Model\.php";\s*)$/m';
+                    $pattern = '/(require\s+__DIR__\s*\.\s*".*?\.php";\s*)$/m';
 
                     if (preg_match_all($pattern, $loadModelContent, $matches, PREG_OFFSET_CAPTURE)) {
                         $lastMatch = end($matches[0]);
@@ -599,8 +599,12 @@ class MaxiterConfiguration
         echo "Do not forget to set your correct app base url using ' php maxiter path [path] ', using: $path";
         exec("start $path" . "gui.html");
     }
+
     public function setPath($pathUrl)
     {
+
+        $pathUrl = rtrim($pathUrl, '/') . '/';
+
         $env_ini = './env.ini';
         $lines = file($env_ini, FILE_IGNORE_NEW_LINES);
         foreach ($lines as $key => $line) {
@@ -618,10 +622,82 @@ class MaxiterConfiguration
                 break;
             }
         }
+
         file_put_contents($env_ini, implode(PHP_EOL, $lines));
         file_put_contents($path_js, implode(PHP_EOL, $lines_js));
         echo "New project base url set: $pathUrl";
     }
+
+    public function autoSetUpPath($port = null)
+    {
+        $cwd = getcwd();
+        $hostname = 'localhost';
+
+        $commonPorts = [
+            80,
+            90,
+            3000,
+            3001,
+            4200,
+            5000,
+            5173,
+            5500,
+            6000,
+            7000,
+            8000,
+            8001,
+            8080,
+            8081,
+            8888,
+            9000,
+            9090
+        ];
+
+        $openPort = $port;
+
+        if ($openPort === null) {
+            foreach ($commonPorts as $testPort) {
+                $fp = @fsockopen($hostname, $testPort, $errno, $errstr, 0.1);
+                if ($fp) {
+                    fclose($fp);
+                    $openPort = $testPort;
+                    break;
+                }
+            }
+            if ($openPort === null) {
+                $openPort = 80;
+            }
+        }
+
+        $docRootCandidates = ['htdocs', 'www', 'public_html'];
+        $docRoot = null;
+        foreach ($docRootCandidates as $candidate) {
+            $pos = strpos($cwd, $candidate);
+            if ($pos !== false) {
+                $docRoot = substr($cwd, 0, $pos + strlen($candidate));
+                break;
+            }
+        }
+
+        if ($docRoot === null) {
+            $docRoot = dirname(dirname($cwd));
+        }
+
+        $relativePath = trim(str_replace($docRoot, '', $cwd), '/');
+
+        $url = "http://$hostname";
+        if ($openPort != 80) {
+            $url .= ":$openPort";
+        }
+        if (!empty($relativePath)) {
+            $url .= "/" . $relativePath;
+        }
+
+        echo "Auto path $url will be set as your main path\n";
+
+        $this->setPath($url);
+    }
+
 
 
     // ############################################################################ //
@@ -1437,7 +1513,7 @@ class MaxiterConfiguration
 
     public function configProdEnv()
     {
-        $gitignorePath = __DIR__ . '/.gitignore';
+        $gitignorePath = __DIR__ . '/.gitignore-example';
 
         $entries = array(
             'vendor/',
@@ -1457,8 +1533,58 @@ class MaxiterConfiguration
 
         file_put_contents($gitignorePath, implode(PHP_EOL, $merged) . PHP_EOL);
 
-        echo "Generated .gitignore with non-prod files\n";
+        echo "Generated .gitignore-example with non-prod files\n";
     }
+
+    public function configProdEnvDel()
+    {
+        $baseDir = dirname(__FILE__);
+
+        $entries = array(
+            'bash.php',
+            'gui.html',
+            'phpunit.xml',
+            'README.md',
+            'release_notes.txt',
+            '.phpunit.result.cache',
+            '.gitignore',
+        );
+
+        foreach ($entries as $entry) {
+            $fullPath = $baseDir . '/' . $entry;
+
+            if (is_dir($fullPath)) {
+                $iterator = new RecursiveIteratorIterator(
+                    new RecursiveDirectoryIterator($fullPath),
+                    RecursiveIteratorIterator::CHILD_FIRST
+                );
+
+                foreach ($iterator as $item) {
+                    $path = $item->getPathname();
+                    if (in_array(basename($path), array('.', '..'))) {
+                        continue;
+                    }
+
+                    if ($item->isFile()) {
+                        if (@unlink($path)) {
+                            echo "File deleted: $path\n";
+                        }
+                    }
+                }
+
+                echo "Files inside directory deleted: $entry\n";
+            } elseif (is_file($fullPath)) {
+                if (@unlink($fullPath)) {
+                    echo "File deleted: $entry\n";
+                }
+            } else {
+                echo "Not found: $entry\n";
+            }
+        }
+
+        echo "All non-prod files successfully deleted (directories preserved).\n";
+    }
+
 
     public function newComponent($componentName, $templateFolder = null)
     {
@@ -1480,7 +1606,7 @@ class MaxiterConfiguration
 
             // Create the header.php file and write the extracted content
             $componentFile = $componentFolder . "\\$componentName.php";
-            $content = "<!--********** $componentName ***********-->\n<!-- Include this file in any file using the command below: -->\n<!-- ". '<?php include __DIR__ . "/../_'. $componentName .'/'. $componentName .'.php"; ?>' ." -->";
+            $content = "<!--********** $componentName ***********-->\n<!-- Include this file in any file using the command below: -->\n<!-- " . '<?php include __DIR__ . "/../_' . $componentName . '/' . $componentName . '.php"; ?>' . " -->";
             if (file_put_contents($componentFile, $content)) {
                 echo "$componentName.php file created successfully inside the _$componentName folder.\n";
             } else {
@@ -1554,18 +1680,7 @@ if ($argc < 2) {
     echo
         "\nMaxiter CLI usage\n" .
         "\n" .
-        "php maxiter new controller         #Create a new controller file in /app/controllers/\n" .
-        "php maxiter new model              #Create a new model file in /app/models/\n" .
-        "php maxiter new view               #Create a new view folder and files in /resources/views/pages/\n" .
-        "php maxiter new log                #Create a basic LogModel to use in your application\n" .
-        "php maxiter new table              #Create a SQL file in /src/tables/\n" .
-        "php maxiter config                 #Is something broke? Try this!\n" .
-        "php maxiter server [port]          #Initiate a PHP server using the default port 7000 if port argument is empty\n" .
-        "php maxiter path                   #Configure the path url of your project, main path: http://localhost/\n" .
-        "php maxiter new template           #Configure a new template in your project\n" .
-        "php maxiter new api                #Create a new API controller file in /app/controllers/\n" .
-        "php maxiter new middleware         #Create a new middleware file in /app/middlewares/\n" .
-        "php maxiter gui                    #Open Maxiter GUI in browser\n\n"
+        "Check the Maxiter Documentation here: https://maxiter-docs.vercel.app/\n\n"
     ;
 
     exit(1);
@@ -1672,12 +1787,28 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
         exit();
     }
     $config->configProdEnv();
+} else if ($argv[1] === 'deltoprod') {
+    if (!isset($argv[1]) || empty($argv[1])) {
+        echo "Error: php maxiter deltoprod";
+        exit();
+    }
+    $config->configProdEnvDel();
+} else if ($argv[1] === 'autopath') {
+    if (!isset($argv[1]) || empty($argv[1])) {
+        echo "Error: php maxiter autopath [port]";
+        exit();
+    }
+    if (isset($argv[2])) {
+        $config->autoSetUpPath($argv[2]);
+    } else {
+        $config->autoSetUpPath();
+    }
 } else if ($argv[1] === 'new' && $argv[2] === 'component') {
     if (!isset($argv[3]) || empty($argv[3])) {
         echo "Error: php maxiter new component [component_name] [template_name]";
         exit();
     }
-    if(isset($argv[4])) {
+    if (isset($argv[4])) {
         $config->newComponent($argv[3], $argv[4]);
     } else {
         $config->newComponent($argv[3]);

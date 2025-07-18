@@ -30,6 +30,9 @@
 
             <div class="row">
                 <div class="col-xl-12 col-lg-8 col-md-8">
+                    <div style="width:100%;display:flex;align-items:center;justify-content:center;">
+                        <img src="<?php echo EnvModel::env("APP_BASE_URL") ?>resources/views/images/logo.png" width="250px" alt="Maxiter PHP">
+                    </div>
                     <div class="card">
                         <div class="card-header">
                             <h4 class="card-title"><?php echo EnvModel::env("APP_NAME") ?> -
