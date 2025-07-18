@@ -43,7 +43,7 @@ class TreatModel
         return count($filtered) > 0;
     }
 
-    public static function hash(string $password, string $method = "md5")
+    public static function hash($password, $method = "md5")
     {
 
         $pass = htmlspecialchars(trim($password), ENT_QUOTES, 'UTF-8');

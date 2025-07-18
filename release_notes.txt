@@ -1,3 +1,6 @@
+1.6.2
+- Bugfix to work perfect and secure at PHP 5.3;
+
 1.6.1
 - Bugfix while using auto path CLI;
 
