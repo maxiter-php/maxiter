@@ -684,14 +684,17 @@ class MaxiterConfiguration
         }
 
         $relativePath = trim(str_replace($docRoot, '', $cwd), '/');
+        $relativePath = str_replace('\\', '/', $relativePath); // <-- esta linha nova
+
 
         $url = "http://$hostname";
         if ($openPort != 80) {
             $url .= ":$openPort";
         }
         if (!empty($relativePath)) {
-            $url .= "/" . $relativePath;
+            $url .= '/' . ltrim($relativePath, '/');
         }
+
 
         echo "Auto path $url will be set as your main path\n";
 

@@ -1,3 +1,6 @@
+1.6.1
+- Bugfix while using auto path CLI;
+
 1.6.0
 - Updated Maxiter CLI with prod env config deleting non-prod files;
 - Updated AuthModel::verify function with Authorization and Authentication method;
