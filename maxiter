@@ -1588,6 +1588,67 @@ class MaxiterConfiguration
         echo "All non-prod files successfully deleted (directories preserved).\n";
     }
 
+    public function configProdEnvWithFolder()
+    {
+        $baseDir = dirname(__FILE__);
+        $targetDir = $baseDir . '/_non-prod-files';
+
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0755, true);
+            echo "Created directory: _non-prod-files\n";
+        }
+
+        $entries = array(
+            'bash.php',
+            'gui.html',
+            'phpunit.xml',
+            'README.md',
+            'release_notes.txt',
+            '.phpunit.result.cache',
+            '.gitignore',
+        );
+
+        foreach ($entries as $entry) {
+            $fullPath = $baseDir . '/' . $entry;
+
+            if (is_dir($fullPath)) {
+                $targetSubdir = $targetDir . '/' . basename($entry);
+
+                $iterator = new RecursiveIteratorIterator(
+                    new RecursiveDirectoryIterator($fullPath, RecursiveDirectoryIterator::SKIP_DOTS),
+                    RecursiveIteratorIterator::SELF_FIRST
+                );
+
+                foreach ($iterator as $item) {
+                    $subPath = $iterator->getSubPathName();
+                    $targetPath = $targetSubdir . '/' . $subPath;
+
+                    if ($item->isDir()) {
+                        @mkdir($targetPath, 0755, true);
+                    } else {
+                        @copy($item, $targetPath);
+                        @unlink($item);
+                    }
+                }
+
+                echo "Directory moved: $entry\n";
+                // Remove diretório original vazio
+                @rmdir($fullPath);
+
+            } elseif (is_file($fullPath)) {
+                $targetPath = $targetDir . '/' . basename($entry);
+                if (@rename($fullPath, $targetPath)) {
+                    echo "File moved: $entry\n";
+                } else {
+                    echo "Failed to move file: $entry\n";
+                }
+            } else {
+                echo "Not found: $entry\n";
+            }
+        }
+
+        echo "All non-prod files moved to _non-prod-files.\n";
+    }
 
     public function newComponent($componentName, $templateFolder = null)
     {
@@ -1796,6 +1857,12 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
         exit();
     }
     $config->configProdEnvDel();
+} else if ($argv[1] === '-f' && $argv[2] === 'deltoprod') {
+    if (!isset($argv[1]) || empty($argv[1]) || !isset($argv[2]) || empty($argv[2])) {
+        echo "Error: php maxiter -f deltoprod";
+        exit();
+    }
+    $config->configProdEnvWithFolder();
 } else if ($argv[1] === 'autopath') {
     if (!isset($argv[1]) || empty($argv[1])) {
         echo "Error: php maxiter autopath [port]";

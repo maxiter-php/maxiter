@@ -1,3 +1,6 @@
+1.6.3
+- Added folder option instead deleting files while config to prod env;
+
 1.6.2
 - Bugfix to work perfect and secure at PHP 5.3;
 
