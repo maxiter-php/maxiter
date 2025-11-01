@@ -115,8 +115,7 @@ class MaxiterConfiguration
                 "    ***********************************-->" . "\n" .
                 "\n" .
                 '<script src="<?php echo EnvModel::env("APP_BASE_URL") ?>resources/views/pages/' . $fileName . '/js/' . $fileName . '.js"></script>' . "\n" .
-                '<?php include __DIR__ . "/../_footer/footer.php"; ?>'
-            ;
+                '<?php include __DIR__ . "/../_footer/footer.php"; ?>';
         }
 
 
@@ -135,7 +134,6 @@ class MaxiterConfiguration
 
             if ($baseContent == null) {
                 file_put_contents($path, $content);
-
             } else if ($baseContent != null) {
                 $indexFile = __DIR__ . "\\src\\template\\$baseContent\\index.html";
 
@@ -276,7 +274,6 @@ class MaxiterConfiguration
                 } else {
                     echo "Failed to update the $fileName.php file.\n";
                 }
-
             } else {
                 echo "The $fileName.php file does not exist.\n";
             }
@@ -552,7 +549,6 @@ class MaxiterConfiguration
             file_put_contents($path, $content);
             echo "Table '$table' created in path /src/tables/\n";
         }
-
     }
 
     public function initServer($port = null)
@@ -1347,11 +1343,6 @@ class MaxiterConfiguration
         } else {
             echo "The footer.php file does not exist.\n";
         }
-
-
-
-
-
     }
 
 
@@ -1511,7 +1502,6 @@ class MaxiterConfiguration
         } else {
             echo "Error: $returnCode";
         }
-
     }
 
     public function configProdEnv()
@@ -1634,7 +1624,6 @@ class MaxiterConfiguration
                 echo "Directory moved: $entry\n";
                 // Remove diretório original vazio
                 @rmdir($fullPath);
-
             } elseif (is_file($fullPath)) {
                 $targetPath = $targetDir . '/' . basename($entry);
                 if (@rename($fullPath, $targetPath)) {
@@ -1676,7 +1665,6 @@ class MaxiterConfiguration
             } else {
                 echo "Failed to create $componentName.php file.\n";
             }
-
         } else {
 
 
@@ -1720,15 +1708,781 @@ class MaxiterConfiguration
             } else {
                 echo "The index.html file does not exist.\n";
             }
+        }
+    }
 
+    public function mirrorExport($databaseName)
+    {
+        // Path to env.ini
+        $envPath = __DIR__ . '/env.ini';
 
+        // Validate env.ini existence
+        if (!file_exists($envPath)) {
+            echo "env.ini not found\n";
+            return null;
+        }
+
+        // Parse env.ini with sections
+        $env = parse_ini_file($envPath, true);
+        if ($env === false || !is_array($env)) {
+            echo "Failed to parse env.ini\n";
+            return null;
+        }
+
+        // Determine the section: prefer direct section name, else match by DB value
+        $sectionName = null;
+        if (isset($env[$databaseName])) {
+            $sectionName = $databaseName;
+        } else {
+            foreach ($env as $section => $values) {
+                if (is_array($values) && isset($values['DB']) && strtolower($values['DB']) === strtolower($databaseName)) {
+                    $sectionName = $section;
+                    break;
+                }
+            }
+        }
+
+        if ($sectionName === null) {
+            echo "Database '$databaseName' not found in env.ini\n";
+            return null;
+        }
+
+        // Fetch connection data
+        $driver = isset($env[$sectionName]['DRIVER']) ? $env[$sectionName]['DRIVER'] : null;
+        $host   = isset($env[$sectionName]['HOST']) ? $env[$sectionName]['HOST'] : 'localhost';
+        $port   = isset($env[$sectionName]['PORT']) ? $env[$sectionName]['PORT'] : '';
+        $user   = isset($env[$sectionName]['USER']) ? $env[$sectionName]['USER'] : '';
+        $pass   = isset($env[$sectionName]['PASS']) ? $env[$sectionName]['PASS'] : '';
+        $dbName = isset($env[$sectionName]['DB']) ? $env[$sectionName]['DB'] : $sectionName;
+
+        if ($driver === null || $driver === '') {
+            echo "DRIVER not defined for database section [$sectionName]\n";
+            return null;
+        }
+
+        // Normalize driver and set file extension
+        $driverKey = strtolower(trim($driver));
+        if (in_array($driverKey, ['mariadb'])) { $driverKey = 'mysql'; }
+        if (in_array($driverKey, ['psql', 'postgres', 'postgresql'])) { $driverKey = 'pgsql'; }
+        if (in_array($driverKey, ['sql server', 'sqlserver', 'mssql'])) { $driverKey = 'sqlsrv'; }
+        if (in_array($driverKey, ['oci', 'ora'])) { $driverKey = 'oracle'; }
+
+        $defaultExt = ($driverKey === 'sqlsrv') ? 'bak' : (($driverKey === 'oracle') ? 'dmp' : 'sql');
+        $exportExt  = isset($env[$sectionName]['EXPORT_EXT']) && $env[$sectionName]['EXPORT_EXT'] !== '' ? trim($env[$sectionName]['EXPORT_EXT']) : $defaultExt;
+
+        // Prepare mirror directory and target file: src/mirror/<dbName>/<dbName>-<timestamp>.<ext>
+        $mirrorDir = __DIR__ . '/src/mirror';
+        $this->createDirectory($mirrorDir);
+        $dbDir    = $mirrorDir . '/' . $dbName;
+        $this->createDirectory($dbDir);
+        // Clean up existing exports from the same day before creating a new one
+        $today = date('Ymd');
+        try {
+            $items = scandir($dbDir);
+            foreach ($items as $it) {
+                if ($it === '.' || $it === '..') continue;
+                $full = $dbDir . '/' . $it;
+                // Match full dump file for today: <db>-YYYYMMDD-HHMMSS.<ext>
+                if (is_file($full)) {
+                    if (preg_match('/^' . preg_quote($dbName, '/') . '-' . $today . '-\d{6}\.' . preg_quote($exportExt, '/') . '$/i', $it)) {
+                        @unlink($full);
+                    }
+                }
+                // Match per-table dir for today: tables-YYYYMMDD-HHMMSS
+                if (is_dir($full)) {
+                    if (preg_match('/^tables-' . $today . '-\d{6}$/i', $it)) {
+                        $this->removeDirectory($full);
+                    }
+                }
+            }
+        } catch (Throwable $e) {
+            echo "Warning: failed to cleanup same-day exports: " . $e->getMessage() . "\n";
+        }
+
+        $timestamp = date('Ymd-His');
+        $fileName  = $dbName . '-' . $timestamp . '.' . $exportExt;
+        $filePath  = $dbDir . '/' . $fileName;
+        $tablesDir = $dbDir . '/tables-' . $timestamp;
+        $this->createDirectory($tablesDir);
+
+        // Environment flags used below
+        $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+
+        // Optional command prefix (e.g., "docker exec -i <container>") for running dumps inside containers
+        $execPrefix = isset($env[$sectionName]['EXEC_PREFIX']) ? trim($env[$sectionName]['EXEC_PREFIX']) : '';
+        $isDockerExec = $execPrefix !== '' && (stripos($execPrefix, 'docker exec') !== false || stripos($execPrefix, 'docker-compose exec') !== false);
+
+        // Try to list tables using PDO (for per-table dumps)
+        $tables = [];
+        try {
+            if ($driverKey === 'mysql') {
+                $dsn = 'mysql:host=' . $host . ';' . ($port !== '' ? 'port=' . $port . ';' : '') . 'dbname=' . $dbName . ';charset=utf8mb4';
+            } else if ($driverKey === 'pgsql' || $driverKey === 'postgres' || $driverKey === 'postgresql') {
+                $dsn = 'pgsql:host=' . $host . ';' . ($port !== '' ? 'port=' . $port . ';' : '') . 'dbname=' . $dbName;
+            } else {
+                $dsn = '';
+            }
+            if ($dsn !== '') {
+                $pdo = new PDO($dsn, $user, $pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+                if ($driverKey === 'mysql') {
+                    $stmt = $pdo->query('SHOW TABLES');
+                    while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+                        if (!empty($row[0])) $tables[] = $row[0];
+                    }
+                } else {
+                    $stmt = $pdo->query("SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = 'public'");
+                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                        if (!empty($row['tablename'])) $tables[] = $row['tablename'];
+                    }
+                }
+            }
+        } catch (Throwable $e) {
+            echo "Warning: failed to list tables via PDO: " . $e->getMessage() . "\n";
         }
 
 
+
+        if ($driverKey === 'mysql') {
+            // Resolve mysqldump binary: allow override via env.ini, then Windows XAMPP path, else PATH
+            $mysqldump = isset($env[$sectionName]['MYSQLDUMP_PATH']) && $env[$sectionName]['MYSQLDUMP_PATH'] !== '' ? $env[$sectionName]['MYSQLDUMP_PATH'] : 'mysqldump';
+            if ($isWindows && $mysqldump === 'mysqldump') {
+                $defaultWinPath = 'C:\\xampp\\mysql\\bin\\mysqldump.exe';
+                if (file_exists($defaultWinPath)) {
+                    $mysqldump = $defaultWinPath;
+                }
+            }
+
+            // Use --result-file to avoid redirecting errors into the dump file (Windows-friendly)
+            echo "Exporting database '$dbName' to '$filePath'...\n";
+            $this->flushOutput();
+            $cmd = ($execPrefix !== '' ? $execPrefix . ' ' : '') . '"' . $mysqldump . '"'
+                . ' --host="' . $host . '"'
+                . ($port !== '' ? ' --port="' . $port . '"' : '')
+                . ' --user="' . $user . '"'
+                . ' --password="' . $pass . '"'
+                . ' --routines --events --triggers --single-transaction --add-drop-table'
+                . ' --result-file="' . $filePath . '"'
+                . ' "' . $dbName . '"';
+
+            shell_exec($cmd);
+
+            if (file_exists($filePath) && filesize($filePath) > 0) {
+                echo "Exported: $filePath (" . round(filesize($filePath) / 1024, 1) . " KB)\n";
+                // Export each table individually
+                $count = 0;
+                foreach ($tables as $table) {
+                    echo "  -> Exporting table '$table'...";
+                    $this->flushOutput();
+                    $tableFile = $tablesDir . '/' . $table . '.sql';
+                    $tcmd = ($execPrefix !== '' ? $execPrefix . ' ' : '') . '"' . $mysqldump . '"'
+                        . ' --host="' . $host . '"'
+                        . ($port !== '' ? ' --port="' . $port . '"' : '')
+                        . ' --user="' . $user . '"'
+                        . ' --password="' . $pass . '"'
+                        . ' --triggers --single-transaction --add-drop-table'
+                        . ' --result-file="' . $tableFile . '"'
+                        . ' "' . $dbName . '" "' . $table . '"';
+
+                    shell_exec($tcmd);
+                    if (file_exists($tableFile) && filesize($tableFile) > 0) {
+                        echo " OK (" . round(filesize($tableFile) / 1024, 1) . " KB)\n";
+                        $count++;
+                    } else {
+                        echo " FAILED\n";
+                    }
+                }
+                if (!empty($tables)) {
+                    echo "Exported tables: $count to $tablesDir\n";
+                }
+                return $filePath;
+            } else {
+                echo "Failed to export MySQL database. Ensure mysqldump is installed and credentials are correct.\n";
+                return null;
+            }
+        } else if ($driverKey === 'pgsql') {
+            // Resolve pg_dump binary: allow override via env.ini, else PATH
+            $pgDump = isset($env[$sectionName]['PG_DUMP_PATH']) && $env[$sectionName]['PG_DUMP_PATH'] !== '' ? $env[$sectionName]['PG_DUMP_PATH'] : 'pg_dump';
+
+            if ($isWindows) {
+                echo "Exporting database '$dbName' to '$filePath'...\n";
+                $this->flushOutput();
+                if ($isDockerExec) {
+                    // Pass PGPASSWORD to the container environment
+                    $cmd = $execPrefix . ' -e PGPASSWORD="' . $pass . '" ' . '"' . $pgDump . '"'
+                        . ' --host="' . $host . '"'
+                        . ($port !== '' ? ' --port="' . $port . '"' : '')
+                        . ' --username="' . $user . '"'
+                        . ' --format=p --no-owner'
+                        . ' --file="' . $filePath . '"'
+                        . ' "' . $dbName . '" 2>&1';
+                } else {
+                    $cmd = 'set "PGPASSWORD=' . $pass . '" && ' . '"' . $pgDump . '"'
+                        . ' --host="' . $host . '"'
+                        . ($port !== '' ? ' --port="' . $port . '"' : '')
+                        . ' --username="' . $user . '"'
+                        . ' --format=p --no-owner'
+                        . ' --file="' . $filePath . '"'
+                        . ' "' . $dbName . '" 2>&1';
+                }
+            } else {
+                echo "Exporting database '$dbName' to '$filePath'...\n";
+                $this->flushOutput();
+                if ($isDockerExec) {
+                    // Pass PGPASSWORD to the container environment
+                    $cmd = $execPrefix . ' -e PGPASSWORD="' . $pass . '" ' . '"' . $pgDump . '"'
+                        . ' --host="' . $host . '"'
+                        . ($port !== '' ? ' --port="' . $port . '"' : '')
+                        . ' --username="' . $user . '"'
+                        . ' --format=p --no-owner'
+                        . ' --file="' . $filePath . '"'
+                        . ' "' . $dbName . '" 2>&1';
+                } else {
+                    $cmd = 'PGPASSWORD="' . $pass . '" ' . '"' . $pgDump . '"'
+                        . ' --host="' . $host . '"'
+                        . ($port !== '' ? ' --port="' . $port . '"' : '')
+                        . ' --username="' . $user . '"'
+                        . ' --format=p --no-owner'
+                        . ' --file="' . $filePath . '"'
+                        . ' "' . $dbName . '" 2>&1';
+                }
+            }
+
+            shell_exec($cmd);
+
+            if (file_exists($filePath) && filesize($filePath) > 0) {
+                echo "Exported: $filePath (" . round(filesize($filePath) / 1024, 1) . " KB)\n";
+                // Export each table individually
+                $count = 0;
+                foreach ($tables as $table) {
+                    echo "  -> Exporting table '$table'...";
+                    $this->flushOutput();
+                    $tableFile = $tablesDir . '/' . $table . '.sql';
+                    if ($isWindows) {
+                        if ($isDockerExec) {
+                            $tc = $execPrefix . ' -e PGPASSWORD="' . $pass . '" ' . '"' . $pgDump . '"'
+                                . ' --host="' . $host . '"'
+                                . ($port !== '' ? ' --port="' . $port . '"' : '')
+                                . ' --username="' . $user . '"'
+                                . ' --format=p --no-owner'
+                                . ' -t public."' . $table . '"'
+                                . ' --file="' . $tableFile . '"'
+                                . ' "' . $dbName . '"';
+                        } else {
+                            $tc = 'set "PGPASSWORD=' . $pass . '" && ' . '"' . $pgDump . '"'
+                                . ' --host="' . $host . '"'
+                                . ($port !== '' ? ' --port="' . $port . '"' : '')
+                                . ' --username="' . $user . '"'
+                                . ' --format=p --no-owner'
+                                . ' -t public."' . $table . '"'
+                                . ' --file="' . $tableFile . '"'
+                                . ' "' . $dbName . '"';
+                        }
+                    } else {
+                        if ($isDockerExec) {
+                            $tc = $execPrefix . ' -e PGPASSWORD="' . $pass . '" ' . '"' . $pgDump . '"'
+                                . ' --host="' . $host . '"'
+                                . ($port !== '' ? ' --port="' . $port . '"' : '')
+                                . ' --username="' . $user . '"'
+                                . ' --format=p --no-owner'
+                                . ' -t public."' . $table . '"'
+                                . ' --file="' . $tableFile . '"'
+                                . ' "' . $dbName . '"';
+                        } else {
+                            $tc = 'PGPASSWORD="' . $pass . '" ' . '"' . $pgDump . '"'
+                                . ' --host="' . $host . '"'
+                                . ($port !== '' ? ' --port="' . $port . '"' : '')
+                                . ' --username="' . $user . '"'
+                                . ' --format=p --no-owner'
+                                . ' -t public."' . $table . '"'
+                                . ' --file="' . $tableFile . '"'
+                                . ' "' . $dbName . '"';
+                        }
+                    }
+
+                    shell_exec($tc);
+                    if (file_exists($tableFile) && filesize($tableFile) > 0) {
+                        echo " OK (" . round(filesize($tableFile) / 1024, 1) . " KB)\n";
+                        $count++;
+                    } else {
+                        echo " FAILED\n";
+                    }
+                }
+                if (!empty($tables)) {
+                    echo "Exported tables: $count to $tablesDir\n";
+                }
+                return $filePath;
+            } else {
+                echo "Failed to export PostgreSQL database. Ensure pg_dump is installed and credentials are correct.\n";
+                return null;
+            }
+        } else if ($driverKey === 'sqlsrv') {
+            // SQL Server: generate a full database backup (.bak) using sqlcmd
+            $sqlcmd = isset($env[$sectionName]['SQLCMD_PATH']) && $env[$sectionName]['SQLCMD_PATH'] !== '' ? $env[$sectionName]['SQLCMD_PATH'] : 'sqlcmd';
+            $server = $host . ($port !== '' ? ',' . $port : '');
+
+            echo "Exporting SQL Server database '$dbName' to '$filePath'...\n";
+            $this->flushOutput();
+
+            // Allow custom command override if provided
+            $customCmd = isset($env[$sectionName]['CUSTOM_EXPORT_CMD']) ? trim($env[$sectionName]['CUSTOM_EXPORT_CMD']) : '';
+            if ($customCmd !== '') {
+                $replacements = [
+                    '%HOST%' => $host,
+                    '%PORT%' => $port,
+                    '%USER%' => $user,
+                    '%PASS%' => $pass,
+                    '%DB%'   => $dbName,
+                    '%FILE%' => $filePath,
+                ];
+                $cmd = ($execPrefix !== '' ? $execPrefix . ' ' : '') . strtr($customCmd, $replacements);
+            } else {
+                $backupQuery = "BACKUP DATABASE [" . $dbName . "] TO DISK = N'" . $filePath . "' WITH INIT, COPY_ONLY";
+                $cmd = ($execPrefix !== '' ? $execPrefix . ' ' : '') . '"' . $sqlcmd . '"'
+                    . ' -S "' . $server . '"'
+                    . ' -U "' . $user . '" -P "' . $pass . '"'
+                    . ' -Q "' . $backupQuery . '" -b';
+            }
+
+            shell_exec($cmd);
+            if (file_exists($filePath) && filesize($filePath) > 0) {
+                echo "Exported: $filePath (" . round(filesize($filePath) / 1024, 1) . " KB)\n";
+                // Per-table SQL scripts are not supported via sqlcmd by default
+                echo "Note: per-table .sql exports are not available for SQL Server.\n";
+                return $filePath;
+            } else {
+                echo "Failed to export SQL Server database. Ensure sqlcmd is installed, credentials are correct, and the path is writable.\n";
+                return null;
+            }
+        } else if ($driverKey === 'oracle') {
+            // Oracle: require a custom export command due to tooling variability (expdp/sqlplus)
+            echo "Exporting Oracle database '$dbName' to '$filePath'...\n";
+            $this->flushOutput();
+
+            $customCmd = isset($env[$sectionName]['CUSTOM_EXPORT_CMD']) ? trim($env[$sectionName]['CUSTOM_EXPORT_CMD']) : '';
+            if ($customCmd === '') {
+                echo "Oracle export requires CUSTOM_EXPORT_CMD in env.ini (templated with %HOST%, %PORT%, %USER%, %PASS%, %DB%, %FILE%).\n";
+                echo "Example: expdp %USER%/%PASS%@%HOST%:%PORT%/%DB% full=y dumpfile=%FILE%\n";
+                return null;
+            }
+
+            $replacements = [
+                '%HOST%' => $host,
+                '%PORT%' => ($port !== '' ? $port : '1521'),
+                '%USER%' => $user,
+                '%PASS%' => $pass,
+                '%DB%'   => $dbName,
+                '%FILE%' => $filePath,
+            ];
+            $cmd = ($execPrefix !== '' ? $execPrefix . ' ' : '') . strtr($customCmd, $replacements);
+            shell_exec($cmd);
+            if (file_exists($filePath) && filesize($filePath) > 0) {
+                echo "Exported: $filePath (" . round(filesize($filePath) / 1024, 1) . " KB)\n";
+                echo "Note: Oracle per-table .sql exports are not available by default in this mode.\n";
+                return $filePath;
+            } else {
+                echo "Failed to export Oracle database. Check CUSTOM_EXPORT_CMD tooling and ensure the target path is mounted/writable.\n";
+                return null;
+            }
+        } else {
+            echo "Unsupported driver '$driver' for export. Supported: mysql/mariadb, pgsql/psql, sql server (sqlcmd), oracle (custom).\n";
+            return null;
+        }
     }
 
+    public function mirrorImport($databaseName, $date = null) {
+        // Path to env.ini
+        $envPath = __DIR__ . '/env.ini';
 
+        // Validate env.ini existence
+        if (!file_exists($envPath)) {
+            echo "env.ini not found\n";
+            return null;
+        }
 
+        // Parse env.ini with sections
+        $env = parse_ini_file($envPath, true);
+        if ($env === false || !is_array($env)) {
+            echo "Failed to parse env.ini\n";
+            return null;
+        }
+
+        // Determine the section: prefer direct section name, else match by DB value
+        $sectionName = null;
+        if (isset($env[$databaseName])) {
+            $sectionName = $databaseName;
+        } else {
+            foreach ($env as $section => $values) {
+                if (is_array($values) && isset($values['DB']) && strtolower($values['DB']) === strtolower($databaseName)) {
+                    $sectionName = $section;
+                    break;
+                }
+            }
+        }
+
+        if ($sectionName === null) {
+            echo "Database '$databaseName' not found in env.ini\n";
+            return null;
+        }
+
+        // Fetch connection data
+        $driver = isset($env[$sectionName]['DRIVER']) ? $env[$sectionName]['DRIVER'] : null;
+        $host   = isset($env[$sectionName]['HOST']) ? $env[$sectionName]['HOST'] : 'localhost';
+        $port   = isset($env[$sectionName]['PORT']) ? $env[$sectionName]['PORT'] : '';
+        $user   = isset($env[$sectionName]['USER']) ? $env[$sectionName]['USER'] : '';
+        $pass   = isset($env[$sectionName]['PASS']) ? $env[$sectionName]['PASS'] : '';
+        $dbName = isset($env[$sectionName]['DB']) ? $env[$sectionName]['DB'] : $sectionName;
+
+        if ($driver === null || $driver === '') {
+            echo "DRIVER not defined for database section [$sectionName]\n";
+            return null;
+        }
+
+        // Normalize driver and determine file extension
+        $driverKey = strtolower(trim($driver));
+        if (in_array($driverKey, ['mariadb'])) { $driverKey = 'mysql'; }
+        if (in_array($driverKey, ['psql', 'postgres', 'postgresql'])) { $driverKey = 'pgsql'; }
+        if (in_array($driverKey, ['sql server', 'sqlserver', 'mssql'])) { $driverKey = 'sqlsrv'; }
+        if (in_array($driverKey, ['oci', 'ora'])) { $driverKey = 'oracle'; }
+
+        $defaultExt = ($driverKey === 'sqlsrv') ? 'bak' : (($driverKey === 'oracle') ? 'dmp' : 'sql');
+        $importExt  = isset($env[$sectionName]['EXPORT_EXT']) && $env[$sectionName]['EXPORT_EXT'] !== '' ? trim($env[$sectionName]['EXPORT_EXT']) : $defaultExt;
+
+        // Prepare mirror directory: src/mirror/<dbName>
+        $mirrorDir = __DIR__ . '/src/mirror';
+        $dbDir     = $mirrorDir . '/' . $dbName;
+        if (!is_dir($dbDir)) {
+            echo "Import directory not found: $dbDir\n";
+            return null;
+        }
+
+        // Environment flags and optional exec prefix (e.g., docker exec)
+        $isWindows  = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+        $execPrefix = isset($env[$sectionName]['EXEC_PREFIX']) ? trim($env[$sectionName]['EXEC_PREFIX']) : '';
+        $isDockerExec = $execPrefix !== '' && (stripos($execPrefix, 'docker exec') !== false || stripos($execPrefix, 'docker-compose exec') !== false);
+        
+        // Optional date filter (expected format dd-mm-yyyy). If provided, only full dump is considered.
+        $targetYmd = null; // YYYYMMDD
+        if ($date !== null && trim($date) !== '') {
+            $dateNorm = str_replace(['/', '.', ' '], ['-', '-', '-'], trim($date));
+            if (preg_match('/^(\d{2})-(\d{2})-(\d{4})$/', $dateNorm, $m)) {
+                // Build YYYYMMDD from dd-mm-yyyy
+                $targetYmd = $m[3] . $m[2] . $m[1];
+                echo "Filtering by date: " . $m[1] . '-' . $m[2] . '-' . $m[3] . "\n";
+                $this->flushOutput();
+            } else {
+                echo "Invalid date format '$date' (expected dd-mm-yyyy). Using latest.\n";
+                $this->flushOutput();
+            }
+        }
+
+        // Locate full dump file by name timestamp; prefer latest or match specific date
+        $pattern = $dbDir . '/' . $dbName . '-*.' . $importExt;
+        $selectedFile = null;
+        $bestStamp = -1; // numeric YYYYMMDDHHMMSS
+        $files = glob($pattern);
+        if (is_array($files)) {
+            foreach ($files as $f) {
+                if (!is_file($f)) { continue; }
+                $base = basename($f);
+                // Match -YYYYMMDD-HHMMSS before extension
+                $extEsc = preg_quote($importExt, '/');
+                if (preg_match('/-([0-9]{8})-([0-9]{6})\.' . $extEsc . '$/i', $base, $m)) {
+                    $ymd = $m[1];
+                    $his = $m[2];
+                    if ($targetYmd !== null && $ymd !== $targetYmd) { continue; }
+                    $stamp = (int)($ymd . $his);
+                    if ($stamp > $bestStamp) {
+                        $bestStamp = $stamp;
+                        $selectedFile = $f;
+                    }
+                }
+            }
+        }
+
+        // If no full dump selected and no date filter, locate latest per-table directory
+        $latestTablesDir = null;
+        if ($selectedFile === null && $targetYmd === null) {
+            $candidateDirs = glob($dbDir . '/tables-*');
+            if (is_array($candidateDirs)) {
+                $bestDirStamp = -1;
+                foreach ($candidateDirs as $d) {
+                    if (!is_dir($d)) { continue; }
+                    $base = basename($d);
+                    if (preg_match('/tables-([0-9]{8})-([0-9]{6})$/', $base, $m)) {
+                        $stamp = (int)($m[1] . $m[2]);
+                        if ($stamp > $bestDirStamp) {
+                            $bestDirStamp = $stamp;
+                            $latestTablesDir = $d;
+                        }
+                    }
+                }
+            }
+        }
+
+        if ($selectedFile !== null) {
+            echo "Importing database '$dbName' from '$selectedFile'...\n";
+            $this->flushOutput();
+
+            if ($driverKey === 'mysql') {
+                // Resolve mysql client binary
+                $mysql = isset($env[$sectionName]['MYSQL_PATH']) && $env[$sectionName]['MYSQL_PATH'] !== '' ? $env[$sectionName]['MYSQL_PATH'] : 'mysql';
+                if ($isWindows && $mysql === 'mysql') {
+                    $defaultWinPath = 'C:\\xampp\\mysql\\bin\\mysql.exe';
+                    if (file_exists($defaultWinPath)) {
+                        $mysql = $defaultWinPath;
+                    }
+                }
+
+                // Overwrite: drop and recreate database to import cleanly
+                $dropCreateCmd = ($execPrefix !== '' ? $execPrefix . ' ' : '') . '"' . $mysql . '"'
+                    . ' --host="' . $host . '"'
+                    . ($port !== '' ? ' --port="' . $port . '"' : '')
+                    . ' --user="' . $user . '"'
+                    . ' --password="' . $pass . '"'
+                    . ' -e "DROP DATABASE IF EXISTS `' . $dbName . '`; CREATE DATABASE `' . $dbName . '` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"';
+                $dropCreateStatus = 0;
+                $dropCreateOutput = [];
+                @exec($dropCreateCmd, $dropCreateOutput, $dropCreateStatus);
+                if ($dropCreateStatus !== 0) {
+                    echo "Warning: failed to drop/recreate database '$dbName' (exit $dropCreateStatus). Proceeding with import.\n";
+                }
+
+                // Use client-side source to import the file (works on Windows and avoids redirection issues)
+                // Normalize Windows path separators for mysql 'source' command
+                $selectedFileForMysql = str_replace('\\', '/', $selectedFile);
+                $cmd = ($execPrefix !== '' ? $execPrefix . ' ' : '') . '"' . $mysql . '"'
+                    . ' --host="' . $host . '"'
+                    . ($port !== '' ? ' --port="' . $port . '"' : '')
+                    . ' --user="' . $user . '"'
+                    . ' --password="' . $pass . '"'
+                    . ' "' . $dbName . '"'
+                    . ' -e "SET FOREIGN_KEY_CHECKS=0; source ' . $selectedFileForMysql . '; SET FOREIGN_KEY_CHECKS=1;"';
+                $importStatus = 0;
+                $importOutput = [];
+                @exec($cmd, $importOutput, $importStatus);
+                if ($importStatus === 0) {
+                    echo "Imported: $selectedFile\n";
+                    return $selectedFile;
+                } else {
+                    echo "Import failed for '$selectedFile' (exit $importStatus).\n";
+                    return null;
+                }
+            } else if ($driverKey === 'pgsql') {
+                // Resolve psql binary
+                $psql = isset($env[$sectionName]['PSQL_PATH']) && $env[$sectionName]['PSQL_PATH'] !== '' ? $env[$sectionName]['PSQL_PATH'] : 'psql';
+
+                if ($isWindows) {
+                    if ($isDockerExec) {
+                        $cmd = $execPrefix . ' -e PGPASSWORD="' . $pass . '" ' . '"' . $psql . '"'
+                            . ' -h "' . $host . '"'
+                            . ($port !== '' ? ' -p "' . $port . '"' : '')
+                            . ' -U "' . $user . '"'
+                            . ' -d "' . $dbName . '"'
+                            . ' -v ON_ERROR_STOP=1'
+                            . ' -f "' . $selectedFile . '"';
+                    } else {
+                        $cmd = 'set "PGPASSWORD=' . $pass . '" && ' . '"' . $psql . '"'
+                            . ' -h "' . $host . '"'
+                            . ($port !== '' ? ' -p "' . $port . '"' : '')
+                            . ' -U "' . $user . '"'
+                            . ' -d "' . $dbName . '"'
+                            . ' -v ON_ERROR_STOP=1'
+                            . ' -f "' . $selectedFile . '"';
+                    }
+                } else {
+                    if ($isDockerExec) {
+                        $cmd = $execPrefix . ' -e PGPASSWORD="' . $pass . '" ' . '"' . $psql . '"'
+                            . ' -h "' . $host . '"'
+                            . ($port !== '' ? ' -p "' . $port . '"' : '')
+                            . ' -U "' . $user . '"'
+                            . ' -d "' . $dbName . '"'
+                            . ' -v ON_ERROR_STOP=1'
+                            . ' -f "' . $selectedFile . '"';
+                    } else {
+                        $cmd = 'PGPASSWORD="' . $pass . '" ' . '"' . $psql . '"'
+                            . ' -h "' . $host . '"'
+                            . ($port !== '' ? ' -p "' . $port . '"' : '')
+                            . ' -U "' . $user . '"'
+                            . ' -d "' . $dbName . '"'
+                            . ' -v ON_ERROR_STOP=1'
+                            . ' -f "' . $selectedFile . '"';
+                    }
+                }
+
+                shell_exec($cmd);
+                echo "Imported: $selectedFile\n";
+                return $selectedFile;
+            } else if ($driverKey === 'sqlsrv') {
+                // SQL Server restore from .bak
+                $sqlcmd = isset($env[$sectionName]['SQLCMD_PATH']) && $env[$sectionName]['SQLCMD_PATH'] !== '' ? $env[$sectionName]['SQLCMD_PATH'] : 'sqlcmd';
+                $server  = $host . ($port !== '' ? ',' . $port : '');
+                $serverFile = isset($env[$sectionName]['SERVER_FILE_PATH']) && $env[$sectionName]['SERVER_FILE_PATH'] !== '' ? $env[$sectionName]['SERVER_FILE_PATH'] : $selectedFile;
+
+                echo "Note: SQL Server requires the .bak to be readable by the server service.\n";
+                $restoreQuery = "RESTORE DATABASE [" . $dbName . "] FROM DISK = N'" . $serverFile . "' WITH REPLACE";
+                $cmd = ($execPrefix !== '' ? $execPrefix . ' ' : '') . '"' . $sqlcmd . '"'
+                    . ' -S "' . $server . '" -U "' . $user . '" -P "' . $pass . '"'
+                    . ' -Q "' . $restoreQuery . '" -b';
+
+                shell_exec($cmd);
+                echo "Restore command executed. Check SQL Server for completion.\n";
+                return $selectedFile;
+            } else if ($driverKey === 'oracle') {
+                // Oracle import requires a custom command (impdp/sqlplus) with directory objects set up
+                $customCmd = isset($env[$sectionName]['CUSTOM_IMPORT_CMD']) ? trim($env[$sectionName]['CUSTOM_IMPORT_CMD']) : '';
+                if ($customCmd === '') {
+                    echo "Oracle import requires CUSTOM_IMPORT_CMD in env.ini (templated with %HOST%, %PORT%, %USER%, %PASS%, %DB%, %FILE%).\n";
+                    echo "Example: impdp %USER%/%PASS%@%HOST%:%PORT%/%DB% full=y dumpfile=%FILE%\n";
+                    return null;
+                }
+                $replacements = [
+                    '%HOST%' => $host,
+                    '%PORT%' => ($port !== '' ? $port : '1521'),
+                    '%USER%' => $user,
+                    '%PASS%' => $pass,
+                    '%DB%'   => $dbName,
+                    '%FILE%' => $selectedFile,
+                ];
+                $cmd = ($execPrefix !== '' ? $execPrefix . ' ' : '') . strtr($customCmd, $replacements);
+                shell_exec($cmd);
+                echo "Import command executed for Oracle.\n";
+                return $selectedFile;
+            } else {
+                echo "Unsupported driver '$driver' for import.\n";
+                return null;
+            }
+        } else if ($latestTablesDir !== null) {
+            echo "No full dump found. Importing per-table from '$latestTablesDir'...\n";
+            $this->flushOutput();
+
+            // Gather table files
+            $tableFiles = [];
+            $items = scandir($latestTablesDir);
+            foreach ($items as $it) {
+                if ($it !== '.' && $it !== '..' && substr($it, -4) === '.sql') {
+                    $tableFiles[] = $latestTablesDir . '/' . $it;
+                }
+            }
+
+            if ($driverKey === 'mysql') {
+                $mysql = isset($env[$sectionName]['MYSQL_PATH']) && $env[$sectionName]['MYSQL_PATH'] !== '' ? $env[$sectionName]['MYSQL_PATH'] : 'mysql';
+                if ($isWindows && $mysql === 'mysql') {
+                    $defaultWinPath = 'C:\\xampp\\mysql\\bin\\mysql.exe';
+                    if (file_exists($defaultWinPath)) {
+                        $mysql = $defaultWinPath;
+                    }
+                }
+                // Overwrite: drop and recreate database before per-table import
+                $dropCreateCmd = ($execPrefix !== '' ? $execPrefix . ' ' : '') . '"' . $mysql . '"'
+                    . ' --host="' . $host . '"'
+                    . ($port !== '' ? ' --port="' . $port . '"' : '')
+                    . ' --user="' . $user . '"'
+                    . ' --password="' . $pass . '"'
+                    . ' -e "DROP DATABASE IF EXISTS `' . $dbName . '`; CREATE DATABASE `' . $dbName . '` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"';
+                @shell_exec($dropCreateCmd);
+                $count = 0;
+                foreach ($tableFiles as $tf) {
+                    $tableName = basename($tf, '.sql');
+                    echo "  -> Importing table '$tableName'...";
+                    $this->flushOutput();
+                    $tfForMysql = str_replace('\\', '/', $tf);
+                    $cmd = ($execPrefix !== '' ? $execPrefix . ' ' : '') . '"' . $mysql . '"'
+                        . ' --host="' . $host . '"'
+                        . ($port !== '' ? ' --port="' . $port . '"' : '')
+                        . ' --user="' . $user . '"'
+                        . ' --password="' . $pass . '"'
+                        . ' "' . $dbName . '"'
+                        . ' -e "SET FOREIGN_KEY_CHECKS=0; source ' . $tfForMysql . '; SET FOREIGN_KEY_CHECKS=1;"';
+                    $tableStatus = 0;
+                    $tableOutput = [];
+                    @exec($cmd, $tableOutput, $tableStatus);
+                    if ($tableStatus === 0) {
+                        echo " OK\n";
+                        $count++;
+                    } else {
+                        echo " FAILED (exit $tableStatus)\n";
+                    }
+                }
+                echo "Imported $count tables from $latestTablesDir\n";
+                return $latestTablesDir;
+            } else if ($driverKey === 'pgsql') {
+                $psql = isset($env[$sectionName]['PSQL_PATH']) && $env[$sectionName]['PSQL_PATH'] !== '' ? $env[$sectionName]['PSQL_PATH'] : 'psql';
+                $count = 0;
+                foreach ($tableFiles as $tf) {
+                    $tableName = basename($tf, '.sql');
+                    echo "  -> Importing table '$tableName'...";
+                    $this->flushOutput();
+                    if ($isWindows) {
+                        if ($isDockerExec) {
+                            $tc = $execPrefix . ' -e PGPASSWORD="' . $pass . '" ' . '"' . $psql . '"'
+                                . ' -h "' . $host . '"'
+                                . ($port !== '' ? ' -p "' . $port . '"' : '')
+                                . ' -U "' . $user . '"'
+                                . ' -d "' . $dbName . '"'
+                                . ' -v ON_ERROR_STOP=1'
+                                . ' -f "' . $tf . '"';
+                        } else {
+                            $tc = 'set "PGPASSWORD=' . $pass . '" && ' . '"' . $psql . '"'
+                                . ' -h "' . $host . '"'
+                                . ($port !== '' ? ' -p "' . $port . '"' : '')
+                                . ' -U "' . $user . '"'
+                                . ' -d "' . $dbName . '"'
+                                . ' -v ON_ERROR_STOP=1'
+                                . ' -f "' . $tf . '"';
+                        }
+                    } else {
+                        if ($isDockerExec) {
+                            $tc = $execPrefix . ' -e PGPASSWORD="' . $pass . '" ' . '"' . $psql . '"'
+                                . ' -h "' . $host . '"'
+                                . ($port !== '' ? ' -p "' . $port . '"' : '')
+                                . ' -U "' . $user . '"'
+                                . ' -d "' . $dbName . '"'
+                                . ' -v ON_ERROR_STOP=1'
+                                . ' -f "' . $tf . '"';
+                        } else {
+                            $tc = 'PGPASSWORD="' . $pass . '" ' . '"' . $psql . '"'
+                                . ' -h "' . $host . '"'
+                                . ($port !== '' ? ' -p "' . $port . '"' : '')
+                                . ' -U "' . $user . '"'
+                                . ' -d "' . $dbName . '"'
+                                . ' -v ON_ERROR_STOP=1'
+                                . ' -f "' . $tf . '"';
+                        }
+                    }
+                    shell_exec($tc);
+                    echo " OK\n";
+                    $count++;
+                }
+                echo "Imported $count tables from $latestTablesDir\n";
+                return $latestTablesDir;
+            } else {
+                echo "Per-table import not supported for driver '$driver'.\n";
+                return null;
+            }
+        } else {
+            if ($targetYmd !== null) {
+                echo "No full dump found for date '$date' in $dbDir\n";
+            } else {
+                echo "No dump file or per-table directory found in $dbDir\n";
+            }
+            return null;
+        }
+
+    }
+
+    private function flushOutput()
+    {
+        if (function_exists('ob_get_level') && ob_get_level() > 0) {
+            @ob_flush();
+        }
+        @flush();
+        if (defined('STDOUT')) {
+            @fflush(STDOUT);
+        }
+        if (defined('STDERR')) {
+            @fflush(STDERR);
+        }
+    }
 
     private function createDirectory($dir)
     {
@@ -1736,16 +2490,31 @@ class MaxiterConfiguration
             mkdir($dir, 0777, true);
         }
     }
+
+    private function removeDirectory($dir)
+    {
+        if (!is_dir($dir)) return;
+        $items = scandir($dir);
+        foreach ($items as $it) {
+            if ($it === '.' || $it === '..') continue;
+            $full = $dir . '/' . $it;
+            if (is_dir($full)) {
+                $this->removeDirectory($full);
+            } else {
+                @unlink($full);
+            }
+        }
+        @rmdir($dir);
+    }
 }
 
 // Check if arguments were passed
 if ($argc < 2) {
 
     echo
-        "\nMaxiter CLI usage\n" .
+    "\nMaxiter CLI usage\n" .
         "\n" .
-        "Check the Maxiter Documentation here: https://maxiter-docs.vercel.app/\n\n"
-    ;
+        "Check the Maxiter Documentation here: https://maxiter-docs.vercel.app/\n\n";
 
     exit(1);
 }
@@ -1883,6 +2652,18 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
     } else {
         $config->newComponent($argv[3]);
     }
+} else if ($argv[1] === 'mirror' && $argv[3] === 'export') {
+    if (!isset($argv[1]) || empty($argv[1]) || !isset($argv[2]) || empty($argv[2]) || !isset($argv[3]) || empty($argv[3])) {
+        echo "Error: php maxiter mirror [database_name] export";
+        exit();
+    }
+    $config->mirrorExport($argv[2]);
+} else if ($argv[1] === 'mirror' && $argv[3] === 'import') {
+    if (!isset($argv[1]) || empty($argv[1]) || !isset($argv[2]) || empty($argv[2]) || !isset($argv[3]) || empty($argv[3])) {
+        echo "Error: php maxiter mirror [database_name] import [date]";
+        exit();
+    }
+    $config->mirrorImport($argv[2], isset($argv[4]) ? $argv[4] : null);
 } else {
     echo "Command not found\n";
 }

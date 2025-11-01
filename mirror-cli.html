@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Maxiter — Mirror CLI (export/import)</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; line-height: 1.5; margin: 0; padding: 2rem; }
+    main { max-width: 960px; margin: 0 auto; }
+    h1 { font-size: 1.8rem; margin: 0 0 1rem; }
+    h2 { font-size: 1.3rem; margin: 2rem 0 0.5rem; }
+    h3 { font-size: 1.1rem; margin: 1.5rem 0 0.5rem; }
+    p, li { font-size: 1rem; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 0.95rem; }
+    pre { background: rgba(127,127,127,0.12); padding: 0.75rem 1rem; border-radius: 8px; overflow: auto; }
+    .note { background: #fffbdd; color: #3b2f00; padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid #f1e3a3; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+    hr { border: 0; height: 1px; background: rgba(127,127,127,0.25); margin: 2rem 0; }
+  </style>
+  <meta name="description" content="Documentação dos comandos mirror export e mirror import do Maxiter." />
+</head>
+<body>
+  <main>
+    <h1>Maxiter — Mirror CLI</h1>
+    <p>Os comandos <code>mirror export</code> e <code>mirror import</code> automatizam backups e restaurações de bancos de dados usando as credenciais e opções definidas em <code>env.ini</code>. Os dumps ficam em <code>src/mirror/&lt;DB&gt;/</code> com nome <code>&lt;db&gt;-YYYYMMDD-HHMMSS.&lt;ext&gt;</code>, e há suporte para export por tabela em <code>tables-YYYYMMDD-HHMMSS</code> (quando aplicável).</p>
+
+    <h2>Pré‑requisitos</h2>
+    <ul>
+      <li>Configurar uma seção por banco no <code>env.ini</code> com <code>DRIVER</code>, <code>HOST</code>, <code>PORT</code>, <code>USER</code>, <code>PASS</code>, <code>DB</code>.</li>
+      <li>Drivers suportados: <strong>mysql/mariadb</strong>, <strong>pgsql</strong> (psql/postgres/postgresql), <strong>sqlsrv</strong> (SQL Server), <strong>oracle</strong> (via comando customizado).</li>
+      <li>Opções úteis: <code>EXPORT_EXT</code>, <code>MYSQL_PATH</code>, <code>MYSQLDUMP_PATH</code>, <code>PSQL_PATH</code>, <code>PG_DUMP_PATH</code>, <code>SQLCMD_PATH</code>, <code>EXEC_PREFIX</code> (ex.: <code>docker exec -i &lt;container&gt;</code>), <code>CUSTOM_EXPORT_CMD</code> e <code>CUSTOM_IMPORT_CMD</code> (Oracle).</li>
+    </ul>
+
+    <h2>Estrutura de Arquivos</h2>
+    <ul>
+      <li><code>src/mirror/&lt;db&gt;/&lt;db&gt;-YYYYMMDD-HHMMSS.&lt;ext&gt;</code>: dump completo do banco.</li>
+      <li><code>src/mirror/&lt;db&gt;/tables-YYYYMMDD-HHMMSS/</code>: arquivos <code>.sql</code> por tabela (quando suportado).</li>
+    </ul>
+
+    <h2>Comando: mirror export</h2>
+    <p>Cria um dump completo e, quando suportado, dumps por tabela na pasta <code>tables-&lt;timestamp&gt;</code>.</p>
+    <ul>
+      <li><strong>Extensão</strong>: <code>.sql</code> para MySQL/PostgreSQL, <code>.bak</code> para SQL Server, <code>.dmp</code> (ou customizada) para Oracle.</li>
+      <li><strong>Regra “um por dia”</strong>: antes de exportar, remove qualquer dump e pasta <code>tables-&lt;timestamp&gt;</code> do mesmo dia, mantendo apenas o novo; acumula somente em dias diferentes.</li>
+      <li><strong>Execução em Docker</strong>: se <code>EXEC_PREFIX</code> estiver definido (ex.: <code>docker exec -i ...</code>), os comandos são executados dentro do container.</li>
+    </ul>
+
+    <h3>Exemplos</h3>
+    <div class="grid">
+      <div>
+        <p><strong>Windows</strong></p>
+        <pre><code>php maxiter mirror teste export
+php maxiter mirror miyagym export</code></pre>
+      </div>
+      <div>
+        <p><strong>Docker (via EXEC_PREFIX)</strong></p>
+        <pre><code>[teste]
+DB="teste"
+DRIVER="mysql"
+HOST="db"
+PORT="3306"
+USER="root"
+PASS="secret"
+EXEC_PREFIX="docker exec -i my_php_container"</code></pre>
+      </div>
+    </div>
+
+    <h2>Comando: mirror import</h2>
+    <p>Restaura um banco a partir do dump mais recente, ou por pasta de tabelas se não houver dump completo (exceto quando você especifica uma data).</p>
+    <ul>
+      <li><strong>Sem data</strong>: escolhe o dump mais novo pelo timestamp no nome do arquivo; se não existir, tenta a pasta <code>tables-&lt;timestamp&gt;</code> mais nova.</li>
+      <li><strong>Com data</strong>: aceita <code>dd-mm-yyyy</code> (separadores <code>/</code>, <code>\</code> e <code>.</code> são normalizados) e importa o dump completo mais recente daquele dia. Com data específica, <em>não</em> há fallback para per‑tabelas.</li>
+      <li><strong>MySQL/MariaDB</strong>: sobrescreve o banco existente (executa <code>DROP DATABASE IF EXISTS</code> + <code>CREATE DATABASE</code>) e normaliza caminhos do <code>source</code> no Windows (<code>C:\...</code> → <code>C:/...</code>).</li>
+      <li><strong>PostgreSQL</strong>: importa no banco existente com <code>ON_ERROR_STOP=1</code>; não faz drop do banco por padrão.</li>
+      <li><strong>SQL Server</strong>: usa <code>RESTORE DATABASE ... WITH REPLACE</code> via <code>sqlcmd</code>; o <code>.bak</code> precisa ser acessível pelo serviço SQL Server (use <code>SERVER_FILE_PATH</code> se necessário).</li>
+      <li><strong>Oracle</strong>: usa <code>CUSTOM_IMPORT_CMD</code> (ex.: <code>impdp</code>/<code>sqlplus</code>), substituindo <code>%HOST%</code>, <code>%PORT%</code>, <code>%USER%</code>, <code>%PASS%</code>, <code>%DB%</code>, <code>%FILE%</code>.</li>
+    </ul>
+
+    <h3>Exemplos</h3>
+    <div class="grid">
+      <div>
+        <p><strong>Import padrão (mais recente)</strong></p>
+        <pre><code>php maxiter mirror teste import</code></pre>
+      </div>
+      <div>
+        <p><strong>Import por data específica</strong></p>
+        <pre><code>php maxiter mirror teste import 31-10-2025</code></pre>
+      </div>
+    </div>
+
+    <h2>Configuração de Exemplo (env.ini)</h2>
+    <pre><code>[teste]
+DB="teste"
+DRIVER="mysql"
+PORT="3306"
+HOST="localhost"
+USER="root"
+PASS=""
+
+; Personalização dos binários/opcionais
+MYSQLDUMP_PATH="C:\\xampp\\mysql\\bin\\mysqldump.exe"
+MYSQL_PATH="C:\\xampp\\mysql\\bin\\mysql.exe"
+PG_DUMP_PATH="pg_dump"
+PSQL_PATH="psql"
+SQLCMD_PATH="sqlcmd"
+; EXEC_PREFIX="docker exec -i my_php_container"
+; CUSTOM_EXPORT_CMD e CUSTOM_IMPORT_CMD para Oracle</code></pre>
+
+    <h2>Boas Práticas</h2>
+    <ul>
+      <li>Verifique se a seção do banco existe no <code>env.ini</code> (mensagem: <code>Database '&lt;db&gt;' not found in env.ini</code>).</li>
+      <li>Garanta permissão de escrita em <code>src/mirror/&lt;db&gt;/</code>.</li>
+      <li>No SQL Server, certifique‑se de que o serviço tem acesso ao caminho do <code>.bak</code> (use <code>SERVER_FILE_PATH</code> se necessário).</li>
+      <li>Use o filtro de data para reproduzir um estado específico (sem fallback para per‑tabelas nesse modo).</li>
+    </ul>
+
+    <h2>Mensagens Comuns</h2>
+    <ul>
+      <li><code>Exporting database '&lt;db&gt;' to '&lt;path&gt;'...</code> / <code>Exported: &lt;path&gt; (&lt;size&gt; KB)</code></li>
+      <li><code>-&gt; Exporting table '&lt;tabela&gt;'... OK</code> ou <code>FAILED</code></li>
+      <li><code>Importing database '&lt;db&gt;' from '&lt;path&gt;'...</code> / <code>Imported: &lt;path&gt;</code></li>
+      <li><code>No full dump found. Importing per-table from '&lt;dir&gt;'...</code></li>
+      <li><code>No dump file or per-table directory found in &lt;dir&gt;</code></li>
+    </ul>
+
+    <hr />
+    <p class="note"><strong>Nota:</strong> No MySQL/MariaDB, o import sobrescreve sempre o banco (drop + create) antes de carregar o dump. Em outros drivers, a sobrescrita segue o comportamento específico (ex.: SQL Server com <code>WITH REPLACE</code>).</p>
+  </main>
+</body>
+</html>
