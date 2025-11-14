@@ -2619,7 +2619,7 @@ class MaxiterConfiguration
         echo "\n🎉 Maxiter updated to v{$remote['version']}!\n";
     }
 
-    public function selfUpdateCLI()
+    public function selfUpdateCLI($force = false)
     {
         echo "🔍 Checking for CLI update...\n";
 
@@ -2644,11 +2644,25 @@ class MaxiterConfiguration
         }
 
         $expected = $manifest['files']['maxiter'];
+        $remoteHash = "sha1-" . sha1($remoteCli);
         $localHash = file_exists($localCliPath) ? ("sha1-" . sha1_file($localCliPath)) : '';
 
         if (!file_exists($localCliPath)) {
             file_put_contents($localCliPath, $remoteCli);
             echo "✨ Installed CLI.\n";
+            return;
+        }
+
+        if ($localHash === $remoteHash) {
+            echo "✔ CLI is already up to date.\n";
+            return;
+        }
+
+        if ($force) {
+            $bak = __DIR__ . "/maxiter.bak";
+            @copy($localCliPath, $bak);
+            file_put_contents($localCliPath, $remoteCli);
+            echo "✔ CLI updated (forced). Backup saved at maxiter.bak\n";
             return;
         }
 
@@ -2821,7 +2835,8 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
     $config->mirrorImport($argv[2], isset($argv[4]) ? $argv[4] : null);
 } else if ($argv[1] === 'update') {
     if (isset($argv[2]) && $argv[2] === 'cli') {
-        $config->selfUpdateCLI();
+        $force = isset($argv[3]) && $argv[3] === '-f';
+        $config->selfUpdateCLI($force);
     } else {
         $config->selfUpdate();
     }
