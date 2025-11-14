@@ -2643,9 +2643,14 @@ class MaxiterConfiguration
             return;
         }
 
-        $expected = $manifest['files']['maxiter'];
-        $remoteHash = "sha1-" . sha1($remoteCli);
-        $localHash = file_exists($localCliPath) ? ("sha1-" . sha1_file($localCliPath)) : '';
+        $expected = strtolower($manifest['files']['maxiter']);
+
+        $localCliContent = file_exists($localCliPath) ? @file_get_contents($localCliPath) : '';
+        $localCliNormalized = $localCliContent !== '' ? str_replace(["\r\n", "\r"], "\n", $localCliContent) : '';
+        $remoteCliNormalized = str_replace(["\r\n", "\r"], "\n", $remoteCli);
+
+        $remoteHash = "sha1-" . sha1($remoteCliNormalized);
+        $localHash = file_exists($localCliPath) ? ("sha1-" . sha1($localCliNormalized)) : '';
 
         if (!file_exists($localCliPath)) {
             file_put_contents($localCliPath, $remoteCli);
