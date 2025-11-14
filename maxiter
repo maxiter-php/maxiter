@@ -2628,35 +2628,18 @@ class MaxiterConfiguration
         $repo = isset($env['app']['UPDATE_REPO']) ? $env['app']['UPDATE_REPO'] : 'maxiter';
         $branch = isset($env['app']['UPDATE_BRANCH']) ? $env['app']['UPDATE_BRANCH'] : 'main';
 
-        $zipUrl = "https://github.com/$user/$repo/archive/refs/heads/$branch.zip";
-        $zipFile = __DIR__ . "/maxiter_cli_update.zip";
-        file_put_contents($zipFile, file_get_contents($zipUrl));
-
-        $extractPath = __DIR__ . "/update_temp_cli";
-        mkdir($extractPath);
-
-        $zip = new ZipArchive();
-        if ($zip->open($zipFile) === TRUE) {
-            $zip->extractTo($extractPath);
-            $zip->close();
-        }
-
-        $manifestPath = $extractPath . "/$repo-$branch/manifest.json";
-        $manifest = json_decode(@file_get_contents($manifestPath), true);
+        $manifestUrl = "https://raw.githubusercontent.com/$user/$repo/$branch/manifest.json";
+        $manifest = json_decode(@file_get_contents($manifestUrl), true);
         if (!$manifest || !isset($manifest['files']) || !isset($manifest['files']['maxiter'])) {
             echo "❌ Manifest missing CLI entry.\n";
-            @unlink($zipFile);
-            $this->removeDirectory($extractPath);
             return;
         }
 
         $localCliPath = __DIR__ . "/maxiter";
-        $remoteCliPath = $extractPath . "/$repo-$branch/maxiter";
-
-        if (!file_exists($remoteCliPath)) {
+        $remoteCliUrl = "https://raw.githubusercontent.com/$user/$repo/$branch/maxiter";
+        $remoteCli = @file_get_contents($remoteCliUrl);
+        if ($remoteCli === false || $remoteCli === '') {
             echo "❌ Remote CLI not found.\n";
-            @unlink($zipFile);
-            $this->removeDirectory($extractPath);
             return;
         }
 
@@ -2664,20 +2647,19 @@ class MaxiterConfiguration
         $localHash = file_exists($localCliPath) ? ("sha1-" . sha1_file($localCliPath)) : '';
 
         if (!file_exists($localCliPath)) {
-            copy($remoteCliPath, $localCliPath);
+            file_put_contents($localCliPath, $remoteCli);
             echo "✨ Installed CLI.\n";
-        } else if ($localHash === $expected) {
+            return;
+        }
+
+        if ($localHash === $expected) {
             $bak = __DIR__ . "/maxiter.bak";
             @copy($localCliPath, $bak);
-            @unlink($localCliPath);
-            copy($remoteCliPath, $localCliPath);
+            file_put_contents($localCliPath, $remoteCli);
             echo "✔ CLI updated. Backup saved at maxiter.bak\n";
         } else {
             echo "⚠ Skipped CLI (modified by user).\n";
         }
-
-        @unlink($zipFile);
-        $this->removeDirectory($extractPath);
     }
 }
 
