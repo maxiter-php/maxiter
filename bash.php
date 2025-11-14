@@ -40,6 +40,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bash'])) {
             echo json_encode($templateFolders);
             break;
 
+        case 'changeUrlAuto':
+            $port = null;
+            if($_POST['port'] != "80") {
+                $port = $_POST['port'];
+            }
+
+            $cmd = "php maxiter autopath " . $port;
+
+            exec($cmd, $output, $returnCode);
+
+            if ($returnCode === 0) {
+                echo implode("\n", $output);
+            } else {
+                echo "Error: $returnCode";
+            }
+            break;
+
         case 'changeUrl':
 
             $cmd = "php maxiter path " . $_POST['url'];
@@ -151,10 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bash'])) {
             }
 
             break;
-
     }
-
 } else {
     echo "Invalid Request!";
 }
-?>

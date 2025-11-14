@@ -137,14 +137,25 @@
                     <div class="card-body">
                         <form id="contactForm">
                             <div class="mb-3">
+                                <label for="name" class="form-label">Port</label>
+                                <input type="number" class="form-control" id="basePort" required placeholder="80">
+                            </div>
+                            <button type="button" id="btnChangeBaseUrlAuto" class="btn w-100"
+                                style="background-color: #3b435b;color:white;">Auto Change</button>
+
+                            <p class="cliDescription">Automatically change the url base in your project</p>
+                        </form>
+                        <hr>
+                        <form id="contactForm">
+                            <div class="mb-3">
                                 <label for="name" class="form-label">URL</label>
                                 <input type="text" class="form-control" id="baseUrl" required
                                     placeholder="http://localhost/my-project/">
                             </div>
                             <button type="button" id="btnChangeBaseUrl" class="btn w-100"
-                                style="background-color: #3b435b;color:white;">Change</button>
-                            <hr>
-                            <p class="cliDescription">Set up a new url base in your project</p>
+                                style="background-color: #3b435b;color:white;">Manual Change</button>
+
+                            <p class="cliDescription">Manually change the url base in your project</p>
                         </form>
                     </div>
                 </div>
@@ -379,6 +390,36 @@
 
             });
 
+            // Change Base URL AUTO
+            let btnChangeBaseUrlAuto = document.querySelector("#btnChangeBaseUrlAuto");
+            btnChangeBaseUrlAuto.addEventListener("click", (e) => {
+                console.log("AUto");
+                let basePort = document.querySelector("#basePort").value;
+
+
+                $.ajax({
+                    url: path.APP_BASE_URL + "bash.php",
+                    type: "POST",
+                    data: {
+                        bash: "changeUrlAuto",
+                        port: basePort
+                    },
+                    success: function (response) {
+
+                        Swal.fire({
+                            title: "Done!",
+                            text: response,
+                            icon: "success"
+                        });
+
+                    }
+                });
+
+
+
+
+            });
+
 
             // Change Base URL
             let btnChangeBaseUrl = document.querySelector("#btnChangeBaseUrl");
@@ -604,7 +645,7 @@
 
             });
 
-            
+
             // New API Controller
             let btnAPIController = document.querySelector("#btnAPIController");
             btnAPIController.addEventListener("click", (e) => {
@@ -629,21 +670,21 @@
                         });
 
                         iptApiController.value = "";
-                        
+
                     }
                 });
-                
+
             });
 
             // New Unit Test Controller
             let btnUnitTest = document.querySelector("#btnUnitTest");
             btnUnitTest.addEventListener("click", (e) => {
                 e.preventDefault();
-            
+
                 let iptUTControllerName = document.querySelector("#iptUTControllerName");
                 let iptUTFunctionName = document.querySelector("#iptUTFunctionName");
                 let apiControllerName = iptUTControllerName.value;
-            
+
                 $.ajax({
                     url: path.APP_BASE_URL + "bash.php",
                     type: "POST",
@@ -653,20 +694,20 @@
                         functionName: iptUTFunctionName.value
                     },
                     success: function (response) {
-            
+
                         Swal.fire({
                             title: "Done!",
                             text: response,
                             icon: "success"
                         });
-            
+
                         iptUTControllerName.value = "";
-            
+
                     }
                 });
-            
+
             });
-            
+
         });
     </script>
 </body>

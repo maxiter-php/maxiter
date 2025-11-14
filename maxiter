@@ -1762,10 +1762,18 @@ class MaxiterConfiguration
 
         // Normalize driver and set file extension
         $driverKey = strtolower(trim($driver));
-        if (in_array($driverKey, ['mariadb'])) { $driverKey = 'mysql'; }
-        if (in_array($driverKey, ['psql', 'postgres', 'postgresql'])) { $driverKey = 'pgsql'; }
-        if (in_array($driverKey, ['sql server', 'sqlserver', 'mssql'])) { $driverKey = 'sqlsrv'; }
-        if (in_array($driverKey, ['oci', 'ora'])) { $driverKey = 'oracle'; }
+        if (in_array($driverKey, ['mariadb'])) {
+            $driverKey = 'mysql';
+        }
+        if (in_array($driverKey, ['psql', 'postgres', 'postgresql'])) {
+            $driverKey = 'pgsql';
+        }
+        if (in_array($driverKey, ['sql server', 'sqlserver', 'mssql'])) {
+            $driverKey = 'sqlsrv';
+        }
+        if (in_array($driverKey, ['oci', 'ora'])) {
+            $driverKey = 'oracle';
+        }
 
         $defaultExt = ($driverKey === 'sqlsrv') ? 'bak' : (($driverKey === 'oracle') ? 'dmp' : 'sql');
         $exportExt  = isset($env[$sectionName]['EXPORT_EXT']) && $env[$sectionName]['EXPORT_EXT'] !== '' ? trim($env[$sectionName]['EXPORT_EXT']) : $defaultExt;
@@ -2089,7 +2097,8 @@ class MaxiterConfiguration
         }
     }
 
-    public function mirrorImport($databaseName, $date = null) {
+    public function mirrorImport($databaseName, $date = null)
+    {
         // Path to env.ini
         $envPath = __DIR__ . '/env.ini';
 
@@ -2139,10 +2148,18 @@ class MaxiterConfiguration
 
         // Normalize driver and determine file extension
         $driverKey = strtolower(trim($driver));
-        if (in_array($driverKey, ['mariadb'])) { $driverKey = 'mysql'; }
-        if (in_array($driverKey, ['psql', 'postgres', 'postgresql'])) { $driverKey = 'pgsql'; }
-        if (in_array($driverKey, ['sql server', 'sqlserver', 'mssql'])) { $driverKey = 'sqlsrv'; }
-        if (in_array($driverKey, ['oci', 'ora'])) { $driverKey = 'oracle'; }
+        if (in_array($driverKey, ['mariadb'])) {
+            $driverKey = 'mysql';
+        }
+        if (in_array($driverKey, ['psql', 'postgres', 'postgresql'])) {
+            $driverKey = 'pgsql';
+        }
+        if (in_array($driverKey, ['sql server', 'sqlserver', 'mssql'])) {
+            $driverKey = 'sqlsrv';
+        }
+        if (in_array($driverKey, ['oci', 'ora'])) {
+            $driverKey = 'oracle';
+        }
 
         $defaultExt = ($driverKey === 'sqlsrv') ? 'bak' : (($driverKey === 'oracle') ? 'dmp' : 'sql');
         $importExt  = isset($env[$sectionName]['EXPORT_EXT']) && $env[$sectionName]['EXPORT_EXT'] !== '' ? trim($env[$sectionName]['EXPORT_EXT']) : $defaultExt;
@@ -2159,7 +2176,7 @@ class MaxiterConfiguration
         $isWindows  = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
         $execPrefix = isset($env[$sectionName]['EXEC_PREFIX']) ? trim($env[$sectionName]['EXEC_PREFIX']) : '';
         $isDockerExec = $execPrefix !== '' && (stripos($execPrefix, 'docker exec') !== false || stripos($execPrefix, 'docker-compose exec') !== false);
-        
+
         // Optional date filter (expected format dd-mm-yyyy). If provided, only full dump is considered.
         $targetYmd = null; // YYYYMMDD
         if ($date !== null && trim($date) !== '') {
@@ -2182,14 +2199,18 @@ class MaxiterConfiguration
         $files = glob($pattern);
         if (is_array($files)) {
             foreach ($files as $f) {
-                if (!is_file($f)) { continue; }
+                if (!is_file($f)) {
+                    continue;
+                }
                 $base = basename($f);
                 // Match -YYYYMMDD-HHMMSS before extension
                 $extEsc = preg_quote($importExt, '/');
                 if (preg_match('/-([0-9]{8})-([0-9]{6})\.' . $extEsc . '$/i', $base, $m)) {
                     $ymd = $m[1];
                     $his = $m[2];
-                    if ($targetYmd !== null && $ymd !== $targetYmd) { continue; }
+                    if ($targetYmd !== null && $ymd !== $targetYmd) {
+                        continue;
+                    }
                     $stamp = (int)($ymd . $his);
                     if ($stamp > $bestStamp) {
                         $bestStamp = $stamp;
@@ -2206,7 +2227,9 @@ class MaxiterConfiguration
             if (is_array($candidateDirs)) {
                 $bestDirStamp = -1;
                 foreach ($candidateDirs as $d) {
-                    if (!is_dir($d)) { continue; }
+                    if (!is_dir($d)) {
+                        continue;
+                    }
                     $base = basename($d);
                     if (preg_match('/tables-([0-9]{8})-([0-9]{6})$/', $base, $m)) {
                         $stamp = (int)($m[1] . $m[2]);
@@ -2467,7 +2490,6 @@ class MaxiterConfiguration
             }
             return null;
         }
-
     }
 
     private function flushOutput()
@@ -2505,6 +2527,157 @@ class MaxiterConfiguration
             }
         }
         @rmdir($dir);
+    }
+
+    public function selfUpdate()
+    {
+        echo "🔍 Checking for updates...\n";
+
+        $env = parse_ini_file(__DIR__ . "/env.ini", true);
+        $user = isset($env['app']['UPDATE_USER']) ? $env['app']['UPDATE_USER'] : 'maxiter-php';
+        $repo = isset($env['app']['UPDATE_REPO']) ? $env['app']['UPDATE_REPO'] : 'maxiter';
+        $branch = isset($env['app']['UPDATE_BRANCH']) ? $env['app']['UPDATE_BRANCH'] : 'main';
+
+        $localVersionFile = __DIR__ . "/version.json";
+        $remoteVersionUrl = "https://raw.githubusercontent.com/$user/$repo/$branch/version.json";
+
+        if (!file_exists($localVersionFile)) {
+            echo "❌ Local version not found.\n";
+            return;
+        }
+
+        $local = json_decode(file_get_contents($localVersionFile), true);
+        $remote = json_decode(file_get_contents($remoteVersionUrl), true);
+
+        if (!$remote) {
+            echo "❌ Could not check remote version.\n";
+            return;
+        }
+
+        if ($remote['version'] == $local['version']) {
+            echo "✔ Maxiter is already up to date (v{$local['version']}).\n";
+            return;
+        }
+
+        echo "📥 New version found: {$remote['version']} (current {$local['version']})\n";
+
+        $zipUrl = "https://github.com/$user/$repo/archive/refs/heads/$branch.zip";
+        $zipFile = __DIR__ . "/maxiter_update.zip";
+
+        file_put_contents($zipFile, file_get_contents($zipUrl));
+
+        echo "📦 Downloaded update package.\n";
+
+        $extractPath = __DIR__ . "/update_temp";
+        mkdir($extractPath);
+
+        $zip = new ZipArchive();
+        if ($zip->open($zipFile) === TRUE) {
+            $zip->extractTo($extractPath);
+            $zip->close();
+        }
+
+        echo "📂 Extracted update.\n";
+
+        $manifest = json_decode(file_get_contents($extractPath . "/$repo-$branch/manifest.json"), true);
+        if (!$manifest || !isset($manifest["files"])) {
+            echo "❌ Manifest not found.\n";
+            return;
+        }
+
+        foreach ($manifest["files"] as $file => $hash) {
+
+            $localPath = __DIR__ . "/" . $file;
+            $remotePath = $extractPath . "/$repo-$branch/" . $file;
+
+            if (!file_exists($remotePath)) continue;
+
+            if (!file_exists($localPath)) {
+                // instalar novo
+                copy($remotePath, $localPath);
+                echo "✨ Installed new file: $file\n";
+                continue;
+            }
+
+            // comparar hash para saber se foi modificado pelo usuário
+            $localHash = "sha1-" . sha1_file($localPath);
+
+            if ($localHash === $hash) {
+                // seguro atualizar
+                copy($remotePath, $localPath);
+                echo "✔ Updated: $file\n";
+            } else {
+                echo "⚠ Skipped (modified by user): $file\n";
+            }
+        }
+
+        file_put_contents($localVersionFile, json_encode($remote, JSON_PRETTY_PRINT));
+
+        unlink($zipFile);
+        $this->removeDirectory($extractPath);
+
+        echo "\n🎉 Maxiter updated to v{$remote['version']}!\n";
+    }
+
+    public function selfUpdateCLI()
+    {
+        echo "🔍 Checking for CLI update...\n";
+
+        $env = parse_ini_file(__DIR__ . "/env.ini", true);
+        $user = isset($env['app']['UPDATE_USER']) ? $env['app']['UPDATE_USER'] : 'maxiter-php';
+        $repo = isset($env['app']['UPDATE_REPO']) ? $env['app']['UPDATE_REPO'] : 'maxiter';
+        $branch = isset($env['app']['UPDATE_BRANCH']) ? $env['app']['UPDATE_BRANCH'] : 'main';
+
+        $zipUrl = "https://github.com/$user/$repo/archive/refs/heads/$branch.zip";
+        $zipFile = __DIR__ . "/maxiter_cli_update.zip";
+        file_put_contents($zipFile, file_get_contents($zipUrl));
+
+        $extractPath = __DIR__ . "/update_temp_cli";
+        mkdir($extractPath);
+
+        $zip = new ZipArchive();
+        if ($zip->open($zipFile) === TRUE) {
+            $zip->extractTo($extractPath);
+            $zip->close();
+        }
+
+        $manifestPath = $extractPath . "/$repo-$branch/manifest.json";
+        $manifest = json_decode(@file_get_contents($manifestPath), true);
+        if (!$manifest || !isset($manifest['files']) || !isset($manifest['files']['maxiter'])) {
+            echo "❌ Manifest missing CLI entry.\n";
+            @unlink($zipFile);
+            $this->removeDirectory($extractPath);
+            return;
+        }
+
+        $localCliPath = __DIR__ . "/maxiter";
+        $remoteCliPath = $extractPath . "/$repo-$branch/maxiter";
+
+        if (!file_exists($remoteCliPath)) {
+            echo "❌ Remote CLI not found.\n";
+            @unlink($zipFile);
+            $this->removeDirectory($extractPath);
+            return;
+        }
+
+        $expected = $manifest['files']['maxiter'];
+        $localHash = file_exists($localCliPath) ? ("sha1-" . sha1_file($localCliPath)) : '';
+
+        if (!file_exists($localCliPath)) {
+            copy($remoteCliPath, $localCliPath);
+            echo "✨ Installed CLI.\n";
+        } else if ($localHash === $expected) {
+            $bak = __DIR__ . "/maxiter.bak";
+            @copy($localCliPath, $bak);
+            @unlink($localCliPath);
+            copy($remoteCliPath, $localCliPath);
+            echo "✔ CLI updated. Backup saved at maxiter.bak\n";
+        } else {
+            echo "⚠ Skipped CLI (modified by user).\n";
+        }
+
+        @unlink($zipFile);
+        $this->removeDirectory($extractPath);
     }
 }
 
@@ -2664,6 +2837,12 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
         exit();
     }
     $config->mirrorImport($argv[2], isset($argv[4]) ? $argv[4] : null);
+} else if ($argv[1] === 'update') {
+    if (isset($argv[2]) && $argv[2] === 'cli') {
+        $config->selfUpdateCLI();
+    } else {
+        $config->selfUpdate();
+    }
 } else {
     echo "Command not found\n";
 }
