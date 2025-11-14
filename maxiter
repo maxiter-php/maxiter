@@ -2659,18 +2659,24 @@ class MaxiterConfiguration
         }
 
         if ($force) {
-            $bak = __DIR__ . "/maxiter.bak";
+            $backupDir = __DIR__ . "/src/temp";
+            $this->createDirectory($backupDir);
+            $date = date('Ymd-His');
+            $bak = $backupDir . "/maxiter-" . $date . ".bak";
             @copy($localCliPath, $bak);
             file_put_contents($localCliPath, $remoteCli);
-            echo "✔ CLI updated (forced). Backup saved at maxiter.bak\n";
+            echo "✔ CLI updated (forced). Backup saved at " . $bak . "\n";
             return;
         }
 
         if ($localHash === $expected) {
-            $bak = __DIR__ . "/maxiter.bak";
+            $backupDir = __DIR__ . "/src/temp";
+            $this->createDirectory($backupDir);
+            $date = date('Ymd-His');
+            $bak = $backupDir . "/maxiter-" . $date . ".bak";
             @copy($localCliPath, $bak);
             file_put_contents($localCliPath, $remoteCli);
-            echo "✔ CLI updated. Backup saved at maxiter.bak\n";
+            echo "✔ CLI updated. Backup saved at " . $bak . "\n";
         } else {
             echo "⚠ Skipped CLI (modified by user).\n";
         }
