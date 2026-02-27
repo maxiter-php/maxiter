@@ -9,7 +9,10 @@ Don't forget, this file should be used in header of all controller files using "
 session_start();
 
 // Vendor Composer
-require __DIR__ . "/../../vendor/autoload.php";
+$autoloadPath = __DIR__ . "/../../vendor/autoload.php";
+if (file_exists($autoloadPath)) {
+    require_once $autoloadPath;
+}
 
 // Required Models
 require __DIR__ . "/EnvModel.php";

@@ -19,7 +19,7 @@
 
         .custom-card {
             width: 100%;
-            height: 320px;
+            min-height: 320px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             overflow: hidden;
@@ -109,6 +109,12 @@
             color: grey;
             font-size: 10pt;
         }
+
+        .section-title {
+            margin: 10px 0 0;
+            font-weight: 600;
+            color: #3b435b;
+        }
     </style>
 </head>
 
@@ -126,9 +132,9 @@
         <h1 class="text-center mb-5">Maxiter GUI Application</h1>
 
         <div class="row g-4">
-
-
-
+            <div class="col-12">
+                <h4 class="section-title">Configuração</h4>
+            </div>
             <div class="col-md-6 col-lg-3   ">
                 <div class="card custom-card">
                     <div class="card-header text-white" style="background-color: #3b435b;">
@@ -159,6 +165,54 @@
                         </form>
                     </div>
                 </div>
+            </div>
+            <div class="col-md-6 col-lg-3   ">
+                <div class="card custom-card">
+                    <div class="card-header text-white" style="background-color: #3b435b;">
+                        <h5 class="card-title mb-0">Path Check</h5>
+                    </div>
+                    <div class="card-body">
+                        <button type="button" id="btnPathCheck" class="btn w-100"
+                            style="background-color: #3b435b;color:white;">Check</button>
+                        <hr>
+                        <p class="cliDescription">Show env.ini and path.js APP_BASE_URL</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3   ">
+                <div class="card custom-card">
+                    <div class="card-header text-white" style="background-color: #3b435b;">
+                        <h5 class="card-title mb-0">Server</h5>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="serverPort" class="form-label">Port</label>
+                                <input type="number" class="form-control" id="serverPort" placeholder="8000">
+                            </div>
+                            <button type="button" id="btnServer" class="btn w-100"
+                                style="background-color: #3b435b;color:white;">Start Server</button>
+                            <hr>
+                            <p class="cliDescription">Start PHP built-in server</p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3   ">
+                <div class="card custom-card">
+                    <div class="card-header text-white" style="background-color: #3b435b;">
+                        <h5 class="card-title mb-0">Open GUI</h5>
+                    </div>
+                    <div class="card-body">
+                        <button type="button" id="btnOpenGui" class="btn w-100"
+                            style="background-color: #3b435b;color:white;">Open</button>
+                        <hr>
+                        <p class="cliDescription">Open GUI in default browser</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <h4 class="section-title">Geradores</h4>
             </div>
             <div class="col-md-6 col-lg-3   ">
                 <div class="card custom-card">
@@ -199,7 +253,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-md-6 col-lg-3   ">
                 <div class="card custom-card">
                     <div class="card-header text-white" style="background-color: #3b435b;">
@@ -222,7 +275,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-md-6 col-lg-3   ">
                 <div class="card custom-card">
                     <div class="card-header text-white" style="background-color: #3b435b;">
@@ -247,7 +299,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-md-6 col-lg-3   ">
                 <div class="card custom-card">
                     <div class="card-header text-white" style="background-color: #3b435b;">
@@ -267,7 +318,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-md-6 col-lg-3   ">
                 <div class="card custom-card">
                     <div class="card-header text-white" style="background-color: #3b435b;">
@@ -287,7 +337,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-md-6 col-lg-3   ">
                 <div class="card custom-card">
                     <div class="card-header text-white" style="background-color: #3b435b;">
@@ -308,6 +357,185 @@
                             <hr>
                             <p class="cliDescription">Create a new Unit Test file in tests/</p>
                         </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3   ">
+                <div class="card custom-card">
+                    <div class="card-header text-white" style="background-color: #3b435b;">
+                        <h5 class="card-title mb-0">New Log Model</h5>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="iptNewLog" class="form-label">Database Name</label>
+                                <input type="text" class="form-control" id="iptNewLog" required>
+                            </div>
+                            <button type="button" id="btnNewLog" class="btn w-100"
+                                style="background-color: #3b435b;color:white;">Create</button>
+                            <hr>
+                            <p class="cliDescription">Create a new log model</p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3   ">
+                <div class="card custom-card">
+                    <div class="card-header text-white" style="background-color: #3b435b;">
+                        <h5 class="card-title mb-0">New Table SQL</h5>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="iptNewTable" class="form-label">Table Name</label>
+                                <input type="text" class="form-control" id="iptNewTable" required>
+                            </div>
+                            <button type="button" id="btnNewTable" class="btn w-100"
+                                style="background-color: #3b435b;color:white;">Create</button>
+                            <hr>
+                            <p class="cliDescription">Generate SQL template for a table</p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3   ">
+                <div class="card custom-card">
+                    <div class="card-header text-white" style="background-color: #3b435b;">
+                        <h5 class="card-title mb-0">New Component</h5>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="iptNewComponent" class="form-label">Component Name</label>
+                                <input type="text" class="form-control" id="iptNewComponent" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="selectComponentTemplate" class="form-label">Template</label>
+                                <select class="form-select" id="selectComponentTemplate">
+                                </select>
+                            </div>
+                            <button type="button" id="btnNewComponent" class="btn w-100"
+                                style="background-color: #3b435b;color:white;">Create</button>
+                            <hr>
+                            <p class="cliDescription">Create reusable component</p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <h4 class="section-title">Produção e Rotas</h4>
+            </div>
+            <div class="col-md-6 col-lg-3   ">
+                <div class="card custom-card">
+                    <div class="card-header text-white" style="background-color: #3b435b;">
+                        <h5 class="card-title mb-0">Production</h5>
+                    </div>
+                    <div class="card-body">
+                        <button type="button" id="btnConfigProd" class="btn w-100 mb-2"
+                            style="background-color: #3b435b;color:white;">Config Prod</button>
+                        <button type="button" id="btnDelToProd" class="btn w-100 mb-2"
+                            style="background-color: #3b435b;color:white;">Delete Non-Prod</button>
+                        <button type="button" id="btnDelToProdFolder" class="btn w-100 mb-2"
+                            style="background-color: #3b435b;color:white;">Move Non-Prod</button>
+                        <button type="button" id="btnDelToProdRestore" class="btn w-100"
+                            style="background-color: #3b435b;color:white;">Restore Non-Prod</button>
+                        <hr>
+                        <p class="cliDescription">Production cleanup and restore</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3   ">
+                <div class="card custom-card">
+                    <div class="card-header text-white" style="background-color: #3b435b;">
+                        <h5 class="card-title mb-0">Routes</h5>
+                    </div>
+                    <div class="card-body">
+                        <button type="button" id="btnCro" class="btn w-100 mb-2"
+                            style="background-color: #3b435b;color:white;">Legacy Routes</button>
+                        <button type="button" id="btnCrn" class="btn w-100"
+                            style="background-color: #3b435b;color:white;">New Routes</button>
+                        <hr>
+                        <p class="cliDescription">Switch index.php routing mode</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <h4 class="section-title">Database Mirror</h4>
+            </div>
+            <div class="col-md-6 col-lg-3   ">
+                <div class="card custom-card">
+                    <div class="card-header text-white" style="background-color: #3b435b;">
+                        <h5 class="card-title mb-0">Mirror Export</h5>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="iptMirrorExportDb" class="form-label">Database Name</label>
+                                <input type="text" class="form-control" id="iptMirrorExportDb" required>
+                            </div>
+                            <button type="button" id="btnMirrorExport" class="btn w-100"
+                                style="background-color: #3b435b;color:white;">Export</button>
+                            <hr>
+                            <p class="cliDescription">Export database to mirror</p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3   ">
+                <div class="card custom-card">
+                    <div class="card-header text-white" style="background-color: #3b435b;">
+                        <h5 class="card-title mb-0">Mirror Import</h5>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="iptMirrorImportDb" class="form-label">Database Name</label>
+                                <input type="text" class="form-control" id="iptMirrorImportDb" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="iptMirrorImportDate" class="form-label">Date (optional)</label>
+                                <input type="text" class="form-control" id="iptMirrorImportDate" placeholder="YYYYMMDD or YYYYMMDD-HHMMSS">
+                            </div>
+                            <button type="button" id="btnMirrorImport" class="btn w-100"
+                                style="background-color: #3b435b;color:white;">Import</button>
+                            <hr>
+                            <p class="cliDescription">Import database from mirror</p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <h4 class="section-title">Updates e Testes</h4>
+            </div>
+            <div class="col-md-6 col-lg-3   ">
+                <div class="card custom-card">
+                    <div class="card-header text-white" style="background-color: #3b435b;">
+                        <h5 class="card-title mb-0">Update</h5>
+                    </div>
+                    <div class="card-body">
+                        <button type="button" id="btnUpdate" class="btn w-100 mb-2"
+                            style="background-color: #3b435b;color:white;">Update Project</button>
+                        <button type="button" id="btnUpdateCli" class="btn w-100 mb-2"
+                            style="background-color: #3b435b;color:white;">Update CLI</button>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="chkForceUpdateCli">
+                            <label class="form-check-label" for="chkForceUpdateCli">Force CLI update</label>
+                        </div>
+                        <hr>
+                        <p class="cliDescription">Update project and CLI</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3   ">
+                <div class="card custom-card">
+                    <div class="card-header text-white" style="background-color: #3b435b;">
+                        <h5 class="card-title mb-0">Tests</h5>
+                    </div>
+                    <div class="card-body">
+                        <button type="button" id="btnTestMe" class="btn w-100"
+                            style="background-color: #3b435b;color:white;">Run PHPUnit</button>
+                        <hr>
+                        <p class="cliDescription">Execute php maxiter testme</p>
                     </div>
                 </div>
             </div>
@@ -332,6 +560,23 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             document.querySelector(".preloader").style.display = "none";
+            function runBash(payload, onDone) {
+                $.ajax({
+                    url: path.APP_BASE_URL + "bash.php",
+                    type: "POST",
+                    data: payload,
+                    success: function (response) {
+                        Swal.fire({
+                            title: "Done!",
+                            text: response,
+                            icon: "success"
+                        });
+                        if (onDone) {
+                            onDone(response);
+                        }
+                    }
+                });
+            }
 
 
             let iptNewView = document.querySelector("#iptNewView");
@@ -368,10 +613,14 @@
                     firstOptionChangeTemplate.innerText = "-";
                     selectChangeTemplate.appendChild(firstOptionChangeTemplate);
 
-                    let selectViewTemplate = document.querySelector("#selectViewTemplate");
+            let selectViewTemplate = document.querySelector("#selectViewTemplate");
                     let firstOptionViewTemplate = document.createElement("option");
                     firstOptionViewTemplate.innerText = "-";
                     selectViewTemplate.appendChild(firstOptionViewTemplate);
+            let selectComponentTemplate = document.querySelector("#selectComponentTemplate");
+            let firstOptionComponentTemplate = document.createElement("option");
+            firstOptionComponentTemplate.innerText = "-";
+            selectComponentTemplate.appendChild(firstOptionComponentTemplate);
                     responseFetch.forEach((item) => {
 
                         let optionChangeTemplate = document.createElement("option");
@@ -383,6 +632,11 @@
                         optionViewTemplate.value = item.name;
                         optionViewTemplate.innerText = item.name;
                         selectViewTemplate.appendChild(optionViewTemplate);
+
+                let optionComponentTemplate = document.createElement("option");
+                optionComponentTemplate.value = item.name;
+                optionComponentTemplate.innerText = item.name;
+                selectComponentTemplate.appendChild(optionComponentTemplate);
 
                     });
 
@@ -470,24 +724,8 @@
                 let iptNewModel = document.querySelector("#iptNewModel");
                 let modelName = iptNewModel.value;
 
-                $.ajax({
-                    url: path.APP_BASE_URL + "bash.php",
-                    type: "POST",
-                    data: {
-                        bash: "newModel",
-                        modelName: modelName
-                    },
-                    success: function (response) {
-
-                        Swal.fire({
-                            title: "Done!",
-                            text: response,
-                            icon: "success"
-                        });
-
-                        iptNewModel.value = "";
-
-                    }
+                runBash({ bash: "newModel", modelName: modelName }, function () {
+                    iptNewModel.value = "";
                 });
 
             });
@@ -500,24 +738,8 @@
                 let iptNewController = document.querySelector("#iptNewController");
                 let controllerName = iptNewController.value;
 
-                $.ajax({
-                    url: path.APP_BASE_URL + "bash.php",
-                    type: "POST",
-                    data: {
-                        bash: "newController",
-                        controllerName: controllerName
-                    },
-                    success: function (response) {
-
-                        Swal.fire({
-                            title: "Done!",
-                            text: response,
-                            icon: "success"
-                        });
-
-                        iptNewController.value = "";
-
-                    }
+                runBash({ bash: "newController", controllerName: controllerName }, function () {
+                    iptNewController.value = "";
                 });
 
             });
@@ -623,24 +845,8 @@
                 let iptNewMiddleware = document.querySelector("#iptNewMiddleware");
                 let middlewareName = iptNewMiddleware.value;
 
-                $.ajax({
-                    url: path.APP_BASE_URL + "bash.php",
-                    type: "POST",
-                    data: {
-                        bash: "newMiddleware",
-                        middlewareName: middlewareName
-                    },
-                    success: function (response) {
-
-                        Swal.fire({
-                            title: "Done!",
-                            text: response,
-                            icon: "success"
-                        });
-
-                        iptNewMiddleware.value = "";
-
-                    }
+                runBash({ bash: "newMiddleware", middlewareName: middlewareName }, function () {
+                    iptNewMiddleware.value = "";
                 });
 
             });
@@ -654,24 +860,8 @@
                 let iptApiController = document.querySelector("#iptApiController");
                 let apiControllerName = iptApiController.value;
 
-                $.ajax({
-                    url: path.APP_BASE_URL + "bash.php",
-                    type: "POST",
-                    data: {
-                        bash: "newAPIController",
-                        apiControllerName: apiControllerName
-                    },
-                    success: function (response) {
-
-                        Swal.fire({
-                            title: "Done!",
-                            text: response,
-                            icon: "success"
-                        });
-
-                        iptApiController.value = "";
-
-                    }
+                runBash({ bash: "newAPIController", apiControllerName: apiControllerName }, function () {
+                    iptApiController.value = "";
                 });
 
             });
@@ -685,27 +875,141 @@
                 let iptUTFunctionName = document.querySelector("#iptUTFunctionName");
                 let apiControllerName = iptUTControllerName.value;
 
-                $.ajax({
-                    url: path.APP_BASE_URL + "bash.php",
-                    type: "POST",
-                    data: {
-                        bash: "newUnitTest",
-                        apiControllerName: apiControllerName,
-                        functionName: iptUTFunctionName.value
-                    },
-                    success: function (response) {
-
-                        Swal.fire({
-                            title: "Done!",
-                            text: response,
-                            icon: "success"
-                        });
-
-                        iptUTControllerName.value = "";
-
-                    }
+                runBash({
+                    bash: "newUnitTest",
+                    apiControllerName: apiControllerName,
+                    functionName: iptUTFunctionName.value
+                }, function () {
+                    iptUTControllerName.value = "";
+                    iptUTFunctionName.value = "";
                 });
 
+            });
+
+            document.querySelector("#btnPathCheck").addEventListener("click", (e) => {
+                runBash({ bash: "pathcheck" });
+            });
+
+            document.querySelector("#btnServer").addEventListener("click", (e) => {
+                let port = document.querySelector("#serverPort").value;
+                runBash({ bash: "server", port: port });
+            });
+
+            document.querySelector("#btnOpenGui").addEventListener("click", (e) => {
+                runBash({ bash: "openGui" });
+            });
+
+            document.querySelector("#btnNewLog").addEventListener("click", (e) => {
+                let databaseName = document.querySelector("#iptNewLog").value;
+                runBash({ bash: "newLog", databaseName: databaseName }, function () {
+                    document.querySelector("#iptNewLog").value = "";
+                });
+            });
+
+            document.querySelector("#btnNewTable").addEventListener("click", (e) => {
+                let tableName = document.querySelector("#iptNewTable").value;
+                runBash({ bash: "newTable", tableName: tableName }, function () {
+                    document.querySelector("#iptNewTable").value = "";
+                });
+            });
+
+            document.querySelector("#btnNewComponent").addEventListener("click", (e) => {
+                let componentName = document.querySelector("#iptNewComponent").value;
+                let templateName = document.querySelector("#selectComponentTemplate").value;
+                if (templateName === "-") {
+                    templateName = "";
+                }
+                runBash({ bash: "newComponent", componentName: componentName, templateName: templateName }, function () {
+                    document.querySelector("#iptNewComponent").value = "";
+                });
+            });
+
+            document.querySelector("#btnConfigProd").addEventListener("click", (e) => {
+                Swal.fire({
+                    title: "Attention!",
+                    text: "This will generate production gitignore entries.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Run"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        runBash({ bash: "configProd" });
+                    }
+                });
+            });
+
+            document.querySelector("#btnDelToProd").addEventListener("click", (e) => {
+                Swal.fire({
+                    title: "Attention!",
+                    text: "This will delete non-production files.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Delete"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        runBash({ bash: "deltoprod" });
+                    }
+                });
+            });
+
+            document.querySelector("#btnDelToProdFolder").addEventListener("click", (e) => {
+                Swal.fire({
+                    title: "Attention!",
+                    text: "This will move non-production files to _non-prod-files.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Move"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        runBash({ bash: "deltoprodFolder" });
+                    }
+                });
+            });
+
+            document.querySelector("#btnDelToProdRestore").addEventListener("click", (e) => {
+                Swal.fire({
+                    title: "Attention!",
+                    text: "This will restore non-production files from _non-prod-files.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Restore"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        runBash({ bash: "deltoprodRestore" });
+                    }
+                });
+            });
+
+            document.querySelector("#btnCro").addEventListener("click", (e) => {
+                runBash({ bash: "cro" });
+            });
+
+            document.querySelector("#btnCrn").addEventListener("click", (e) => {
+                runBash({ bash: "crn" });
+            });
+
+            document.querySelector("#btnMirrorExport").addEventListener("click", (e) => {
+                let databaseName = document.querySelector("#iptMirrorExportDb").value;
+                runBash({ bash: "mirrorExport", databaseName: databaseName });
+            });
+
+            document.querySelector("#btnMirrorImport").addEventListener("click", (e) => {
+                let databaseName = document.querySelector("#iptMirrorImportDb").value;
+                let date = document.querySelector("#iptMirrorImportDate").value;
+                runBash({ bash: "mirrorImport", databaseName: databaseName, date: date });
+            });
+
+            document.querySelector("#btnUpdate").addEventListener("click", (e) => {
+                runBash({ bash: "update" });
+            });
+
+            document.querySelector("#btnUpdateCli").addEventListener("click", (e) => {
+                let force = document.querySelector("#chkForceUpdateCli").checked ? "1" : "0";
+                runBash({ bash: "updateCli", force: force });
+            });
+
+            document.querySelector("#btnTestMe").addEventListener("click", (e) => {
+                runBash({ bash: "testme" });
             });
 
         });

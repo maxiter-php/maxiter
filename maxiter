@@ -590,6 +590,7 @@ class MaxiterConfiguration
 
     public function initGUI()
     {
+        $this->autoSetUpPath();
         $env = parse_ini_file("./env.ini", true);
         $path = $env["app"]["APP_BASE_URL"];
         echo "Do not forget to set your correct app base url using ' php maxiter path [path] ', using: $path";
@@ -614,7 +615,7 @@ class MaxiterConfiguration
         $lines_js = file($path_js, FILE_IGNORE_NEW_LINES);
         foreach ($lines_js as $key => $line) {
             if (strpos($line, 'APP_BASE_URL') !== false) {
-                $lines_js[$key] = 'APP_BASE_URL:"' . $pathUrl . '"';
+                $lines_js[$key] = 'APP_BASE_URL:"' . $pathUrl . '",';
                 break;
             }
         }
@@ -1432,7 +1433,7 @@ class MaxiterConfiguration
             "\n" .
             "@author Victor Béser\n" .
             "*/\n" .
-            "require __DIR__ . '/../models/LoadModel.php';\n\n" .
+            "// require __DIR__ . '/../models/LoadModel.php';\n\n" .
             "class " . ucfirst($fileName) . " {\n\n" .
             "    public static function handle() {\n" .
             "        // Your code here\n" .
@@ -1637,6 +1638,70 @@ class MaxiterConfiguration
         }
 
         echo "All non-prod files moved to _non-prod-files.\n";
+    }
+
+    public function reverseProdEnvWithFolder()
+    {
+        $baseDir = dirname(__FILE__);
+        $targetDir = $baseDir . '/_non-prod-files';
+
+        if (!is_dir($targetDir)) {
+            echo "Directory not found: _non-prod-files\n";
+            return;
+        }
+
+        $entries = array(
+            'bash.php',
+            'gui.html',
+            'phpunit.xml',
+            'README.md',
+            'release_notes.txt',
+            '.phpunit.result.cache',
+            '.gitignore',
+        );
+
+        foreach ($entries as $entry) {
+            $targetPath = $targetDir . '/' . $entry;
+            $restorePath = $baseDir . '/' . $entry;
+
+            if (is_dir($targetPath)) {
+                if (!is_dir($restorePath)) {
+                    mkdir($restorePath, 0755, true);
+                }
+
+                $iterator = new RecursiveIteratorIterator(
+                    new RecursiveDirectoryIterator($targetPath, RecursiveDirectoryIterator::SKIP_DOTS),
+                    RecursiveIteratorIterator::SELF_FIRST
+                );
+
+                foreach ($iterator as $item) {
+                    $subPath = $iterator->getSubPathName();
+                    $destPath = $restorePath . '/' . $subPath;
+
+                    if ($item->isDir()) {
+                        @mkdir($destPath, 0755, true);
+                    } else {
+                        if (!@rename($item, $destPath)) {
+                            @copy($item, $destPath);
+                            @unlink($item);
+                        }
+                    }
+                }
+
+                echo "Directory restored: $entry\n";
+                @rmdir($targetPath);
+            } elseif (is_file($targetPath)) {
+                if (@rename($targetPath, $restorePath)) {
+                    echo "File restored: $entry\n";
+                } else {
+                    echo "Failed to restore file: $entry\n";
+                }
+            } else {
+                echo "Not found: $entry\n";
+            }
+        }
+
+        echo "All non-prod files restored from _non-prod-files.\n";
     }
 
     public function newComponent($componentName, $templateFolder = null)
@@ -2686,6 +2751,66 @@ class MaxiterConfiguration
             echo "⚠ Skipped CLI (modified by user).\n";
         }
     }
+
+    public function pathCheck()
+    {
+        $envIniPath = './env.ini';
+        $envValue = '';
+        if (file_exists($envIniPath)) {
+            $envLines = file($envIniPath, FILE_IGNORE_NEW_LINES);
+            foreach ($envLines as $line) {
+                if (strpos($line, 'APP_BASE_URL') !== false) {
+                    $envValue = trim(str_replace('APP_BASE_URL=', '', $line));
+                    $envValue = trim($envValue, "\"'");
+                    break;
+                }
+            }
+        }
+
+        $pathJsPath = './path.js';
+        $jsValue = '';
+        if (file_exists($pathJsPath)) {
+            $jsContent = file_get_contents($pathJsPath);
+            if (preg_match('/APP_BASE_URL\s*:\s*["\']([^"\']+)["\']/', $jsContent, $matches)) {
+                $jsValue = $matches[1];
+            }
+        }
+
+        echo "env.ini: " . $envValue . PHP_EOL;
+        echo "path.js: " . $jsValue . PHP_EOL;
+    }
+
+    public function cro()
+    {
+        // Config Route for Old
+        $indexPath = __DIR__ . '/index.php';
+        if (!file_exists($indexPath)) {
+            echo "index.php not found";
+            return;
+        }
+
+        $contents = file_get_contents($indexPath);
+        $contents = str_replace('$routes = new Routes();', '$routes = new Routes($url);', $contents);
+        $contents = str_replace('$routes->routes($url);', '// $routes->routes($url);', $contents);
+        file_put_contents($indexPath, $contents);
+        echo "Config Route for Old success in index.php";
+    }
+
+    public function crn()
+    {
+        // Config Route for New
+        $indexPath = __DIR__ . '/index.php';
+        if (!file_exists($indexPath)) {
+            echo "index.php not found";
+            return;
+        }
+
+        $contents = file_get_contents($indexPath);
+        $contents = str_replace('$routes = new Routes($url);', '$routes = new Routes();', $contents);
+        $contents = str_replace('// $routes->routes($url);', '$routes->routes($url);', $contents);
+        file_put_contents($indexPath, $contents);
+        echo "Config Route for New success in index.php";
+    }
 }
 
 // Check if arguments were passed
@@ -2812,6 +2937,12 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
         exit();
     }
     $config->configProdEnvWithFolder();
+} else if ($argv[1] === '-r' && $argv[2] === 'deltoprod') {
+    if (!isset($argv[1]) || empty($argv[1]) || !isset($argv[2]) || empty($argv[2])) {
+        echo "Error: php maxiter -r deltoprod";
+        exit();
+    }
+    $config->reverseProdEnvWithFolder();
 } else if ($argv[1] === 'autopath') {
     if (!isset($argv[1]) || empty($argv[1])) {
         echo "Error: php maxiter autopath [port]";
@@ -2851,6 +2982,24 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
     } else {
         $config->selfUpdate();
     }
+} else if ($argv[1] === 'pathcheck') {
+    if (!isset($argv[1]) || empty($argv[1])) {
+        echo "Error: php maxiter pathcheck";
+        exit();
+    }
+    $config->pathCheck();
+} else if ($argv[1] === 'cro') {
+    if (!isset($argv[1]) || empty($argv[1])) {
+        echo "Error: php maxiter cro";
+        exit();
+    }
+    $config->cro();
+} else if ($argv[1] === 'crn') {
+    if (!isset($argv[1]) || empty($argv[1])) {
+        echo "Error: php maxiter crn";
+        exit();
+    }
+    $config->crn();
 } else {
     echo "Command not found\n";
 }

@@ -12,15 +12,29 @@ class ResponseModel {
 
     private static $status;
     private static $data;
+    private static $code;
 
-    public static function json($status, $data) {
+    public static function json($status, $data, $code = null) {
         self::$status = $status;
         self::$data = $data;
+        self::$code = $code;
 
+        http_response_code(self::$code);
         echo json_encode(array(
             "status" => self::$status,
             "data" => self::$data,
         ));
+
+        if (php_sapi_name() !== 'cli' || !defined('PHPUNIT_RUNNING')) {
+            exit();
+        } 
+
+    }
+
+    public static function http($code) {
+        self::$code = $code;
+
+        http_response_code(self::$code);
 
         if (php_sapi_name() !== 'cli' || !defined('PHPUNIT_RUNNING')) {
             exit();

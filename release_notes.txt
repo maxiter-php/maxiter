@@ -1,3 +1,13 @@
+1.6.7
+- Fix while generating middleware with LoadModel included;
+- Fix while set path now using "," in the end of the line;
+- Added http response to ResponseModel;
+- Added pathcheck to Maxiter CLI;
+- Added check if autoload from vendor exists;
+- Added cro and crn to Maxiter CLI;
+- Added -r (reverse -f) to deltprod CLI function;
+- Gui updated;
+
 1.6.6
 - Added Autopath gui.html & bash.php;
 - Added src/scripts;
