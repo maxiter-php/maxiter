@@ -26,6 +26,10 @@ class EnvModel
 
     public static function env($key)
     {
+        if ($key === 'APP_BASE_URL') {
+            return AppUrlModel::baseUrl();
+        }
+
         if (array_key_exists($key, self::$env)) {
             return self::$env[$key];
         }

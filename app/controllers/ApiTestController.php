@@ -21,4 +21,18 @@ class ApiTestController {
         ResponseModel::json(true, "You're authorized!");
     }
 
+    public function user($id) {
+        return array(
+            'user_id' => $id,
+            'message' => 'Dynamic route parameter working',
+        );
+    }
+
+    public function postComment($postId, $commentId) {
+        return array(
+            'post_id' => $postId,
+            'comment_id' => $commentId,
+        );
+    }
+
 }

@@ -6,7 +6,9 @@ Don't forget, this file should be used in header of all controller files using "
 
 @author Victor Béser
 */
-session_start();
+if (session_id() === '') {
+    session_start();
+}
 
 // Vendor Composer
 $autoloadPath = __DIR__ . "/../../vendor/autoload.php";
@@ -16,6 +18,7 @@ if (file_exists($autoloadPath)) {
 
 // Required Models
 require __DIR__ . "/EnvModel.php";
+require __DIR__ . "/AppUrlModel.php";
 require __DIR__ . "/DatabaseModel.php";
 require __DIR__ . "/AuthModel.php";
 require __DIR__ . "/LogModel.php";

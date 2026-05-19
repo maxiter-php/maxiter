@@ -138,7 +138,7 @@
             <div class="col-md-6 col-lg-3   ">
                 <div class="card custom-card">
                     <div class="card-header text-white" style="background-color: #3b435b;">
-                        <h5 class="card-title mb-0">Change Base URL</h5>
+                        <h5 class="card-title mb-0">Detected Base URL</h5>
                     </div>
                     <div class="card-body">
                         <form id="contactForm">
@@ -147,9 +147,9 @@
                                 <input type="number" class="form-control" id="basePort" required placeholder="80">
                             </div>
                             <button type="button" id="btnChangeBaseUrlAuto" class="btn w-100"
-                                style="background-color: #3b435b;color:white;">Auto Change</button>
+                                style="background-color: #3b435b;color:white;">Show Info</button>
 
-                            <p class="cliDescription">Automatically change the url base in your project</p>
+                            <p class="cliDescription">The framework now detects the base URL automatically</p>
                         </form>
                         <hr>
                         <form id="contactForm">
@@ -159,9 +159,9 @@
                                     placeholder="http://localhost/my-project/">
                             </div>
                             <button type="button" id="btnChangeBaseUrl" class="btn w-100"
-                                style="background-color: #3b435b;color:white;">Manual Change</button>
+                                style="background-color: #3b435b;color:white;">No Longer Needed</button>
 
-                            <p class="cliDescription">Manually change the url base in your project</p>
+                            <p class="cliDescription">Laravel-style behavior: no manual path definition is required</p>
                         </form>
                     </div>
                 </div>
@@ -175,7 +175,7 @@
                         <button type="button" id="btnPathCheck" class="btn w-100"
                             style="background-color: #3b435b;color:white;">Check</button>
                         <hr>
-                        <p class="cliDescription">Show env.ini and path.js APP_BASE_URL</p>
+                        <p class="cliDescription">Show the auto-detected base URL used by the framework</p>
                     </div>
                 </div>
             </div>
@@ -555,14 +555,21 @@
 
     <!-- SWEET ALERT -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="./path.js"></script>
     <!-- JS -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             document.querySelector(".preloader").style.display = "none";
+            function getBaseUrl() {
+                return new URL('./', window.location.href).toString();
+            }
+
+            function getBashUrl() {
+                return new URL('bash.php', window.location.href).toString();
+            }
+
             function runBash(payload, onDone) {
                 $.ajax({
-                    url: path.APP_BASE_URL + "bash.php",
+                    url: getBashUrl(),
                     type: "POST",
                     data: payload,
                     success: function (response) {
@@ -589,7 +596,7 @@
             // Actual app url
             let inputBaseUrl = document.querySelector("#baseUrl");
             inputBaseUrl.value = "";
-            inputBaseUrl.value = path.APP_BASE_URL;
+            inputBaseUrl.value = getBaseUrl();
 
             Swal.fire({
                 title: "Attention!",
@@ -599,7 +606,7 @@
 
             // Load all templates
             $.ajax({
-                url: path.APP_BASE_URL + "bash.php",
+                url: getBashUrl(),
                 type: "POST",
                 data: {
                     bash: "loadTemplates"
@@ -652,7 +659,7 @@
 
 
                 $.ajax({
-                    url: path.APP_BASE_URL + "bash.php",
+                    url: getBashUrl(),
                     type: "POST",
                     data: {
                         bash: "changeUrlAuto",
@@ -661,9 +668,9 @@
                     success: function (response) {
 
                         Swal.fire({
-                            title: "Done!",
+                            title: "Auto-Detected",
                             text: response,
-                            icon: "success"
+                            icon: "info"
                         });
 
                     }
@@ -681,37 +688,9 @@
                 let baseUrl = document.querySelector("#baseUrl").value;
 
                 Swal.fire({
-                    title: "Attention!",
-                    text: "Do not forget to put the '/' after your URL, example: http://localhost/maxiter/ and not http://localhost/maxiter",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#3085d6",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Change URL"
-                }).then((result) => {
-
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: path.APP_BASE_URL + "bash.php",
-                            type: "POST",
-                            data: {
-                                bash: "changeUrl",
-                                url: baseUrl
-                            },
-                            success: function (response) {
-
-                                Swal.fire({
-                                    title: "Done!",
-                                    text: response,
-                                    icon: "success"
-                                });
-
-                            }
-                        });
-                    }
-
-
-
+                    title: "No longer needed",
+                    text: "The framework now detects the base URL automatically from the current request, so no manual path configuration is required.",
+                    icon: "info"
                 });
 
             });
@@ -765,7 +744,7 @@
                     if (result.isConfirmed) {
                         document.querySelector(".preloader").style.display = "flex";
                         $.ajax({
-                            url: path.APP_BASE_URL + "bash.php",
+                            url: getBashUrl(),
                             type: "POST",
                             data: {
                                 bash: "changeTemplate",
@@ -804,7 +783,7 @@
                 let viewTemplateName = selectViewTemplate.value;
 
                 $.ajax({
-                    url: path.APP_BASE_URL + "bash.php",
+                    url: getBashUrl(),
                     type: "POST",
                     data: {
                         bash: "newView",
@@ -824,7 +803,7 @@
                             cancelButtonText: "Keep here"
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                window.open(path.APP_BASE_URL + viewName, '_blank');
+                                window.open(new URL(viewName, getBaseUrl()).toString(), '_blank');
                             }
                         });
 

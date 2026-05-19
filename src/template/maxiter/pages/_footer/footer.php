@@ -22,9 +22,6 @@
         Scripts
     ***********************************-->
 
-<!-- PATH JS -->
-<script src="<?php echo EnvModel::env("APP_BASE_URL") ?>path.js"></script>
-
 <!-- Cards JS -->
 <script src="<?php echo EnvModel::env("APP_BASE_URL") ?>resources/views/js/cards.js"></script>
 

@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log("List Example");
     $.ajax({
-        url: path.APP_BASE_URL + "app/controllers/UsersController.php",
+        url: "app/controllers/UsersController.php",
         type: "POST",
         data: {
             controller: 'getUsers' // Function in controller

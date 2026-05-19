@@ -54,9 +54,6 @@
     <!--**********************************
         Scripts
     ***********************************-->
-    <!-- PATH JS -->
-    <script src="<?php echo EnvModel::env("APP_BASE_URL") ?>path.js"></script>
-    
     <!-- Required vendors -->
     <script src="<?php echo EnvModel::env("APP_BASE_URL") ?>resources/views/vendor/global/global.min.js"></script>
     <script src="<?php echo EnvModel::env("APP_BASE_URL") ?>resources/views/js/quixnav-init.js"></script>

@@ -17,7 +17,7 @@ class AuthModel
 
         if (!$isLogged) {
             if ($redirectPage !== null) {
-                header("Location: " . EnvModel::env("APP_BASE_URL") . $redirectPage);
+                header("Location: " . AppUrlModel::url($redirectPage));
                 exit();
             }
             return false;
@@ -45,7 +45,7 @@ class AuthModel
 
             if (!$hasAuthority) {
                 if ($redirectPage !== null) {
-                    header("Location: " . EnvModel::env("APP_BASE_URL") . $redirectPage);
+                    header("Location: " . AppUrlModel::url($redirectPage));
                     exit();
                 }
                 return false;

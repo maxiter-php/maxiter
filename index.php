@@ -7,6 +7,10 @@ Suggestion: DON'T CHANGE ANYTHING HERE.
 @ author Victor Béser
 */
 
+if (session_id() === '') {
+    session_start();
+}
+
 class Routes {
     
     public function routes($url) {

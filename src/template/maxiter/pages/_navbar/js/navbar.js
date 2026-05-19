@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (logoutButton) {
         logoutButton.addEventListener('click', (e) => {
             $.ajax({
-                url: path.APP_BASE_URL + "app/controllers/LogoutController.php",
+                url: "app/controllers/LogoutController.php",
                 type: "POST",
                 success: function (response) {
                     let responseFetch = JSON.parse(response);

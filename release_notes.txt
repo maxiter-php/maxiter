@@ -1,3 +1,10 @@
+1.7.0
+- Better use for the API Routes;
+- Added API Restful method;
+- SecureRequestModel fix for subdomains redirects;
+- Removed APP_BASE_URL and path definition;
+- Added versioning to CLI;
+
 1.6.7
 - Fix while generating middleware with LoadModel included;
 - Fix while set path now using "," in the end of the line;
