@@ -1,3 +1,6 @@
+1.7.1
+- Added codeversion verification function;
+
 1.7.0
 - Better use for the API Routes;
 - Added API Restful method;

@@ -1,0 +1,9 @@
+Maxiter Code Version Verification
+Target PHP version: 5.3
+Generated at: 2026-05-22 19:14:17
+Project root: C:\xampp\htdocs\maxiter
+
+[app/models/ApiModel.php]
+line 77: match expression requires PHP 8.0+
+code: public static function match($methods, $url, $action, $middleware = null) {
+

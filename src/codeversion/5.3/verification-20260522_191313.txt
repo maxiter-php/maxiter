@@ -1,0 +1,65 @@
+Maxiter Code Version Verification
+Target PHP version: 5.3
+Generated at: 2026-05-22 19:13:13
+Project root: C:\xampp\htdocs\maxiter
+
+[app/models/ApiModel.php]
+line 10: typed properties require PHP 7.4+
+code: private static $routes = array();
+line 11: typed properties require PHP 7.4+
+code: private static $groupStack = array();
+line 77: match expression requires PHP 8.0+
+code: public static function match($methods, $url, $action, $middleware = null) {
+
+[app/models/AuthModel.php]
+line 11: typed properties require PHP 7.4+
+code: private static $contextData;
+
+[app/models/DatabaseModel.php]
+line 11: typed properties require PHP 7.4+
+code: private static $driver;
+line 12: typed properties require PHP 7.4+
+code: private static $host;
+line 13: typed properties require PHP 7.4+
+code: private static $port;
+line 14: typed properties require PHP 7.4+
+code: private static $user;
+line 15: typed properties require PHP 7.4+
+code: private static $pass;
+line 16: typed properties require PHP 7.4+
+code: private static $db;
+line 17: typed properties require PHP 7.4+
+code: private static $pdo;
+
+[app/models/EnvModel.php]
+line 11: typed properties require PHP 7.4+
+code: private static $env;
+line 12: typed properties require PHP 7.4+
+code: private static $title;
+line 13: typed properties require PHP 7.4+
+code: private static $token;
+line 14: typed properties require PHP 7.4+
+code: private static $driver;
+line 15: typed properties require PHP 7.4+
+code: private static $port;
+line 16: typed properties require PHP 7.4+
+code: private static $host;
+line 17: typed properties require PHP 7.4+
+code: private static $user;
+line 18: typed properties require PHP 7.4+
+code: private static $pass;
+line 19: typed properties require PHP 7.4+
+code: private static $db;
+
+[app/models/PagesTitleModel.php]
+line 11: typed properties require PHP 7.4+
+code: private static $title;
+
+[app/models/ResponseModel.php]
+line 13: typed properties require PHP 7.4+
+code: private static $status;
+line 14: typed properties require PHP 7.4+
+code: private static $data;
+line 15: typed properties require PHP 7.4+
+code: private static $code;
+

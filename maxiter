@@ -2883,6 +2883,326 @@ class MaxiterConfiguration
             . ".\n";
     }
 
+    public function codeversion($phpVersion)
+    {
+        $phpVersion = $this->normalizeCodeVersion($phpVersion);
+        if ($phpVersion === false) {
+            echo "Error: invalid PHP version. Example: php maxiter codeversion 5.3\n";
+            return;
+        }
+
+        $directories = array(
+            __DIR__ . '/app/models',
+            __DIR__ . '/app/controllers',
+            __DIR__ . '/app/middlewares',
+        );
+
+        $files = $this->collectCodeVersionFiles($directories);
+        sort($files);
+
+        $reportDirectory = __DIR__ . '/src/codeversion/' . $phpVersion;
+        $this->createDirectory(__DIR__ . '/src');
+        $this->createDirectory(__DIR__ . '/src/codeversion');
+        $this->createDirectory($reportDirectory);
+
+        $findings = array();
+        foreach ($files as $filePath) {
+            $issues = $this->inspectCodeVersionFile($filePath, $phpVersion);
+            if (count($issues) > 0) {
+                $findings[$filePath] = $issues;
+            }
+        }
+
+        $timestamp = date('Ymd_His');
+        $reportPath = $reportDirectory . '/verification-' . $timestamp . '.txt';
+        $reportLines = array();
+        $reportLines[] = 'Maxiter Code Version Verification';
+        $reportLines[] = 'Target PHP version: ' . $phpVersion;
+        $reportLines[] = 'Generated at: ' . date('Y-m-d H:i:s');
+        $reportLines[] = 'Project root: ' . __DIR__;
+        $reportLines[] = '';
+
+        if (count($findings) === 0) {
+            $reportLines[] = 'No incompatibilities found in app/models, app/controllers and app/middlewares.';
+        } else {
+            foreach ($findings as $filePath => $issues) {
+                $reportLines[] = '[' . $this->relativeCodeVersionPath($filePath) . ']';
+                foreach ($issues as $issue) {
+                    $reportLines[] = 'line ' . $issue['line'] . ': ' . $issue['message'];
+                    $reportLines[] = 'code: ' . trim($issue['code']);
+                }
+                $reportLines[] = '';
+            }
+        }
+
+        file_put_contents($reportPath, implode(PHP_EOL, $reportLines) . PHP_EOL);
+
+        echo "Verification completed for PHP " . $phpVersion . ".\n";
+        echo "Files checked: " . count($files) . "\n";
+        echo "Files with incompatibilities: " . count($findings) . "\n";
+        echo "Report generated: " . $reportPath . "\n";
+    }
+
+    private function normalizeCodeVersion($phpVersion)
+    {
+        $phpVersion = trim($phpVersion);
+        $phpVersion = trim($phpVersion, "\"'");
+
+        if (!preg_match('/^\d+\.\d+(\.\d+)?$/', $phpVersion)) {
+            return false;
+        }
+
+        return $phpVersion;
+    }
+
+    private function collectCodeVersionFiles($directories)
+    {
+        $files = array();
+
+        foreach ($directories as $directory) {
+            if (!is_dir($directory)) {
+                continue;
+            }
+
+            $items = scandir($directory);
+            foreach ($items as $item) {
+                if ($item === '.' || $item === '..') {
+                    continue;
+                }
+
+                $path = $directory . '/' . $item;
+                if (is_dir($path)) {
+                    $files = array_merge($files, $this->collectCodeVersionFiles(array($path)));
+                } else if (substr($item, -4) === '.php') {
+                    $files[] = $path;
+                }
+            }
+        }
+
+        return $files;
+    }
+
+    private function inspectCodeVersionFile($filePath, $phpVersion)
+    {
+        $code = file_get_contents($filePath);
+        if ($code === false) {
+            return array();
+        }
+
+        $lines = file($filePath, FILE_IGNORE_NEW_LINES);
+        if ($lines === false) {
+            $lines = array();
+        }
+
+        $issues = array();
+        $issueMap = array();
+
+        $regexRules = $this->getCodeVersionRegexRules();
+        foreach ($lines as $index => $lineContent) {
+            $lineNumber = $index + 1;
+            if (preg_match('/^\s*(\/\/|#|\*|\/\*|\*\/)/', $lineContent)) {
+                continue;
+            }
+
+            foreach ($regexRules as $rule) {
+                if (version_compare($phpVersion, $rule['min_version'], '<') && preg_match($rule['pattern'], $lineContent)) {
+                    $this->addCodeVersionIssue($issues, $issueMap, $lineNumber, $rule['message'], $lineContent);
+                }
+            }
+        }
+
+        $tokenIssues = $this->inspectCodeVersionTokens($code, $phpVersion, $lines);
+        foreach ($tokenIssues as $issue) {
+            $this->addCodeVersionIssue(
+                $issues,
+                $issueMap,
+                $issue['line'],
+                $issue['message'],
+                $issue['code']
+            );
+        }
+
+        usort($issues, array($this, 'sortCodeVersionIssues'));
+
+        return $issues;
+    }
+
+    private function getCodeVersionRegexRules()
+    {
+        return array(
+            array('min_version' => '5.4', 'pattern' => '/\btrait\s+[A-Za-z_]/', 'message' => 'traits require PHP 5.4+'),
+            array('min_version' => '5.5', 'pattern' => '/::class\b/', 'message' => 'class name resolution (::class) requires PHP 5.5+'),
+            array('min_version' => '5.5', 'pattern' => '/\byield\b/', 'message' => 'yield requires PHP 5.5+'),
+            array('min_version' => '5.5', 'pattern' => '/\bfinally\b/', 'message' => 'finally requires PHP 5.5+'),
+            array('min_version' => '5.6', 'pattern' => '/\.\.\./', 'message' => 'variadics or argument unpacking (...) require PHP 5.6+'),
+            array('min_version' => '7.0', 'pattern' => '/\?\?/', 'message' => 'null coalescing operator (??) requires PHP 7.0+'),
+            array('min_version' => '7.0', 'pattern' => '/<=>/', 'message' => 'spaceship operator (<=>) requires PHP 7.0+'),
+            array('min_version' => '7.0', 'pattern' => '/function\s+[^(]*\([^)]*\)\s*:\s*[A-Za-z_\\\\][A-Za-z0-9_\\\\]*/', 'message' => 'return type declarations require PHP 7.0+'),
+            array('min_version' => '7.0', 'pattern' => '/function\s+[^(]*\([^)]*\b(?:string|int|float|bool)\s+\$\w+/', 'message' => 'scalar parameter types require PHP 7.0+'),
+            array('min_version' => '7.1', 'pattern' => '/function\s+[^(]*\([^)]*\)\s*:\s*\?[A-Za-z_\\\\][A-Za-z0-9_\\\\]*/', 'message' => 'nullable return types require PHP 7.1+'),
+            array('min_version' => '7.1', 'pattern' => '/function\s+[^(]*\([^)]*\?[A-Za-z_\\\\][A-Za-z0-9_\\\\]*\s+\$\w+/', 'message' => 'nullable parameter types require PHP 7.1+'),
+            array('min_version' => '7.1', 'pattern' => '/function\s+[^(]*\([^)]*\biterable\s+\$\w+/', 'message' => 'iterable parameter type requires PHP 7.1+'),
+            array('min_version' => '7.2', 'pattern' => '/function\s+[^(]*\([^)]*\bobject\s+\$\w+/', 'message' => 'object parameter type requires PHP 7.2+'),
+            array('min_version' => '7.4', 'pattern' => '/\bfn\s*\(/', 'message' => 'arrow functions require PHP 7.4+'),
+            array('min_version' => '7.4', 'pattern' => '/\b(public|protected|private)\s+(static\s+)?(?!static\b)[A-Za-z_\\\\][A-Za-z0-9_\\\\]*\s+\$\w+/', 'message' => 'typed properties require PHP 7.4+'),
+            array('min_version' => '8.0', 'pattern' => '/\?\->/', 'message' => 'nullsafe operator (?->) requires PHP 8.0+'),
+            array('min_version' => '8.0', 'pattern' => '/#\s*\[/', 'message' => 'attributes require PHP 8.0+'),
+            array('min_version' => '8.0', 'pattern' => '/function\s+[^(]*\([^)]*\)\s*:\s*[^ ]+\|[^ ]+/', 'message' => 'union return types require PHP 8.0+'),
+            array('min_version' => '8.0', 'pattern' => '/function\s+[^(]*\([^)]*[^,]\|[^,]*\$\w+/', 'message' => 'union parameter types require PHP 8.0+'),
+            array('min_version' => '8.1', 'pattern' => '/\benum\s+[A-Za-z_]/', 'message' => 'enums require PHP 8.1+'),
+            array('min_version' => '8.1', 'pattern' => '/\breadonly\b/', 'message' => 'readonly properties require PHP 8.1+')
+        );
+    }
+
+    private function inspectCodeVersionTokens($code, $phpVersion, $lines)
+    {
+        $issues = array();
+        $tokens = token_get_all($code);
+        $currentLine = 1;
+        $previousSignificant = null;
+
+        foreach ($tokens as $token) {
+            if (is_array($token)) {
+                $tokenId = $token[0];
+                $tokenText = $token[1];
+                $tokenLine = $token[2];
+
+                if (version_compare($phpVersion, '7.0', '<') && $tokenId === T_CLASS && $this->isAnonymousClassToken($previousSignificant)) {
+                    $issues[] = array(
+                        'line' => $tokenLine,
+                        'message' => 'anonymous classes require PHP 7.0+',
+                        'code' => $this->getCodeVersionLine($lines, $tokenLine),
+                    );
+                }
+
+                if (
+                    defined('T_MATCH') &&
+                    version_compare($phpVersion, '8.0', '<') &&
+                    $tokenId === T_MATCH &&
+                    !$this->isFunctionNamedMatchToken($previousSignificant)
+                ) {
+                    $issues[] = array(
+                        'line' => $tokenLine,
+                        'message' => 'match expression requires PHP 8.0+',
+                        'code' => $this->getCodeVersionLine($lines, $tokenLine),
+                    );
+                }
+
+                if (version_compare($phpVersion, '5.5', '<') && $this->isDoubleColonClassToken($previousSignificant, $token)) {
+                    $issues[] = array(
+                        'line' => $tokenLine,
+                        'message' => 'class name resolution (::class) requires PHP 5.5+',
+                        'code' => $this->getCodeVersionLine($lines, $tokenLine),
+                    );
+                }
+
+                if (!in_array($tokenId, array(T_WHITESPACE, T_COMMENT, T_DOC_COMMENT), true)) {
+                    $previousSignificant = array('type' => $tokenId, 'text' => $tokenText);
+                }
+
+                $currentLine = $tokenLine + substr_count($tokenText, "\n");
+            } else {
+                $tokenLine = $currentLine;
+
+                if ($token === '[' && version_compare($phpVersion, '5.4', '<') && $this->isShortArrayStartToken($previousSignificant)) {
+                    $issues[] = array(
+                        'line' => $tokenLine,
+                        'message' => 'short array syntax [] requires PHP 5.4+',
+                        'code' => $this->getCodeVersionLine($lines, $tokenLine),
+                    );
+                }
+
+                if (trim($token) !== '') {
+                    $previousSignificant = array('type' => 'char', 'text' => $token);
+                }
+
+                $currentLine += substr_count($token, "\n");
+            }
+        }
+
+        return $issues;
+    }
+
+    private function isShortArrayStartToken($previousSignificant)
+    {
+        if ($previousSignificant === null) {
+            return true;
+        }
+
+        if ($previousSignificant['type'] === 'char') {
+            return in_array($previousSignificant['text'], array('=', '(', ',', '[', '!', '+', '-', '*', '/', '%', '&', '|', '^', '~', '?', ':', ';', '{'), true);
+        }
+
+        return in_array(
+            $previousSignificant['type'],
+            array(T_RETURN, T_DOUBLE_ARROW, T_AS, T_CASE, T_ECHO, T_PRINT, T_EXIT, T_OPEN_TAG, T_OPEN_TAG_WITH_ECHO),
+            true
+        );
+    }
+
+    private function isAnonymousClassToken($previousSignificant)
+    {
+        return $previousSignificant !== null && $previousSignificant['type'] === T_NEW;
+    }
+
+    private function isDoubleColonClassToken($previousSignificant, $token)
+    {
+        if ($previousSignificant === null || !is_array($token)) {
+            return false;
+        }
+
+        return (
+            $previousSignificant['type'] === T_DOUBLE_COLON &&
+            strtolower($token[1]) === 'class'
+        );
+    }
+
+    private function isFunctionNamedMatchToken($previousSignificant)
+    {
+        return $previousSignificant !== null && $previousSignificant['type'] === T_FUNCTION;
+    }
+
+    private function getCodeVersionLine($lines, $lineNumber)
+    {
+        return isset($lines[$lineNumber - 1]) ? $lines[$lineNumber - 1] : '';
+    }
+
+    private function addCodeVersionIssue(&$issues, &$issueMap, $lineNumber, $message, $code)
+    {
+        $issueKey = $lineNumber . '|' . $message;
+        if (isset($issueMap[$issueKey])) {
+            return;
+        }
+
+        $issueMap[$issueKey] = true;
+        $issues[] = array(
+            'line' => $lineNumber,
+            'message' => $message,
+            'code' => $code,
+        );
+    }
+
+    private function sortCodeVersionIssues($left, $right)
+    {
+        if ($left['line'] == $right['line']) {
+            return strcmp($left['message'], $right['message']);
+        }
+
+        return ($left['line'] < $right['line']) ? -1 : 1;
+    }
+
+    private function relativeCodeVersionPath($filePath)
+    {
+        $normalizedRoot = str_replace('\\', '/', __DIR__);
+        $normalizedPath = str_replace('\\', '/', $filePath);
+
+        if (strpos(strtolower($normalizedPath), strtolower($normalizedRoot)) === 0) {
+            return ltrim(substr($normalizedPath, strlen($normalizedRoot)), '/');
+        }
+
+        return $normalizedPath;
+    }
+
     public function selfUpdate()
     {
         echo "🔍 Checking for updates...\n";
@@ -3273,6 +3593,12 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
         exit();
     }
     $config->versioning($argv[2]);
+} else if ($argv[1] === 'versioncode' || $argv[1] === 'codeversion') {
+    if (!isset($argv[2]) || empty($argv[2])) {
+        echo "Error: php maxiter codeversion \"[PHP_VERSION]\"";
+        exit();
+    }
+    $config->codeversion($argv[2]);
 } else {
     echo "Command not found\n";
 }
