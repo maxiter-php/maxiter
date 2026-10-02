@@ -1,18 +1,22 @@
-<?php include __DIR__ . '/../_header/header.php'; ?>
-
-<!-- Page Title -->
-
-<?php PagesTitleModel::title('Maxiter - Home Page'); ?>
-
-<link rel='stylesheet' href='<?php echo EnvModel::env('APP_BASE_URL') ?>resources/views/pages/home/css/home.css'>
-
+@header
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Maxiter Start</title>
+  <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+@header
+@body
 <body>
   <div class="grid"></div>
   <div class="glow" id="glow"></div>
 
   <header>
     <a class="brand" href="#" aria-label="Maxiter">
-      <img src="<?php echo EnvModel::env('APP_BASE_URL') ?>resources/views/assets/maxiter-logo.png" alt="">
+      <img src="assets/maxiter-logo.png" alt="">
       <strong>MAXITER</strong>
     </a>
     <span class="status"><i></i> project ready</span>
@@ -21,7 +25,7 @@
   <main>
     <section class="welcome">
       <div class="mark">
-        <img src="<?php echo EnvModel::env('APP_BASE_URL') ?>resources/views/assets/maxiter-logo.png" alt="Maxiter">
+        <img src="assets/maxiter-logo.png" alt="Maxiter">
       </div>
 
       <p class="eyebrow">MAXITER / PHP FRAMEWORK</p>
@@ -70,6 +74,14 @@
     </section>
   </main>
 
-<script src='<?php echo EnvModel::env('APP_BASE_URL') ?>resources/views/pages/home/js/home.js'></script>
+@body
+@footer
+  <footer>
+    <span>MAXITER</span>
+    <span>PHP FRAMEWORK</span>
+  </footer>
 
-<?php include __DIR__ . '/../_footer/footer.php'; ?>
+  <script src="./assets/js/script.js"></script>
+</body>
+</html>
+@footer
