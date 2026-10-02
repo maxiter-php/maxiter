@@ -6,6 +6,9 @@ invokes business logic, and returns as needed.
 @author Victor Béser
 */
 
+require __DIR__ . '/../models/LoadModel.php';
+require __DIR__ . '/../models/SecureRequestModel.php';
+
 class ApiTestController {
 
     public function info() {
@@ -21,18 +24,57 @@ class ApiTestController {
         ResponseModel::json(true, "You're authorized!");
     }
 
-    public function user($id) {
-        return array(
-            'user_id' => $id,
-            'message' => 'Dynamic route parameter working',
-        );
+    public function indexUsers() {
+        ResponseModel::json(true, array(
+            'resource' => 'users',
+            'method' => 'GET',
+            'action' => 'index',
+        ));
     }
 
-    public function postComment($postId, $commentId) {
-        return array(
+    public function storeUser() {
+        ResponseModel::json(true, array(
+            'resource' => 'users',
+            'method' => 'POST',
+            'action' => 'store',
+        ));
+    }
+
+    public function showUser($id) {
+        ResponseModel::json(true, array(
+            'user_id' => $id,
+            'resource' => 'users',
+            'method' => 'GET',
+            'action' => 'show',
+        ));
+    }
+
+    public function updateUser($id) {
+        ResponseModel::json(true, array(
+            'user_id' => $id,
+            'resource' => 'users',
+            'method' => 'PUT',
+            'action' => 'update',
+        ));
+    }
+
+    public function destroyUser($id) {
+        ResponseModel::json(true, array(
+            'user_id' => $id,
+            'resource' => 'users',
+            'method' => 'DELETE',
+            'action' => 'destroy',
+        ));
+    }
+
+    public function showPostComment($postId, $commentId) {
+        ResponseModel::json(true, array(
             'post_id' => $postId,
             'comment_id' => $commentId,
-        );
+            'resource' => 'comments',
+            'method' => 'GET',
+            'action' => 'show',
+        ));
     }
 
 }

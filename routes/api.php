@@ -1,21 +1,20 @@
 <?php
 /*
-Here is where you will configure all your API Routes,
-follow the instructions in docs or just feel 
-how it works and happy hacking!
+Here is where you will configure all your API routes.
+Use the HTTP verb helpers directly in a RESTful style.
 
 @author Victor Béser
 */
-// LoadModel
-require __DIR__ . '/../app/models/LoadModel.php';
 
-if (!isset($_SESSION['api-route']) || !is_array($_SESSION['api-route'])) {
-    ResponseModel::json(false, "404 not found", 404);
-}
+ApiModel::get('/system/info', array('ApiTestController', 'info'));
+ApiModel::get('/system/greeting', array('ApiTestController', 'helloWorld'));
 
-$urlParsed = $_SESSION['api-route'];
-unset($_SESSION['api-route']);
+ApiModel::get('/auth/me', array('ApiTestController', 'withMiddleware'), 'BearerAuthorizationMiddleware');
 
-ApiModel::reset();
-ApiModel::loadRoutesFromDirectory(__DIR__ . '/api');
-ApiModel::dispatch($urlParsed);
+ApiModel::get('/users', array('ApiTestController', 'indexUsers'));
+ApiModel::post('/users', array('ApiTestController', 'storeUser'));
+ApiModel::get('/users/{id}', array('ApiTestController', 'showUser'));
+ApiModel::put('/users/{id}', array('ApiTestController', 'updateUser'));
+ApiModel::delete('/users/{id}', array('ApiTestController', 'destroyUser'));
+
+ApiModel::get('/posts/{postId}/comments/{commentId}', array('ApiTestController', 'showPostComment'));

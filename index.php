@@ -7,9 +7,10 @@ Suggestion: DON'T CHANGE ANYTHING HERE.
 @ author Victor Béser
 */
 
-if (session_id() === '') {
-    session_start();
-}
+require_once __DIR__ . '/bootstrap/session.php';
+require_once __DIR__ . '/bootstrap/request.php';
+
+maxiter_start_session(__DIR__);
 
 class Routes {
     
@@ -19,8 +20,8 @@ class Routes {
         $page = $part[0];
 
         if($page === "api") {
-            $_SESSION['api-route'] = parse_url($url);
-            $pagePath = __DIR__ . "/routes/api.php";
+            maxiter_store_api_route($url);
+            $pagePath = __DIR__ . "/bootstrap/api.php";
         } else {
             $pagePath = __DIR__ . "/resources/views/pages/$page/$page.php";
         }
@@ -34,6 +35,6 @@ class Routes {
     }
 }
 
-$url = isset($_GET['url']) && !empty($_GET['url']) ? htmlspecialchars(trim($_GET['url'])) : 'home';
+$url = maxiter_detect_route_url();
 $routes = new Routes();
 $routes->routes($url); // Remove this line for PHP Legacy Versions and add the $url variable to the new Routes() above: $routes new Routes($url);

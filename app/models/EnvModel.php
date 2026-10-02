@@ -1,7 +1,7 @@
 <?php
 /* 
-This file get all the env.ini data and convert in to use statically in your project.
-Feel free to create new functions to get new data from env.ini file!
+This file loads environment data from env.ini and/or .env to use statically in your project.
+Feel free to create new functions to get new data from the environment configuration files.
 
 @author Victor Béser
 */
@@ -20,7 +20,11 @@ class EnvModel
 
     public static function init()
     {
-        self::$env = parse_ini_file(__DIR__ . "/../../env.ini", true);
+        if (!function_exists('maxiter_load_env_config')) {
+            require_once dirname(dirname(__DIR__)) . '/bootstrap/config.php';
+        }
+
+        self::$env = maxiter_load_env_config();
 
     }
 
@@ -44,12 +48,22 @@ class EnvModel
 
     public static function database($database)
     {
+        $sectionName = $database;
 
-        self::$driver = self::$env[$database]['DRIVER'];
-        self::$port = self::$env[$database]['PORT'];
-        self::$host = self::$env[$database]['HOST'];
-        self::$user = self::$env[$database]['USER'];
-        self::$pass = self::$env[$database]['PASS'];
+        if (!isset(self::$env[$sectionName]) || !is_array(self::$env[$sectionName])) {
+            foreach (self::$env as $section => $values) {
+                if (is_array($values) && isset($values['DB']) && $values['DB'] === $database) {
+                    $sectionName = $section;
+                    break;
+                }
+            }
+        }
+
+        self::$driver = isset(self::$env[$sectionName]['DRIVER']) ? self::$env[$sectionName]['DRIVER'] : null;
+        self::$port = isset(self::$env[$sectionName]['PORT']) ? self::$env[$sectionName]['PORT'] : null;
+        self::$host = isset(self::$env[$sectionName]['HOST']) ? self::$env[$sectionName]['HOST'] : null;
+        self::$user = isset(self::$env[$sectionName]['USER']) ? self::$env[$sectionName]['USER'] : null;
+        self::$pass = isset(self::$env[$sectionName]['PASS']) ? self::$env[$sectionName]['PASS'] : null;
 
         return json_encode(array(
             "driver" => self::$driver,

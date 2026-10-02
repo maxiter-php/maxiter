@@ -1,0 +1,10 @@
+<?php
+/*
+Official Maxiter CLI entrypoint.
+*/
+
+if (!defined('MAXITER_PROJECT_ROOT')) {
+    define('MAXITER_PROJECT_ROOT', dirname(__DIR__));
+}
+
+require MAXITER_PROJECT_ROOT . '/bootstrap/cli/maxiter.php';

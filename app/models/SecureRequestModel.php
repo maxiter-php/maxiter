@@ -7,6 +7,18 @@ It will deny any url direct access.
 */
 class SecureRequestModel {
 
+    private static function hasTrustedExecutionContext() {
+        if (php_sapi_name() === 'cli') {
+            return true;
+        }
+
+        if (isset($GLOBALS['maxiter_secure_controller_context']) && is_array($GLOBALS['maxiter_secure_controller_context'])) {
+            return true;
+        }
+
+        return false;
+    }
+
     private static function getHeaderValue($key) {
         if (!isset($_SERVER[$key]) || empty($_SERVER[$key])) {
             return null;
@@ -97,6 +109,7 @@ class SecureRequestModel {
 
     public static function init() {
         if (
+            self::hasTrustedExecutionContext() ||
             self::isAjaxRequest() ||
             self::isAllowedOrigin(self::getHeaderValue('HTTP_ORIGIN')) ||
             self::isAllowedOrigin(self::getHeaderValue('HTTP_REFERER'))

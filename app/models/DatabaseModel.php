@@ -29,15 +29,13 @@ class DatabaseModel
         self::$pass = $config['pass'];
 
         try {
-            self::$pdo = new PDO(self::$driver . ":host=" . self::$host . ";port=" . self::$port . ";dbname=" . self::$db . ";charset=utf8", self::$user, self::$pass);
-            self::$pdo->exec("SET NAMES 'utf8'");
+            self::$pdo = new PDO(self::$driver . ":host=" . self::$host . ";port=" . self::$port . ";dbname=" . self::$db . ";charset=utf8mb4", self::$user, self::$pass, [PDO::ATTR_PERSISTENT => true]);
+            self::$pdo->exec("SET NAMES 'utf8mb4'");
         } catch (PDOException $e) {
             die("Error while connecting database: " . $e->getMessage());
         }
 
         return new self();
-
-
     }
 
     public static function execute($query, $bindParams = null)
@@ -46,7 +44,7 @@ class DatabaseModel
 
         if ($bindParams != null) {
             foreach ($bindParams as $key => $value) {
-                $result->bindValue($key, $value); 
+                $result->bindValue($key, $value);
             }
         }
 
@@ -64,5 +62,4 @@ class DatabaseModel
     {
         self::$pdo = null;
     }
-
 }

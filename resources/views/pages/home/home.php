@@ -121,7 +121,7 @@
 
                                     </p>
                                     <p>
-                                        <strong>env.ini</strong> you will find all the environment variables
+                                        <strong>env.ini / .env</strong> you will find all the environment variables
                                         of the Maxiter.
 
                                     </p>

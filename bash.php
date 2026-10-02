@@ -1,6 +1,8 @@
 <?php
 header('Content-Type: text/plain');
-$env = parse_ini_file("./env.ini", true);
+require_once __DIR__ . '/bootstrap/config.php';
+
+$env = maxiter_load_env_config();
 
 function runCommand($cmd) {
     exec($cmd, $output, $returnCode);

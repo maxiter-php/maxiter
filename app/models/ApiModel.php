@@ -136,7 +136,9 @@ class ApiModel {
             ResponseModel::json(false, "Route controller not defined", 500);
         }
 
+        self::enterSecureControllerContext($controller, $function, $routeParameters);
         self::loadClassFile(__DIR__ . '/../controllers/' . $controller . '.php');
+        self::leaveSecureControllerContext();
 
         foreach ($route['middleware'] as $middleware) {
             self::loadClassFile(__DIR__ . '/../middlewares/' . $middleware . '.php');
@@ -330,6 +332,20 @@ class ApiModel {
     private static function loadClassFile($path) {
         if (file_exists($path)) {
             require_once $path;
+        }
+    }
+
+    private static function enterSecureControllerContext($controller, $function, $routeParameters) {
+        $GLOBALS['maxiter_secure_controller_context'] = array(
+            'controller' => $controller,
+            'function' => $function,
+            'parameters' => $routeParameters,
+        );
+    }
+
+    private static function leaveSecureControllerContext() {
+        if (isset($GLOBALS['maxiter_secure_controller_context'])) {
+            unset($GLOBALS['maxiter_secure_controller_context']);
         }
     }
 

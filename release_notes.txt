@@ -1,3 +1,11 @@
+1.8.0
+- Database Model persistence adjust;
+- CLI method updated;
+- Bootstrap applied;
+- API Routing updated;
+- Secure Request updated;
+- Env usage updated for .env or env.ini;
+
 1.7.1
 - Added codeversion verification function;
 

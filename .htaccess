@@ -11,10 +11,10 @@ ErrorDocument 403 https://freefrontend.com/assets/img/403-forbidden-html-templat
 
 Options -Indexes
 
-<Files env.ini>
+<FilesMatch "^(env\.ini|\.env|\.env-example|\.env\.example)$">
     Order allow,deny
     Deny from all
-</Files>
+</FilesMatch>
 
 <Files api.php>
     Order allow,deny
