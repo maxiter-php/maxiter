@@ -1,6 +1,23 @@
 1.8.1
-- Prod config adjustment;
-- Built-in PHP realtime dev CLI update;
+- Maxiter Dev Server (React/Vite-style): built-in PHP live reload server via `php maxiter serve [port] [host]`;
+  - Same-tab auto-reload in browser (no new tabs, no manual F5 needed);
+  - File watcher with hash + mtime polling for app, bootstrap, routes, views folders;
+  - Static assets (CSS/JS/HTML): instant WebSocket broadcast (HMR-style, no server restart);
+  - PHP/.env/config changes: server restart + WebSocket broadcast reload;
+  - Fallback to SSE (Server-Sent Events) if WebSocket is unavailable;
+  - Works on Windows (XAMPP/WAMP), Linux and macOS with native PHP streams only (no extra extensions);
+  - Overlay status badge ("Live: connected" / reconnecting) injected on HTML pages;
+- `php maxiter deltoprod` CLI command rewritten with 4 operating modes;
+  - Flags accepted in ANY position: `-c/--check` (preview/dry-run), `-f/--move` (safe move to _non-prod-files), `-r/--restore` (restore backup), `-d/--delete` (default permanent delete);
+  - Extended detection rules: env files (env.ini, .env variants), dev-server flag, tests folders, docs, CI/CD/Docker configs, IDE folders, code quality tools (phpcs/phpmd/psalm/phpstan), logs (*.log, error_log), glob patterns (_test_*.php, *.tmp, *.bak);
+  - Full stats output (files/dirs processed, bytes freed, skipped/not found counters);
+- Router.php production-safe guardrails:
+  - Dual env file support: reads env.ini (parse_ini_file) OR .env (dotenv KEY=VAL format) with both ENVIRONMENT and APP_ENV keys;
+  - Automatic dev-mode detection: any non-dev/non-local/non-development environment blocks all __maxiter_live_* routes, script injection, output buffer rewrite and flag file;
+  - Path traversal protection: realpath() check against project root before serving static HTML;
+- Fixed: WebSocket handshake failures on Windows PHP non-blocking streams (stream_socket_server instead of ext-sockets);
+- Fixed: Duplicate live reload script injection (idempotent injection tag guard);
+- Fixed: Browser opening multiple tabs on every server restart (single $browserOpened flag);
 
 1.8.0
 - Database Model persistence adjust;
