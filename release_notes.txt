@@ -1,3 +1,7 @@
+1.8.1
+- Prod config adjustment;
+- Built-in PHP realtime dev CLI update;
+
 1.8.0
 - Database Model persistence adjust;
 - CLI method updated;

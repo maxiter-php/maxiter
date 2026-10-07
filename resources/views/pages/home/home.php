@@ -29,7 +29,7 @@
       
       <p class="lead">
         Your Maxiter project is ready.<br>
-        Now build something amazing.
+        Now build something amazing. 
       </p>
 
       <div class="actions">
@@ -39,7 +39,7 @@
           target="_blank"
           rel="noreferrer"
         >
-          Documentation <span>↗</span>
+          Documentations <span>↗</span>
         </a>
 
         <a

@@ -1497,141 +1497,399 @@ class MaxiterConfiguration
         $baseDir = MAXITER_PROJECT_ROOT;
         $targetDir = $baseDir . '/_non-prod-files';
 
-        $entries = array(
-            'bash.php',
-            'gui.html',
-            'phpunit.xml',
-            'README.md',
-            'release_notes.txt',
-            '.phpunit.result.cache',
-            '.gitignore',
-            'maxiter.md',
+        $checkOnly = ($mode === 'check');
+        $deleteMode = ($mode === 'delete');
+        $moveMode = ($mode === 'move');
+        $restoreMode = ($mode === 'restore');
+
+        $files = array(
+            array('type' => 'file', 'path' => 'bash.php', 'reason' => 'Shell PHP script (dev only)'),
+            array('type' => 'file', 'path' => 'gui.html', 'reason' => 'GUI tools (dev only)'),
+            array('type' => 'file', 'path' => 'phpunit.xml', 'reason' => 'PHPUnit config (tests only)'),
+            array('type' => 'file', 'path' => 'phpunit.xml.dist', 'reason' => 'PHPUnit config (tests only)'),
+            array('type' => 'file', 'path' => 'README.md', 'reason' => 'Documentation'),
+            array('type' => 'file', 'path' => 'README', 'reason' => 'Documentation'),
+            array('type' => 'file', 'path' => 'maxiter.md', 'reason' => 'Documentation'),
+            array('type' => 'file', 'path' => 'release_notes.txt', 'reason' => 'Release notes'),
+            array('type' => 'file', 'path' => 'CHANGELOG.md', 'reason' => 'Changelog (dev only)'),
+            array('type' => 'file', 'path' => 'CONTRIBUTING.md', 'reason' => 'Contrib guide (dev only)'),
+            array('type' => 'file', 'path' => '.phpunit.result.cache', 'reason' => 'PHPUnit cache'),
+            array('type' => 'file', 'path' => '.gitignore', 'reason' => 'Git config (dev only)'),
+            array('type' => 'file', 'path' => '.gitignore-example', 'reason' => 'Git config (dev only)'),
+            array('type' => 'file', 'path' => '.gitattributes', 'reason' => 'Git config (dev only)'),
+            array('type' => 'file', 'path' => '.travis.yml', 'reason' => 'CI pipeline (dev only)'),
+            array('type' => 'file', 'path' => '.github', 'reason' => 'GitHub CI workflows'),
+            array('type' => 'file', 'path' => '.circleci', 'reason' => 'CI pipeline (dev only)'),
+            array('type' => 'file', 'path' => '.editorconfig', 'reason' => 'IDE formatter (dev only)'),
+            array('type' => 'file', 'path' => '.vscode', 'reason' => 'IDE config (dev only)'),
+            array('type' => 'file', 'path' => '.idea', 'reason' => 'IDE config (dev only)'),
+            array('type' => 'file', 'path' => 'phpcs.xml', 'reason' => 'Code style (dev only)'),
+            array('type' => 'file', 'path' => 'phpcs.xml.dist', 'reason' => 'Code style (dev only)'),
+            array('type' => 'file', 'path' => 'phpmd.xml', 'reason' => 'Mess detector (dev only)'),
+            array('type' => 'file', 'path' => 'psalm.xml', 'reason' => 'Static analysis (dev only)'),
+            array('type' => 'file', 'path' => 'psalm.xml.dist', 'reason' => 'Static analysis (dev only)'),
+            array('type' => 'file', 'path' => 'phpstan.neon', 'reason' => 'Static analysis (dev only)'),
+            array('type' => 'file', 'path' => 'phpstan.neon.dist', 'reason' => 'Static analysis (dev only)'),
+            array('type' => 'file', 'path' => 'infection.json.dist', 'reason' => 'Mutation testing (dev only)'),
+            array('type' => 'file', 'path' => 'box.json', 'reason' => 'Phar build (dev only)'),
+            array('type' => 'file', 'path' => 'Dockerfile', 'reason' => 'Container build (CI/dev only)'),
+            array('type' => 'file', 'path' => 'docker-compose.yml', 'reason' => 'Container stack (dev only)'),
+            array('type' => 'file', 'path' => 'docker-compose.override.yml', 'reason' => 'Container stack (dev only)'),
+            array('type' => 'file', 'path' => 'Makefile', 'reason' => 'Build/run tasks (dev only)'),
+            array('type' => 'dir',  'path' => 'tests', 'reason' => 'Unit/feature tests'),
+            array('type' => 'dir',  'path' => 'test', 'reason' => 'Unit/feature tests'),
+            array('type' => 'dir',  'path' => 'Tests', 'reason' => 'Unit/feature tests'),
+            array('type' => 'dir',  'path' => '__tests__', 'reason' => 'Unit/feature tests'),
+            array('type' => 'dir',  'path' => 'spec', 'reason' => 'Spec/BDD tests'),
+            array('type' => 'dir',  'path' => 'features', 'reason' => 'Behat BDD tests'),
+            array('type' => 'dir',  'path' => 'coverage', 'reason' => 'Code coverage report'),
+            array('type' => 'dir',  'path' => 'build', 'reason' => 'Build artifacts (dev only)'),
+            array('type' => 'dir',  'path' => 'docs', 'reason' => 'Documentation folder'),
+            array('type' => 'dir',  'path' => 'documentation', 'reason' => 'Documentation folder'),
+            array('type' => 'dir',  'path' => '.github', 'reason' => 'GitHub workflows/configs'),
+            array('type' => 'dir',  'path' => '.vscode', 'reason' => 'IDE config (dev only)'),
+            array('type' => 'dir',  'path' => '.idea', 'reason' => 'IDE config (dev only)'),
+            array('type' => 'file', 'path' => 'bootstrap/server/.maxiter_dev_server', 'reason' => 'Dev server flag (dev only)'),
+            array('type' => 'file', 'path' => 'bootstrap/server/.maxiter_dev_server', 'reason' => 'Dev server flag (dev only)'),
+            array('type' => 'dir',  'path' => '_non-prod-files', 'reason' => 'Previous non-prod backup folder'),
         );
 
-        if ($mode === 'restore' && !is_dir($targetDir)) {
-            echo "Directory not found: _non-prod-files\n";
+        $envFiles = array(
+            'env.ini', '.env', '.env.example', '.env-example', '.env.local', '.env.production',
+            '.env.staging', '.env.ci', '.env.test', '.env.dev', '.env.development',
+        );
+        foreach ($envFiles as $e) {
+            $files[] = array('type' => 'file', 'path' => $e, 'reason' => 'Env/config file (prod MUST be set manually)');
+        }
+
+        $logFiles = array(
+            'error_log', 'access_log', 'debug.log', 'app.log',
+        );
+        foreach ($logFiles as $l) {
+            $files[] = array('type' => 'file', 'path' => $l, 'reason' => 'Log file');
+        }
+
+        $maxiterDevRoot = rtrim(str_replace('\\', '/', $baseDir), '/');
+        $globPatterns = array(
+            '_test_*.php', 'test_*.php', '*_test.php',
+            '*.log', '*.tmp', '*.bak', '*.swp', '*.swo', '*~',
+        );
+        $scannedGlob = array();
+        foreach ($globPatterns as $pat) {
+            $matches = @glob($maxiterDevRoot . '/' . $pat, GLOB_NOSORT | GLOB_ERR);
+            if (is_array($matches)) {
+                foreach ($matches as $m) {
+                    $rel = substr(str_replace('\\', '/', $m), strlen($maxiterDevRoot) + 1);
+                    if ($rel === '' || $rel === false || strpos($rel, '/') !== false) continue;
+                    $isDot = ($rel[0] === '.');
+                    if ($isDot && !in_array($rel, array('.env', '.env.example'))) continue;
+                    $scannedGlob[$rel] = $rel;
+                }
+            }
+            $matches2 = @glob($maxiterDevRoot . '/_*_*.php', GLOB_NOSORT | GLOB_ERR);
+            if (is_array($matches2)) {
+                foreach ($matches2 as $m) {
+                    $rel = substr(str_replace('\\', '/', $m), strlen($maxiterDevRoot) + 1);
+                    if ($rel === '' || $rel === false || strpos($rel, '/') !== false) continue;
+                    $scannedGlob[$rel] = $rel;
+                }
+            }
+        }
+        foreach ($scannedGlob as $rel) {
+            $files[] = array('type' => is_dir($maxiterDevRoot . '/' . $rel) ? 'dir' : 'file', 'path' => $rel, 'reason' => 'Glob pattern dev-only file');
+        }
+
+        $seen = array();
+        $finalEntries = array();
+        foreach ($files as $f) {
+            $key = strtolower(str_replace('\\', '/', $f['path']));
+            if (isset($seen[$key])) continue;
+            $seen[$key] = true;
+            $finalEntries[] = $f;
+        }
+        $entries = $finalEntries;
+        unset($finalEntries, $files, $seen, $scannedGlob);
+
+        $stats = array(
+            'processed_dirs'   => 0,
+            'processed_files'  => 0,
+            'not_found'        => 0,
+            'skipped'          => 0,
+            'bytes_freed'      => 0,
+        );
+
+        $pad = 46;
+        $colorRed = "\033[0;31m";
+        $colorGreen = "\033[0;32m";
+        $colorYellow = "\033[0;33m";
+        $colorCyan = "\033[0;36m";
+        $colorDim = "\033[2;37m";
+        $colorReset = "\033[0m";
+
+        if ($checkOnly) {
+            echo PHP_EOL . "{$colorCyan}╔══════════════════════════════════════════════════════════════════════╗{$colorReset}" . PHP_EOL;
+            echo "{$colorCyan}║  MAXITER: DELTOPROD PREVIEW (CHECK MODE - NO FILES CHANGED)         ║{$colorReset}" . PHP_EOL;
+            echo "{$colorCyan}╚══════════════════════════════════════════════════════════════════════╝{$colorReset}" . PHP_EOL . PHP_EOL;
+        } else {
+            if ($deleteMode) {
+                echo PHP_EOL . "{$colorRed}╔══════════════════════════════════════════════════════════════════════╗{$colorReset}" . PHP_EOL;
+                echo "{$colorRed}║  WARNING: DELETE MODE - FILES WILL BE PERMANENTLY REMOVED               ║{$colorReset}" . PHP_EOL;
+                echo "{$colorRed}║  Use \"-f deltoprod\" (move) to move to _non-prod-files instead       ║{$colorReset}" . PHP_EOL;
+                echo "{$colorRed}╚══════════════════════════════════════════════════════════════════════╝{$colorReset}" . PHP_EOL . PHP_EOL;
+            }
+        }
+
+        if ($restoreMode && !is_dir($targetDir)) {
+            echo "Directory not found: _non-prod-files (nothing to restore)\n";
             return;
         }
-
-        if ($mode === 'move' && !is_dir($targetDir)) {
-            mkdir($targetDir, 0755, true);
-            echo "Created directory: _non-prod-files\n";
+        if ($moveMode && !is_dir($targetDir)) {
+            if (!$checkOnly) { @mkdir($targetDir, 0755, true); }
+            echo ($checkOnly ? "{$colorYellow}[PREVIEW]{$colorReset} " : "") . "Created directory: _non-prod-files\n";
         }
 
-        foreach ($entries as $entry) {
-            if ($mode === 'delete') {
-                $fullPath = $baseDir . '/' . $entry;
-
-                if (is_dir($fullPath)) {
-                    $iterator = new RecursiveIteratorIterator(
-                        new RecursiveDirectoryIterator($fullPath),
-                        RecursiveIteratorIterator::CHILD_FIRST
-                    );
-
-                    foreach ($iterator as $item) {
-                        $path = $item->getPathname();
-                        if (in_array(basename($path), array('.', '..'))) {
-                            continue;
-                        }
-
-                        if ($item->isFile()) {
-                            if (@unlink($path)) {
-                                echo "File deleted: $path\n";
-                            }
-                        }
+        $rmDir = function ($dirPath) use (&$stats, $colorRed, $colorDim, $colorReset, $deleteMode, $moveMode, $restoreMode, $checkOnly) {
+            if (!is_dir($dirPath)) return;
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($dirPath, RecursiveDirectoryIterator::SKIP_DOTS),
+                RecursiveIteratorIterator::CHILD_FIRST
+            );
+            foreach ($iterator as $item) {
+                if ($item->isFile()) {
+                    $p = $item->getPathname();
+                    $sz = @filesize($p);
+                    if ($sz > 0) $stats['bytes_freed'] += $sz;
+                    if ($checkOnly) { $stats['processed_files']++; continue; }
+                    if (@unlink($p)) {
+                        $stats['processed_files']++;
+                        if ($deleteMode) echo "   {$colorDim}Deleted file inside dir: {$p}{$colorReset}\n";
                     }
-
-                    echo "Files inside directory deleted: $entry\n";
-                } elseif (is_file($fullPath)) {
-                    if (@unlink($fullPath)) {
-                        echo "File deleted: $entry\n";
-                    }
-                } else {
-                    echo "Not found: $entry\n";
+                } elseif ($item->isDir()) {
+                    $p = $item->getPathname();
+                    if ($checkOnly) { continue; }
+                    @rmdir($p);
                 }
-            } elseif ($mode === 'move') {
-                $fullPath = $baseDir . '/' . $entry;
+            }
+            if ($checkOnly) { return; }
+            @rmdir($dirPath);
+        };
 
-                if (is_dir($fullPath)) {
-                    $targetSubdir = $targetDir . '/' . basename($entry);
-
-                    $iterator = new RecursiveIteratorIterator(
-                        new RecursiveDirectoryIterator($fullPath, RecursiveDirectoryIterator::SKIP_DOTS),
-                        RecursiveIteratorIterator::SELF_FIRST
-                    );
-
-                    foreach ($iterator as $item) {
-                        $subPath = $iterator->getSubPathName();
-                        $targetPath = $targetSubdir . '/' . $subPath;
-
-                        if ($item->isDir()) {
-                            @mkdir($targetPath, 0755, true);
-                        } else {
-                            @copy($item, $targetPath);
-                            @unlink($item);
-                        }
-                    }
-
-                    echo "Directory moved: $entry\n";
-                    @rmdir($fullPath);
-                } elseif (is_file($fullPath)) {
-                    $targetPath = $targetDir . '/' . basename($entry);
-                    if (@rename($fullPath, $targetPath)) {
-                        echo "File moved: $entry\n";
-                    } else {
-                        echo "Failed to move file: $entry\n";
-                    }
-                } else {
-                    echo "Not found: $entry\n";
+        $dirSize = function ($dirPath) {
+            $total = 0;
+            if (!is_dir($dirPath)) return $total;
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($dirPath, RecursiveDirectoryIterator::SKIP_DOTS)
+            );
+            foreach ($iterator as $item) {
+                if ($item->isFile()) {
+                    $s = @filesize($item->getPathname());
+                    if ($s > 0) $total += $s;
                 }
-            } elseif ($mode === 'restore') {
-                $srcPath = $targetDir . '/' . $entry;
-                $restorePath = $baseDir . '/' . $entry;
+            }
+            return $total;
+        };
 
-                if (is_dir($srcPath)) {
-                    if (!is_dir($restorePath)) {
-                        mkdir($restorePath, 0755, true);
+        $fmtBytes = function ($bytes) {
+            $units = array('B','KB','MB','GB');
+            $i = 0; $b = (float)$bytes;
+            while ($b >= 1024 && $i < count($units) - 1) { $b /= 1024; $i++; }
+            return number_format($b, 2, ',', '.') . ' ' . $units[$i];
+        };
+
+        $copyDir = function ($src, $dst) use (&$stats) {
+            if (!is_dir($src)) return false;
+            if (!is_dir($dst)) { @mkdir($dst, 0755, true); }
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($src, RecursiveDirectoryIterator::SKIP_DOTS),
+                RecursiveIteratorIterator::SELF_FIRST
+            );
+            foreach ($iterator as $item) {
+                $subPath = $iterator->getSubPathName();
+                $target = $dst . '/' . $subPath;
+                if ($item->isDir()) {
+                    if (!is_dir($target)) @mkdir($target, 0755, true);
+                } else {
+                    $sz = @filesize($item->getPathname());
+                    if (@copy($item->getPathname(), $target)) {
+                        if ($sz > 0) $stats['bytes_freed'] += $sz;
                     }
+                }
+            }
+            return true;
+        };
 
-                    $iterator = new RecursiveIteratorIterator(
-                        new RecursiveDirectoryIterator($srcPath, RecursiveDirectoryIterator::SKIP_DOTS),
-                        RecursiveIteratorIterator::SELF_FIRST
+        $deleteDirContents = function ($dirPath) use ($rmDir) {
+            $rmDir($dirPath);
+        };
+
+        foreach ($entries as $idx => $entry) {
+            $type = $entry['type'];
+            $relPath = str_replace('\\', '/', $entry['path']);
+            $reason = !empty($entry['reason']) ? $entry['reason'] : 'non-prod';
+            $labelType = ($type === 'dir') ? "[DIR]" : "[FILE]";
+            $fullPath = $baseDir . '/' . $relPath;
+
+            if ($restoreMode) {
+                $src = $targetDir . '/' . basename($relPath);
+                $dest = $fullPath;
+            } else {
+                $src = $fullPath;
+                $dest = $targetDir . '/' . basename($relPath);
+            }
+
+            $exists = false;
+            if ($restoreMode) {
+                $exists = (file_exists($src) || is_dir($src));
+            } else {
+                $exists = ($type === 'dir') ? is_dir($src) : is_file($src);
+            }
+            if (!$exists) {
+                $stats['not_found']++;
+                if ($checkOnly) {
+                    echo "{$colorDim}  [SKIP] " . str_pad($labelType . ' ' . $relPath, $pad, ' ') . "   (not found)  {$reason}{$colorReset}\n";
+                }
+                continue;
+            }
+
+            if (strpos(basename($relPath), '_non-prod-files') !== false && !$restoreMode && !$deleteMode && !$moveMode && !$checkOnly) {
+                $stats['skipped']++;
+                continue;
+            }
+
+            $sizeHuman = '';
+            if ($type === 'dir') {
+                $sz = $dirSize($src);
+            } else {
+                $sz = @filesize($src);
+                $sz = ($sz === false) ? 0 : (int)$sz;
+            }
+            if ($sz > 0) {
+                $sizeHuman = '(' . $fmtBytes($sz) . ')';
+            }
+
+            if ($checkOnly) {
+                $color = ($type === 'dir') ? $colorYellow : $colorCyan;
+                echo "  {$color}[REMOVE]{$colorReset} " . str_pad($labelType . ' ' . $relPath . ' ' . $sizeHuman, $pad, ' ') . " {$reason}\n";
+                $stats['bytes_freed'] += $sz;
+                if ($type === 'dir') {
+                    $stats['processed_dirs']++;
+                    $it = new RecursiveIteratorIterator(
+                        new RecursiveDirectoryIterator($src, RecursiveDirectoryIterator::SKIP_DOTS)
                     );
+                    $count = 0;
+                    foreach ($it as $f) { if ($f->isFile()) $count++; }
+                    $stats['processed_files'] += $count;
+                } else {
+                    $stats['processed_files']++;
+                }
+                continue;
+            }
 
-                    foreach ($iterator as $item) {
-                        $subPath = $iterator->getSubPathName();
-                        $destPath = $restorePath . '/' . $subPath;
-
-                        if ($item->isDir()) {
-                            @mkdir($destPath, 0755, true);
+            if ($deleteMode) {
+                if ($type === 'dir') {
+                    $deleteDirContents($src);
+                    if (is_dir($src)) @rmdir($src);
+                    $stats['processed_dirs']++;
+                    echo " {$colorRed}[DELETE_DIR]{$colorReset} {$relPath} {$sizeHuman}\n";
+                } else {
+                    if (@unlink($src)) {
+                        $stats['processed_files']++;
+                        echo " {$colorRed}[DELETE_FILE]{$colorReset} {$relPath} {$sizeHuman}\n";
+                    } else {
+                        $stats['skipped']++;
+                        echo " {$colorYellow}[SKIP_FAIL]{$colorReset} {$relPath} {$sizeHuman}\n";
+                    }
+                }
+            } elseif ($moveMode) {
+                if (is_file($dest) || is_dir($dest)) {
+                    $backupTarget = $targetDir . '/' . basename($relPath) . '~bak_' . date('YmdHis');
+                    if (@rename($dest, $backupTarget)) {
+                        echo " {$colorDim}[MOVED_EXISTING_BAK] " . basename($dest) . " -> " . basename($backupTarget) . "{$colorReset}\n";
+                    }
+                }
+                if ($type === 'dir') {
+                    $copyDir($src, $dest);
+                    $deleteDirContents($src);
+                    if (is_dir($src)) @rmdir($src);
+                    $stats['processed_dirs']++;
+                    echo " {$colorGreen}[MOVE_DIR]{$colorReset} {$relPath} -> _non-prod-files/ {$sizeHuman}\n";
+                } else {
+                    if (@rename($src, $dest)) {
+                        $stats['processed_files']++;
+                        echo " {$colorGreen}[MOVE_FILE]{$colorReset} {$relPath} -> _non-prod-files/ {$sizeHuman}\n";
+                    } else {
+                        if (@copy($src, $dest) && @unlink($src)) {
+                            $stats['processed_files']++;
+                            echo " {$colorGreen}[COPY+DEL]{$colorReset} {$relPath} -> _non-prod-files/ {$sizeHuman}\n";
                         } else {
-                            if (!@rename($item, $destPath)) {
-                                @copy($item, $destPath);
-                                @unlink($item);
-                            }
+                            $stats['skipped']++;
+                            echo " {$colorYellow}[SKIP_FAIL]{$colorReset} {$relPath} {$sizeHuman}\n";
                         }
                     }
-
-                    echo "Directory restored: $entry\n";
-                    @rmdir($srcPath);
-                } elseif (is_file($srcPath)) {
-                    if (@rename($srcPath, $restorePath)) {
-                        echo "File restored: $entry\n";
-                    } else {
-                        echo "Failed to restore file: $entry\n";
+                }
+            } elseif ($restoreMode) {
+                if (is_file($dest) || is_dir($dest)) {
+                    $backupTarget = $dest . '~restored_bak_' . date('YmdHis');
+                    if (@rename($dest, $backupTarget)) {
+                        echo " {$colorDim}[RESTORE_BAK] existing -> " . basename($backupTarget) . "{$colorReset}\n";
                     }
+                }
+                if ($type === 'dir') {
+                    $copyDir($src, $dest);
+                    $deleteDirContents($src);
+                    if (is_dir($src)) @rmdir($src);
+                    $stats['processed_dirs']++;
+                    echo " {$colorGreen}[RESTORE_DIR]{$colorReset} _non-prod-files/" . basename($relPath) . " -> root {$sizeHuman}\n";
                 } else {
-                    echo "Not found: $entry\n";
+                    if (@rename($src, $dest)) {
+                        $stats['processed_files']++;
+                        echo " {$colorGreen}[RESTORE_FILE]{$colorReset} _non-prod-files/" . basename($relPath) . " -> root {$sizeHuman}\n";
+                    } else {
+                        if (@copy($src, $dest) && @unlink($src)) {
+                            $stats['processed_files']++;
+                            echo " {$colorGreen}[COPY+DEL]{$colorReset} _non-prod-files/" . basename($relPath) . " -> root {$sizeHuman}\n";
+                        } else {
+                            $stats['skipped']++;
+                            echo " {$colorYellow}[SKIP_FAIL]{$colorReset} {$relPath} {$sizeHuman}\n";
+                        }
+                    }
                 }
             }
         }
 
-        if ($mode === 'delete') {
-            echo "All non-prod files successfully deleted (directories preserved).\n";
-        } elseif ($mode === 'move') {
-            echo "All non-prod files moved to _non-prod-files.\n";
-        } elseif ($mode === 'restore') {
-            echo "All non-prod files restored from _non-prod-files.\n";
+        if ($restoreMode && is_dir($targetDir)) {
+            $it = new FilesystemIterator($targetDir, FilesystemIterator::SKIP_DOTS);
+            $empty = true;
+            foreach ($it as $f) { $empty = false; break; }
+            if ($empty) { @rmdir($targetDir); }
+        }
+
+        echo PHP_EOL . "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+        if ($checkOnly) {
+            echo " {$colorGreen}✓ PREVIEW MODE (no files were changed){$colorReset}\n";
+            echo "   Files that would be removed/moved ......... {$stats['processed_files']}\n";
+            echo "   Dirs  that would be removed/moved ......... {$stats['processed_dirs']}\n";
+            echo "   Space that would be freed ................. {$fmtBytes($stats['bytes_freed'])}\n";
+            echo "   Files not found ........................... {$stats['not_found']}\n";
+        } else {
+            if ($deleteMode) {
+                echo " {$colorRed}DELETE MODE executed.{$colorReset}\n";
+            } elseif ($moveMode) {
+                echo " {$colorGreen}MOVE MODE executed. Everything is in _non-prod-files/{$colorReset}\n";
+            } elseif ($restoreMode) {
+                echo " {$colorGreen}RESTORE MODE executed. Files returned to root.{$colorReset}\n";
+            }
+            echo "   Files processed .......................... {$stats['processed_files']}\n";
+            echo "   Dirs  processed .......................... {$stats['processed_dirs']}\n";
+            echo "   Files not found .......................... {$stats['not_found']}\n";
+            echo "   Skipped/failed ........................... {$stats['skipped']}\n";
+            echo "   Space freed .............................. {$fmtBytes($stats['bytes_freed'])}\n";
+        }
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+
+        if (!$checkOnly && $deleteMode) {
+            echo PHP_EOL . "{$colorYellow}TIP: Before deploying to production, double-check with check mode first:{$colorReset}\n";
+            echo "       {$colorCyan}php maxiter -c deltoprod{$colorReset}\n";
         }
     }
 
@@ -3362,11 +3620,1001 @@ class MaxiterConfiguration
     }
 }
 
+class MaxiterDevServer
+{
+    private $port;
+    private $host;
+    private $projectRoot;
+    private $routerFile;
+    private $serverProcess = null;
+    private $serverPipes = [];
+    private $fileHashes = [];
+    private $watchedDirs = [];
+    private $watchedExtensions = [];
+    private $lastHeartbeat = 0;
+    private $heartbeatInterval = 15;
+    private $pollInterval = 500000;
+    private $restartCount = 0;
+    private $maxRestarts = 50;
+    private $restartWindow = 60;
+    private $restartTimestamps = [];
+    private $shutdownRequested = false;
+    private $isWindows;
+
+    private $lrSocket = null;
+    private $lrHost = '127.0.0.1';
+    private $lrPort = 0;
+    private $lrClients = [];
+    private $lrEnabled = false;
+    private $lrFlagFile = '';
+    private $lrBroadcastCount = 0;
+    private $lrLastPing = 0;
+    private $lrPingInterval = 20;
+    private $browserOpened = false;
+    private $lrClientsSSE = [];
+
+    public function __construct($port = 7000, $host = 'localhost')
+    {
+        $this->port = $port;
+        $this->host = $host;
+        $this->projectRoot = MAXITER_PROJECT_ROOT;
+        $this->routerFile = $this->projectRoot . '/bootstrap/server/router.php';
+        $this->isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+        $this->lrFlagFile = $this->projectRoot . '/bootstrap/server/.maxiter_dev_server';
+
+        $this->watchedDirs = [
+            $this->projectRoot . '/app',
+            $this->projectRoot . '/bootstrap',
+            $this->projectRoot . '/routes',
+            $this->projectRoot . '/resources/views/pages',
+            $this->projectRoot . '/index.php',
+        ];
+
+        $this->watchedExtensions = [
+            'php', 'phtml', 'php3', 'php4', 'php5',
+            'css', 'js', 'html', 'htm',
+            'ini', 'env', 'json', 'yml', 'yaml', 'xml',
+        ];
+    }
+
+    public function run()
+    {
+        $this->registerGlobalErrorHandlers();
+        $this->startLiveReloadServer();
+        $this->writeFlagFile();
+        $this->printBanner();
+        $this->registerSignalHandlers();
+        $this->buildFileHashSnapshot();
+        $this->startServer();
+
+        $lastCheck = 0;
+
+        while (!$this->shutdownRequested) {
+            try {
+                usleep($this->pollInterval);
+
+                $now = time();
+                $this->pollLiveReload();
+                $changed = $this->detectChanges();
+
+                if (!empty($changed)) {
+                    $relChanged = array_map(array($this, 'relativePath'), $changed);
+                    foreach ($relChanged as $f) {
+                        $this->log('CHANGE', $f);
+                    }
+
+                    $hasPhp = false;
+                    $hasConfig = false;
+                    foreach ($changed as $file) {
+                        $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                        if (in_array($ext, array('php', 'phtml', 'php3', 'php4', 'php5'))) {
+                            $hasPhp = true;
+                        }
+                        if (in_array($ext, array('ini', 'json', 'yml', 'yaml', 'xml')) || basename($file) === '.env' || basename($file) === 'env.ini') {
+                            $hasConfig = true;
+                        }
+                    }
+
+                    $this->broadcastReload($relChanged);
+
+                    if ($hasPhp || $hasConfig) {
+                        $this->log('HMR', 'PHP/config changes detected, bouncing server + reload page.');
+                        $this->restartServer();
+                    } else {
+                        $this->log('HMR', 'Static changes detected, browser reload in same tab.');
+                    }
+
+                    $this->buildFileHashSnapshot();
+                    continue;
+                }
+
+                if ($this->serverProcess !== null) {
+                    $status = @proc_get_status($this->serverProcess);
+                    if ($status && !$status['running']) {
+                        $exitCode = isset($status['exitcode']) ? $status['exitcode'] : '?';
+                        $this->log('WARN', "Server process stopped (exit=$exitCode). Auto-recovering...");
+                        $this->closeServerPipes();
+                        @proc_close($this->serverProcess);
+                        $this->serverProcess = null;
+                        usleep(300000);
+                        $this->startServer();
+                    }
+                } else {
+                    if ($this->canRestart()) {
+                        $this->log('WARN', 'No active server process. Spawning a new one...');
+                        usleep(200000);
+                        $this->startServer();
+                    }
+                }
+
+                if ($now - $this->lrLastPing >= $this->lrPingInterval) {
+                    $this->broadcastPing();
+                    $this->lrLastPing = $now;
+                }
+
+                if ($now - $this->lastHeartbeat >= $this->heartbeatInterval) {
+                    $this->printHeartbeat();
+                    $this->lastHeartbeat = $now;
+                }
+
+                if (function_exists('pcntl_signal_dispatch')) {
+                    @pcntl_signal_dispatch();
+                }
+            } catch (\Throwable $e) {
+                $rel = $this->relativePath($e->getFile());
+                $this->log('ERROR', get_class($e) . ': ' . $e->getMessage() . " at $rel:" . $e->getLine());
+                $this->log('WARN', 'Recovering watch loop from exception... will continue in 1s.');
+                sleep(1);
+            } catch (\Exception $e) {
+                $rel = $this->relativePath($e->getFile());
+                $this->log('ERROR', get_class($e) . ': ' . $e->getMessage() . " at $rel:" . $e->getLine());
+                $this->log('WARN', 'Recovering watch loop from exception... will continue in 1s.');
+                sleep(1);
+            }
+        }
+
+        $this->shutdown();
+    }
+
+    private function printBanner()
+    {
+        $version = @file_get_contents($this->projectRoot . '/version.json');
+        $versionStr = 'latest';
+        if ($version !== false) {
+            $data = @json_decode($version, true);
+            if (is_array($data) && isset($data['version'])) {
+                $versionStr = $data['version'];
+            }
+        }
+
+        $pollMs = number_format($this->pollInterval / 1000, 0);
+        $relRouter = $this->relativePath($this->routerFile);
+        $lrInfo = $this->lrEnabled ? "ws://{$this->lrHost}:{$this->lrPort} (LiveReload: ON)" : 'OFF';
+        $bannerPHP = <<<BANNERPHP
+\033[36m
+  __  __            _   _ _
+ |  \/  | __ ___  _| |_(_) |_ ___ _ __
+ | |\/| |/ _` \ \/ / __| | __/ _ \ '__|
+ | |  | | (_| |>  <| |_| | ||  __/ |
+ |_|  |_|\__,_/_/\_\\__|_|\__\___|_|
+
+\033[0m\033[1;37m  +-------------------------------------------------------+
+  |  \033[32mMaxiter Dev Server\033[0m\033[1;37m        \033[33mv{$versionStr}\033[0m\033[1;37m                   |
+  +-------------------------------------------------------+
+  |  \033[36mURL:\033[0m      http://{$this->host}:{$this->port}                     \033[1;37m|
+  |  \033[36mHMR:\033[0m      {$lrInfo}\033[1;37m |
+  |  \033[36mRouter:\033[0m   {$relRouter}
+  |  \033[36mWatch:\033[0m    app/ bootstrap/ routes/ views/ index.php  \033[1;37m|
+  |  \033[36mPolling:\033[0m  ~{$pollMs}ms                                   \033[1;37m|
+  +-------------------------------------------------------+
+  |  Press \033[31mCtrl+C\033[0m\033[1;37m to stop the server                    |
+  +-------------------------------------------------------+
+\033[0m
+
+BANNERPHP;
+        echo $bannerPHP;
+        $this->flushOutput();
+    }
+
+    private function printHeartbeat()
+    {
+        $status = ($this->serverProcess !== null) ? proc_get_status($this->serverProcess) : ['running' => false];
+        $statusStr = $status['running'] ? "\033[32mALIVE\033[0m" : "\033[31mDOWN\033[0m";
+        $pid = $status['running'] ? 'PID ' . $status['pid'] : '-';
+        $mem = $this->formatBytes(@memory_get_usage(true));
+        $ts = date('H:i:s');
+        $this->log('HEARTBEAT', "[$ts] status=$statusStr $pid | mem=$mem | restarts={$this->restartCount}");
+    }
+
+    private function buildFileHashSnapshot()
+    {
+        $this->fileHashes = [];
+        foreach ($this->watchedDirs as $dir) {
+            if (is_file($dir)) {
+                $this->fileHashes[$dir] = @md5_file($dir) . '|' . @filemtime($dir);
+            } elseif (is_dir($dir)) {
+                $this->scanDirectory($dir);
+            }
+        }
+    }
+
+    private function scanDirectory($dir)
+    {
+        $items = @scandir($dir);
+        if ($items === false) return;
+
+        foreach ($items as $item) {
+            if ($item === '.' || $item === '..') continue;
+            if ($item === 'vendor' || $item === '.git' || $item === 'node_modules') continue;
+            if (strpos($item, '.log') !== false || strpos($item, '.cache') !== false) continue;
+
+            $full = $dir . DIRECTORY_SEPARATOR . $item;
+
+            if (is_dir($full)) {
+                $this->scanDirectory($full);
+            } elseif (is_file($full)) {
+                $ext = strtolower(pathinfo($full, PATHINFO_EXTENSION));
+                if (in_array($ext, $this->watchedExtensions, true) || $item === '.env' || $item === 'env.ini') {
+                    $this->fileHashes[$full] = @md5_file($full) . '|' . @filemtime($full);
+                }
+            }
+        }
+    }
+
+    private function detectChanges()
+    {
+        $changed = [];
+        $currentHashes = [];
+
+        foreach ($this->watchedDirs as $dir) {
+            if (is_file($dir)) {
+                $currentHashes[$dir] = @md5_file($dir) . '|' . @filemtime($dir);
+            } elseif (is_dir($dir)) {
+                $this->collectCurrentHashes($dir, $currentHashes);
+            }
+        }
+
+        foreach ($currentHashes as $file => $hash) {
+            if (!isset($this->fileHashes[$file]) || $this->fileHashes[$file] !== $hash) {
+                $changed[] = $file;
+            }
+        }
+
+        foreach ($this->fileHashes as $file => $hash) {
+            if (!isset($currentHashes[$file])) {
+                $changed[] = $file;
+            }
+        }
+
+        $this->fileHashes = $currentHashes;
+        return $changed;
+    }
+
+    private function collectCurrentHashes($dir, &$collection)
+    {
+        $items = @scandir($dir);
+        if ($items === false) return;
+
+        foreach ($items as $item) {
+            if ($item === '.' || $item === '..') continue;
+            if ($item === 'vendor' || $item === '.git' || $item === 'node_modules') continue;
+            if (strpos($item, '.log') !== false || strpos($item, '.cache') !== false) continue;
+
+            $full = $dir . DIRECTORY_SEPARATOR . $item;
+
+            if (is_dir($full)) {
+                $this->collectCurrentHashes($full, $collection);
+            } elseif (is_file($full)) {
+                $ext = strtolower(pathinfo($full, PATHINFO_EXTENSION));
+                if (in_array($ext, $this->watchedExtensions, true) || $item === '.env' || $item === 'env.ini') {
+                    $collection[$full] = @md5_file($full) . '|' . @filemtime($full);
+                }
+            }
+        }
+    }
+
+    private function startServer()
+    {
+        if (!$this->canRestart()) {
+            $this->log('ERROR', "Too many restarts ({$this->restartCount} in {$this->restartWindow}s). Throttling...");
+            sleep(5);
+            $this->restartTimestamps = [];
+        }
+
+        $this->restartTimestamps[] = time();
+        $this->restartTimestamps = array_filter($this->restartTimestamps, function ($t) {
+            return (time() - $t) <= $this->restartWindow;
+        });
+
+        if (!file_exists($this->routerFile)) {
+            $this->log('ERROR', "Router file not found: {$this->routerFile}");
+            return false;
+        }
+
+        $host = escapeshellarg($this->host);
+        $port = escapeshellarg((string)$this->port);
+        $router = escapeshellarg($this->routerFile);
+
+        if ($this->isWindows) {
+            $phpBin = $this->findPHPBinary();
+            $cmd = '"' . $phpBin . '" -S ' . $this->host . ':' . $this->port . ' ' . $router;
+            $descriptorspec = [
+                0 => ['pipe', 'r'],
+                1 => ['pipe', 'w'],
+                2 => ['pipe', 'w'],
+            ];
+        } else {
+            $phpBin = $this->findPHPBinary();
+            $cmd = escapeshellcmd($phpBin) . ' -S ' . escapeshellarg($this->host . ':' . $this->port) . ' ' . $router;
+            $descriptorspec = [
+                0 => ['pipe', 'r'],
+                1 => ['pipe', 'w'],
+                2 => ['pipe', 'w'],
+            ];
+        }
+
+        $cwd = $this->projectRoot;
+        $env = null;
+        $options = $this->isWindows ? ['bypass_shell' => true] : [];
+
+        $this->log('START', "Spawning PHP dev server on http://{$this->host}:{$this->port}...");
+        $this->flushOutput();
+
+        $process = @proc_open($cmd, $descriptorspec, $pipes, $cwd, $env, $options);
+
+        if (!is_resource($process)) {
+            $this->log('ERROR', "Failed to start server. proc_open() returned false.");
+            return false;
+        }
+
+        stream_set_blocking($pipes[1], false);
+        stream_set_blocking($pipes[2], false);
+
+        $this->serverProcess = $process;
+        $this->serverPipes = $pipes;
+
+        usleep(400000);
+        $status = proc_get_status($this->serverProcess);
+        if ($status['running']) {
+            $this->log('READY', "Server running on \033[4;32mhttp://{$this->host}:{$this->port}\033[0m (PID {$status['pid']})");
+            if (!$this->browserOpened) {
+                $this->browserOpened = true;
+                $this->openBrowser("http://{$this->host}:{$this->port}");
+            }
+            return true;
+        } else {
+            $stderr = @stream_get_contents($pipes[2]);
+            $this->log('ERROR', "Server failed to start: " . trim($stderr));
+            $this->closeServerPipes();
+            @proc_close($this->serverProcess);
+            $this->serverProcess = null;
+            return false;
+        }
+    }
+
+    private function restartServer()
+    {
+        $this->restartCount++;
+        $this->killServerProcess();
+        usleep(200000);
+        $this->startServer();
+    }
+
+    private function killServerProcess()
+    {
+        if ($this->serverProcess === null) return;
+
+        $status = proc_get_status($this->serverProcess);
+        $pid = isset($status['pid']) ? $status['pid'] : null;
+
+        $this->closeServerPipes();
+
+        if (is_resource($this->serverProcess)) {
+            if ($this->isWindows && $pid !== null) {
+                @exec('taskkill /F /T /PID ' . (int)$pid . ' 2>NUL');
+            } else {
+                if (function_exists('proc_terminate')) {
+                    @proc_terminate($this->serverProcess, 15);
+                    usleep(200000);
+                    @proc_terminate($this->serverProcess, 9);
+                }
+            }
+            @proc_close($this->serverProcess);
+        }
+
+        $this->serverProcess = null;
+        $this->serverPipes = [];
+    }
+
+    private function closeServerPipes()
+    {
+        if (!empty($this->serverPipes)) {
+            foreach ($this->serverPipes as $pipe) {
+                if (is_resource($pipe)) {
+                    @fclose($pipe);
+                }
+            }
+            $this->serverPipes = [];
+        }
+    }
+
+    private function canRestart()
+    {
+        return count($this->restartTimestamps) < $this->maxRestarts;
+    }
+
+    private function openBrowser($url)
+    {
+        if ($this->isWindows) {
+            @pclose(@popen('start "" "' . $url . '"', 'r'));
+        } elseif (strtoupper(substr(PHP_OS, 0, 5)) === 'LINUX') {
+            @exec('xdg-open ' . escapeshellarg($url) . ' > /dev/null 2>&1 &');
+        } elseif (strtoupper(substr(PHP_OS, 0, 6)) === 'DARWIN') {
+            @exec('open ' . escapeshellarg($url) . ' > /dev/null 2>&1 &');
+        }
+    }
+
+    private function findPHPBinary()
+    {
+        if (defined('PHP_BINARY') && PHP_BINARY !== '') {
+            return PHP_BINARY;
+        }
+        if ($this->isWindows) {
+            $paths = [
+                'C:\\xampp\\php\\php.exe',
+                'C:\\php\\php.exe',
+            ];
+            foreach ($paths as $p) {
+                if (file_exists($p)) return $p;
+            }
+        }
+        return 'php';
+    }
+
+    private function registerGlobalErrorHandlers()
+    {
+        $self = $this;
+        set_error_handler(function ($errno, $errstr, $errfile, $errline) use ($self) {
+            if (!(error_reporting() & $errno)) return false;
+            $levels = [
+                E_WARNING             => 'WARNING',
+                E_NOTICE              => 'NOTICE',
+                E_USER_ERROR          => 'USER_ERROR',
+                E_USER_WARNING        => 'USER_WARNING',
+                E_USER_NOTICE         => 'USER_NOTICE',
+                E_STRICT              => 'STRICT',
+                E_RECOVERABLE_ERROR   => 'RECOVERABLE',
+                E_DEPRECATED          => 'DEPRECATED',
+                E_USER_DEPRECATED     => 'USER_DEPRECATED',
+            ];
+            $tag = isset($levels[$errno]) ? $levels[$errno] : 'ERROR';
+            $rel = $self->relativePath($errfile);
+            $self->log('WARN', "PHP $tag at $rel:$errline - $errstr");
+            return true;
+        });
+
+        set_exception_handler(function ($e) use ($self) {
+            $rel = $self->relativePath($e->getFile());
+            $msg = get_class($e) . ': ' . $e->getMessage() . " at $rel:" . $e->getLine();
+            $self->log('ERROR', $msg);
+            if (!$self->shutdownRequested) {
+                $self->log('WARN', 'Recovering from uncaught exception... loop continues.');
+            }
+        });
+
+        register_shutdown_function(function () use ($self) {
+            $err = error_get_last();
+            if ($err !== null) {
+                $fatal = [E_ERROR, E_PARSE, E_CORE_ERROR, E_CORE_WARNING, E_COMPILE_ERROR, E_COMPILE_WARNING];
+                if (in_array($err['type'], $fatal, true)) {
+                    $rel = $self->relativePath($err['file']);
+                    $msg = 'Fatal: ' . $err['message'] . " at $rel:" . $err['line'];
+                    @file_put_contents('php://stderr', '[FATAL] ' . $msg . PHP_EOL);
+                }
+            }
+        });
+    }
+
+    private function registerSignalHandlers()
+    {
+        if (function_exists('pcntl_async_signals')) {
+            @pcntl_async_signals(true);
+        }
+        if (function_exists('pcntl_signal')) {
+            $handler = function ($signo) {
+                $this->log('SIGNAL', "Received signal $signo. Shutting down gracefully...");
+                $this->shutdownRequested = true;
+            };
+            @pcntl_signal(SIGINT, $handler);
+            @pcntl_signal(SIGTERM, $handler);
+            if (defined('SIGHUP')) {
+                @pcntl_signal(SIGHUP, $handler);
+            }
+        }
+        if ($this->isWindows && function_exists('sapi_windows_set_ctrl_handler')) {
+            @sapi_windows_set_ctrl_handler(function ($event) {
+                if ($event === PHP_WINDOWS_EVENT_CTRL_C || $event === PHP_WINDOWS_EVENT_CTRL_BREAK) {
+                    $this->log('SIGNAL', 'Ctrl+C pressed. Shutting down gracefully...');
+                    $this->shutdownRequested = true;
+                    return true;
+                }
+                return false;
+            });
+        }
+    }
+
+    private function shutdown()
+    {
+        $this->log('STOP', 'Stopping Maxiter Dev Server...');
+        $this->killServerProcess();
+        $this->stopLiveReloadServer();
+        $this->removeFlagFile();
+        $this->log('BYE', "Goodbye! (total restarts: {$this->restartCount}, broadcasts: {$this->lrBroadcastCount})");
+        echo "\n";
+        exit(0);
+    }
+
+    private function writeFlagFile()
+    {
+        if ($this->lrEnabled && $this->lrPort > 0) {
+            $dir = dirname($this->lrFlagFile);
+            if (!is_dir($dir)) {
+                @mkdir($dir, 0777, true);
+            }
+            @file_put_contents($this->lrFlagFile, (string)$this->lrPort);
+        }
+    }
+
+    private function removeFlagFile()
+    {
+        if (file_exists($this->lrFlagFile)) {
+            @unlink($this->lrFlagFile);
+        }
+    }
+
+    private function startLiveReloadServer()
+    {
+        $basePort = $this->port + 1000;
+        $maxTries = 50;
+        $server = null;
+        $boundPort = 0;
+
+        for ($i = 0; $i < $maxTries; $i++) {
+            $candidate = $basePort + $i;
+            $errno = 0;
+            $errstr = '';
+            $addr = 'tcp://' . $this->lrHost . ':' . $candidate;
+            $s = @stream_socket_server(
+                $addr,
+                $errno,
+                $errstr,
+                STREAM_SERVER_BIND | STREAM_SERVER_LISTEN,
+                stream_context_create([
+                    'socket' => [
+                        'backlog'        => 32,
+                        'so_reuseport'   => 1,
+                        'so_reuseaddr'   => 1,
+                        'tcp_nodelay'    => 1,
+                    ],
+                ])
+            );
+            if (is_resource($s)) {
+                $server = $s;
+                $boundPort = $candidate;
+                @stream_set_blocking($server, false);
+                break;
+            }
+        }
+
+        if ($server === null) {
+            $this->log('WARN', 'Could not bind LiveReload stream socket; using server restart fallback only.');
+            return;
+        }
+
+        $this->lrSocket = $server;
+        $this->lrPort = $boundPort;
+        $this->lrEnabled = true;
+        $this->log('INFO', "LiveReload socket listening on ws://{$this->lrHost}:{$this->lrPort}/__maxiter_live");
+    }
+
+    private function stopLiveReloadServer()
+    {
+        foreach ($this->lrClients as $id => $c) {
+            if (isset($c['socket']) && is_resource($c['socket'])) {
+                @stream_socket_shutdown($c['socket'], STREAM_SHUT_RDWR);
+                @fclose($c['socket']);
+            }
+        }
+        $this->lrClients = [];
+        $this->lrClientsSSE = [];
+        if ($this->lrSocket !== null && is_resource($this->lrSocket)) {
+            @stream_socket_shutdown($this->lrSocket, STREAM_SHUT_RDWR);
+            @fclose($this->lrSocket);
+        }
+        $this->lrSocket = null;
+        $this->lrEnabled = false;
+    }
+
+    private function pollLiveReload()
+    {
+        if (!$this->lrEnabled || !is_resource($this->lrSocket)) return;
+
+        $read = [];
+        $read[(int)$this->lrSocket] = $this->lrSocket;
+        foreach ($this->lrClients as $id => $c) {
+            if (isset($c['socket']) && is_resource($c['socket'])) {
+                $read[(int)$c['socket']] = $c['socket'];
+            }
+        }
+        $write = null;
+        $except = null;
+        $origCount = count($read);
+        $changed = @stream_select($read, $write, $except, 0, 0);
+        if ($changed === false || $changed < 1) return;
+        $this->log('INFO:poll', "stream_select: $changed/$origCount ready");
+
+        foreach ($read as $s) {
+            if ($s === $this->lrSocket) {
+                $client = @stream_socket_accept($this->lrSocket, 0, $peerName);
+                if (is_resource($client)) {
+                    @stream_set_blocking($client, false);
+                    $id = (int)$client;
+                    $this->log('INFO', "Accepted new client id=$id peer=" . ($peerName ?: '?'));
+                    $this->lrClients[$id] = [
+                        'socket'     => $client,
+                        'handshake'  => false,
+                        'buffer'     => '',
+                        'last_seen'  => microtime(true),
+                        'is_sse'     => false,
+                    ];
+                }
+                continue;
+            }
+
+            $id = (int)$s;
+            if (!isset($this->lrClients[$id])) continue;
+            $chunk = '';
+            $bytesRead = 0;
+            $socketDead = false;
+            while (true) {
+                $piece = @fread($s, 8192);
+                if ($piece === false) {
+                    $meta = stream_get_meta_data($s);
+                    if (!empty($meta['timed_out'])) {
+                        break;
+                    }
+                    $socketDead = true;
+                    break;
+                }
+                if ($piece === '' || $piece === null) {
+                    $meta = stream_get_meta_data($s);
+                    if (!empty($meta['eof'])) {
+                        $socketDead = true;
+                    }
+                    break;
+                }
+                $chunk .= $piece;
+                $bytesRead += strlen($piece);
+                if (strlen($piece) < 8192) break;
+            }
+            if ($socketDead) {
+                $this->log('INFO', "Closing client id=$id (socket dead)");
+                $this->closeClient($id);
+                continue;
+            }
+            if ($bytesRead === 0) continue;
+            $this->lrClients[$id]['last_seen'] = microtime(true);
+            $this->lrClients[$id]['buffer'] .= $chunk;
+
+            if (!$this->lrClients[$id]['handshake']) {
+                $this->log('INFO', "tryHandshake id=$id buflen=" . strlen($this->lrClients[$id]['buffer']));
+                $this->tryHandshake($id);
+            } else {
+                $this->handleClientData($id, $chunk);
+            }
+        }
+
+        $now = microtime(true);
+        foreach (array_keys($this->lrClients) as $id) {
+            if (!isset($this->lrClients[$id])) continue;
+            $c = $this->lrClients[$id];
+            if (!$c['handshake'] && ($now - $c['last_seen']) > 3.0) {
+                $this->log('WARN', "Dropping client id=$id (handshake timeout)");
+                $this->closeClient($id);
+                continue;
+            }
+            if ($c['handshake'] && ($now - $c['last_seen']) > 120.0) {
+                $this->closeClient($id);
+            }
+        }
+    }
+
+    private function tryHandshake($id)
+    {
+        $client = &$this->lrClients[$id];
+        $buf = &$client['buffer'];
+        if (strpos($buf, "\r\n\r\n") === false && strpos($buf, "\n\n") === false) return;
+
+        $this->log('INFO', "tryHandshake id=$id parsing headers (".strlen($buf)." bytes)");
+
+        $headers = $buf;
+        if (preg_match('#^GET[^\r\n]+\sHTTP/[\d.]+#i', $headers) !== 1) {
+            $this->log('WARN', "tryHandshake id=$id not a GET request; closing");
+            $this->closeClient($id);
+            return;
+        }
+
+        $isSse = (stripos($headers, 'text/event-stream') !== false) || (stripos($headers, 'Accept:') !== false && preg_match('#Accept:\s*([^\r\n]+)#i', $headers, $m) && stripos($m[1], 'text/event-stream') !== false);
+        if ($isSse) {
+            $response = "HTTP/1.1 200 OK\r\n"
+                . "Content-Type: text/event-stream\r\n"
+                . "Cache-Control: no-store, no-cache, must-revalidate\r\n"
+                . "Connection: keep-alive\r\n"
+                . "Access-Control-Allow-Origin: *\r\n"
+                . "X-Accel-Buffering: no\r\n\r\n"
+                . "retry: 1500\n\n";
+            $this->log('INFO', "tryHandshake id=$id SSE mode; sending headers len=".strlen($response));
+            $sent = $this->writeToSocket($client['socket'], $response);
+            if ($sent === false) {
+                $this->log('WARN', "tryHandshake id=$id SSE write FAIL");
+                $this->closeClient($id);
+                return;
+            }
+            $client['handshake'] = true;
+            $client['is_sse'] = true;
+            $client['buffer'] = '';
+            $this->lrClientsSSE[$id] = $id;
+            $this->log('INFO', "tryHandshake id=$id SSE OK");
+            return;
+        }
+
+        $hasUpgrade = (stripos($headers, 'Upgrade: websocket') !== false);
+        $hasKey = preg_match('#Sec-WebSocket-Key:\s*([^\r\n]+)#i', $headers, $keyMatch);
+        if (!$hasUpgrade || !$hasKey) {
+            $httpOk = "HTTP/1.1 200 OK\r\n"
+                . "Content-Type: application/json\r\n"
+                . "Access-Control-Allow-Origin: *\r\n"
+                . "Connection: close\r\n\r\n"
+                . json_encode(['ok' => true, 'hmr' => true, 'port' => $this->lrPort]);
+            $this->log('INFO', "tryHandshake id=$id HTTP fallback response (no ws upgrade)");
+            $this->writeToSocket($client['socket'], $httpOk);
+            $this->closeClient($id);
+            return;
+        }
+
+        $key = trim($keyMatch[1]);
+        $accept = base64_encode(sha1($key . '258EAFA5-E914-47DA-95CA-C5AB0DC85B11', true));
+        $response = "HTTP/1.1 101 Switching Protocols\r\n"
+            . "Upgrade: websocket\r\n"
+            . "Connection: Upgrade\r\n"
+            . "Sec-WebSocket-Accept: {$accept}\r\n"
+            . "Access-Control-Allow-Origin: *\r\n\r\n";
+        $this->log('INFO', "tryHandshake id=$id WS upgrade response len=".strlen($response));
+        $sent = $this->writeToSocket($client['socket'], $response);
+        if ($sent === false) {
+            $this->log('WARN', "tryHandshake id=$id WS write FAIL");
+            $this->closeClient($id);
+            return;
+        }
+        $client['handshake'] = true;
+        $client['is_sse'] = false;
+        $client['buffer'] = '';
+        $this->log('INFO', "tryHandshake id=$id WS OK");
+    }
+
+    private function handleClientData($id, $data)
+    {
+        $client = &$this->lrClients[$id];
+        if ($client['is_sse']) {
+            if (strlen($client['buffer']) > 65536) {
+                $this->closeClient($id);
+            }
+            return;
+        }
+    }
+
+    private function closeClient($id)
+    {
+        if (!isset($this->lrClients[$id])) return;
+        $c = $this->lrClients[$id];
+        if (isset($c['socket']) && is_resource($c['socket'])) {
+            @stream_socket_shutdown($c['socket'], STREAM_SHUT_RDWR);
+            @fclose($c['socket']);
+        }
+        unset($this->lrClients[$id]);
+        unset($this->lrClientsSSE[$id]);
+    }
+
+    private function writeToSocket($socket, $data)
+    {
+        if (!is_resource($socket)) return false;
+        $len = strlen($data);
+        if ($len === 0) return true;
+        $written = 0;
+        $max = 30;
+        $attempt = 0;
+        while ($written < $len && $attempt < $max) {
+            $chunk = substr($data, $written);
+            $res = @fwrite($socket, $chunk, strlen($chunk));
+            if ($res === false || $res === 0 || $res === null) {
+                $meta = stream_get_meta_data($socket);
+                if (!empty($meta['timed_out']) || !empty($meta['blocked'])) {
+                    usleep(10000);
+                    $attempt++;
+                    continue;
+                }
+                if ($written > 0) {
+                    usleep(5000);
+                    $attempt++;
+                    continue;
+                }
+                return false;
+            }
+            $written += (int)$res;
+            $attempt++;
+        }
+        if ($written > 0 && $written < $len) {
+            @fflush($socket);
+        }
+        return $written === $len;
+    }
+
+    private function wsEncodeFrame($payload, $opcode = 0x01)
+    {
+        $length = strlen($payload);
+        $out = chr(0x80 | ($opcode & 0x0F));
+        if ($length <= 125) {
+            $out .= chr($length);
+        } elseif ($length <= 65535) {
+            $out .= chr(126) . pack('n', $length);
+        } else {
+            if (PHP_VERSION_ID >= 50600) {
+                $out .= chr(127) . pack('J', $length);
+            } else {
+                $hi = ($length & 0xFFFFFFFF00000000) >> 32;
+                $lo = ($length & 0x00000000FFFFFFFF);
+                $out .= chr(127) . pack('N2', $hi, $lo);
+            }
+        }
+        return $out . $payload;
+    }
+
+    private function broadcastReload($files = [])
+    {
+        $this->lrBroadcastCount++;
+        $msg = json_encode(['type' => 'reload', 'files' => $files, 'ts' => microtime(true)]);
+        $wsFrame = $this->wsEncodeFrame($msg);
+        $ssePayload = "event: reload\ndata: " . $msg . "\n\n";
+        $this->log('INFO', "broadcastReload: to ".count($this->lrClients)." clients (msg=".strlen($wsFrame)." ws bytes)");
+
+        $dead = [];
+        foreach ($this->lrClients as $id => $c) {
+            if (!$c['handshake']) continue;
+            if ($c['is_sse']) {
+                $this->log('INFO', "broadcastReload SSE -> id=$id");
+                $ok = $this->writeToSocket($c['socket'], $ssePayload);
+            } else {
+                $this->log('INFO', "broadcastReload WS -> id=$id");
+                $ok = $this->writeToSocket($c['socket'], $wsFrame);
+            }
+            if ($ok === false) {
+                $this->log('WARN', "broadcastReload FAIL id=$id");
+                $dead[] = $id;
+            } else {
+                $this->log('INFO', "broadcastReload OK id=$id");
+            }
+        }
+        foreach ($dead as $id) $this->closeClient($id);
+    }
+
+    private function broadcastPing()
+    {
+        if (!$this->lrEnabled) return;
+        $msg = json_encode(['type' => 'ping', 'ts' => microtime(true)]);
+        $wsFrame = $this->wsEncodeFrame($msg, 0x09);
+        $ssePayload = "event: ping\ndata: {$msg}\n\n";
+        $dead = [];
+        foreach ($this->lrClients as $id => $c) {
+            if (!$c['handshake']) continue;
+            if ($c['is_sse']) {
+                $ok = $this->writeToSocket($c['socket'], $ssePayload);
+            } else {
+                $ok = $this->writeToSocket($c['socket'], $wsFrame);
+            }
+            if ($ok === false) $dead[] = $id;
+        }
+        foreach ($dead as $id) $this->closeClient($id);
+    }
+
+    private function log($level, $message)
+    {
+        $levelColors = [
+            'START'     => ['\033[1;35m', 'BOOT'],
+            'READY'     => ['\033[1;32m', ' OK '],
+            'STOP'      => ['\033[1;31m', 'EXIT'],
+            'BYE'       => ['\033[1;36m', 'BYE '],
+            'CHANGE'    => ['\033[1;33m', 'FS   '],
+            'RELOAD'    => ['\033[1;33m', 'HMR  '],
+            'HEARTBEAT' => ['\033[2;37m', 'HB   '],
+            'WARN'      => ['\033[1;33m', 'WARN'],
+            'ERROR'     => ['\033[1;31m', 'ERR '],
+            'SIGNAL'    => ['\033[1;34m', 'SIG '],
+            'INFO'      => ['\033[0;36m', 'INFO'],
+            'INFO:poll' => ['\033[0;36m', 'POLL'],
+        ];
+
+        if (isset($levelColors[$level])) {
+            list($color, $tag) = $levelColors[$level];
+        } else {
+            $color = '\033[0;37m';
+            $tag = str_pad(substr($level, 0, 4), 4);
+        }
+
+        $outColor = $this->supportsColors() ? $color : '';
+        $reset = $this->supportsColors() ? '\033[0m' : '';
+
+        $ts = date('H:i:s');
+        $line = "{$outColor}[{$tag}]{$reset} [{$ts}] {$message}" . PHP_EOL;
+        echo $line;
+        $this->flushOutput();
+    }
+
+    private function supportsColors()
+    {
+        static $supports = null;
+        if ($supports !== null) return $supports;
+        if ($this->isWindows) {
+            $supports = (function_exists('sapi_windows_vt100_support') && @sapi_windows_vt100_support(STDOUT))
+                || getenv('ANSICON') !== false
+                || getenv('ConEmuANSI') === 'ON'
+                || getenv('TERM') !== false;
+        } else {
+            $supports = defined('STDOUT') && @stream_isatty(STDOUT);
+        }
+        return $supports;
+    }
+
+    private function relativePath($file)
+    {
+        $root = rtrim(str_replace('\\', '/', $this->projectRoot), '/') . '/';
+        $norm = str_replace('\\', '/', $file);
+        if (strpos($norm, $root) === 0) {
+            return substr($norm, strlen($root));
+        }
+        return $file;
+    }
+
+    private function formatBytes($bytes)
+    {
+        if ($bytes < 1024) return $bytes . ' B';
+        if ($bytes < 1048576) return round($bytes / 1024, 1) . ' KB';
+        if ($bytes < 1073741824) return round($bytes / 1048576, 1) . ' MB';
+        return round($bytes / 1073741824, 2) . ' GB';
+    }
+
+    private function flushOutput()
+    {
+        if (function_exists('ob_get_level') && ob_get_level() > 0) {
+            @ob_flush();
+        }
+        @flush();
+        if (defined('STDOUT')) @fflush(STDOUT);
+        if (defined('STDERR')) @fflush(STDERR);
+    }
+}
+
 // Check if arguments were passed
 if ($argc < 2) {
 
     echo
-    "\nMaxiter CLI usage\n" .
+    "\n\033[1;36mMaxiter CLI Usage\033[0m\n" .
+        "\n" .
+        "  \033[33mDev server (hot reload):\033[0m\n" .
+        "    php maxiter serve           [port]   Start dev server with file watching & hot reload\n" .
+        "    php maxiter serve 8080               Custom port, hot reload enabled\n" .
+        "\n" .
+        "  \033[33mLegacy server:\033[0m\n" .
+        "    php maxiter server          [port]   Simple PHP built-in server (no watch)\n" .
         "\n" .
         "Check the Maxiter Documentation here: https://maxiter-docs.vercel.app/\n\n";
 
@@ -3375,6 +4623,27 @@ if ($argc < 2) {
 
 // Instantiate the MaxiterConfiguration class
 $config = new MaxiterConfiguration();
+
+// deltoprod pre-parser: aceita flags em QUALQUER posicao (deltoprod -c, -c deltoprod, deltoprod --move, etc)
+{
+    $deltoprodFlag = null;
+    $deltoprodPos = null;
+    for ($i = 1; $i < count($argv); $i++) {
+        if ($argv[$i] === 'deltoprod') { $deltoprodPos = $i; }
+        if (in_array($argv[$i], array('-f','-r','-c','-d','--force','--restore','--check','--delete','--move'), true)) {
+            if ($argv[$i] === '-f' || $argv[$i] === '--force' || $argv[$i] === '--move')  $deltoprodFlag = 'move';
+            if ($argv[$i] === '-r' || $argv[$i] === '--restore')                         $deltoprodFlag = 'restore';
+            if ($argv[$i] === '-c' || $argv[$i] === '--check')                           $deltoprodFlag = 'check';
+            if ($argv[$i] === '-d' || $argv[$i] === '--delete')                          $deltoprodFlag = 'delete';
+        }
+    }
+    if ($deltoprodPos !== null) {
+        if ($deltoprodFlag === null) $deltoprodFlag = 'delete';
+        $config->configProdEnvDel($deltoprodFlag);
+        exit;
+    }
+    unset($deltoprodFlag, $deltoprodPos);
+}
 
 // Check if the second argument is 'new' and the third is 'controller'
 if ($argv[1] === 'new' && $argv[2] === 'controller') {
@@ -3412,11 +4681,37 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
         exit();
     }
     $config->generateSQL($argv[3]);
+} else if ($argv[1] === 'serve') {
+    $port = 7000;
+    if (isset($argv[2]) && !empty($argv[2]) && ctype_digit($argv[2])) {
+        $port = (int)$argv[2];
+    }
+    $host = 'localhost';
+    if (isset($argv[3]) && !empty($argv[3])) {
+        $host = $argv[3];
+    }
+    $dev = new MaxiterDevServer($port, $host);
+    $dev->run();
 } else if ($argv[1] === 'server') {
-    if (!isset($argv[2]) || empty($argv[2])) {
-        $config->initServer();
+    $useWatch = false;
+    $port = null;
+    for ($i = 2; $i < $argc; $i++) {
+        if ($argv[$i] === '--watch' || $argv[$i] === '-w') {
+            $useWatch = true;
+        } else if (ctype_digit($argv[$i])) {
+            $port = (int)$argv[$i];
+        }
+    }
+    if ($useWatch) {
+        $p = ($port !== null) ? $port : 7000;
+        $dev = new MaxiterDevServer($p, 'localhost');
+        $dev->run();
     } else {
-        $config->initServer($argv[2]);
+        if ($port !== null) {
+            $config->initServer($port);
+        } else {
+            $config->initServer();
+        }
     }
 } else if ($argv[1] === 'gui') {
     if (!isset($argv[2]) || empty($argv[2])) {
@@ -3474,24 +4769,6 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
         exit();
     }
     $config->configProdEnv();
-} else if ($argv[1] === 'deltoprod') {
-    if (!isset($argv[1]) || empty($argv[1])) {
-        echo "Error: php maxiter deltoprod";
-        exit();
-    }
-    $config->configProdEnvDel('delete');
-} else if ($argv[1] === '-f' && $argv[2] === 'deltoprod') {
-    if (!isset($argv[1]) || empty($argv[1]) || !isset($argv[2]) || empty($argv[2])) {
-        echo "Error: php maxiter -f deltoprod";
-        exit();
-    }
-    $config->configProdEnvDel('move');
-} else if ($argv[1] === '-r' && $argv[2] === 'deltoprod') {
-    if (!isset($argv[1]) || empty($argv[1]) || !isset($argv[2]) || empty($argv[2])) {
-        echo "Error: php maxiter -r deltoprod";
-        exit();
-    }
-    $config->configProdEnvDel('restore');
 } else if ($argv[1] === 'autopath') {
     if (!isset($argv[1]) || empty($argv[1])) {
         echo "Error: php maxiter autopath [port]";
